@@ -1,0 +1,3 @@
+RULE: Every action taken must be recorded in this file with a timestamp for future reference or sharing.
+
+[2025-04-17 12:00] Created this action log file to record all steps taken during tasks.
