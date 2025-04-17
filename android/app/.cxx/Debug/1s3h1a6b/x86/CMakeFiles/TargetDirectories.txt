@@ -1,0 +1,2 @@
+/Users/sakshamsrivastava/next_gen/android/app/.cxx/Debug/1s3h1a6b/x86/CMakeFiles/edit_cache.dir
+/Users/sakshamsrivastava/next_gen/android/app/.cxx/Debug/1s3h1a6b/x86/CMakeFiles/rebuild_cache.dir
