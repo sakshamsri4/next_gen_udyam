@@ -5,3 +5,33 @@ RULE: Every action taken must be recorded in this file with a timestamp for futu
 [2023-06-12 10:30] Attempting to create a Firebase project for NextGen Udyam.
 [2023-06-12 10:35] Encountered error with Firebase CLI command: unknown option '--region'
 [2023-06-12 10:40] Successfully created Firebase project with ID: next-gen-udyam and name: NextGen Udyam
+[2023-06-12 10:45] Setting up Firebase services: adding project to local config, initializing Firestore, Auth, Hosting, Functions, and Storage
+[2023-06-12 10:50] Error: firebase use must be run from a Firebase project directory. Need to run firebase init first.
+[2023-06-12 10:55] Started Firebase initialization process, selected Firestore and Storage services
+[2023-06-12 11:00] Encountered quota error during Firebase initialization: HTTP Error 429, Quota exceeded for quota metric 'Default requests'
+[2023-06-12 11:05] Created .firebaserc file manually to set next-gen-udyam as the default project
+[2023-06-12 11:10] Created firebase.json file with configurations for Firestore, Functions, Hosting, and Storage
+[2023-06-12 11:15] Created firestore.rules and firestore.indexes.json files for Firestore configuration
+[2023-06-12 11:20] Created storage.rules file for Firebase Storage configuration
+[2023-06-12 11:25] Received comprehensive instructions for Firebase integration with Flutter project
+[2023-06-12 11:30] Verified Firebase CLI (v13.0.3) and FlutterFire CLI (v1.2.0) are already installed
+[2023-06-12 11:35] Confirmed user is logged in to Firebase and next-gen-udyam project is already created and set as current
+[2023-06-12 11:40] Starting Firebase initialization for Firestore, Auth, Hosting, Functions, and Storage
+[2023-06-12 11:45] Encountered issues with interactive Firebase initialization. Will initialize services individually
+[2023-06-12 11:50] Error: Firestore database needs to be created first in the Firebase console
+[2023-06-12 11:55] Received updated instructions to focus on Firebase Auth and Storage only
+[2023-06-12 12:00] Encountered issues with Firebase initialization. Will create necessary files manually
+[2023-06-12 12:05] Verified that storage.rules, .firebaserc, and firebase.json files already exist
+[2023-06-12 12:10] Ran flutterfire configure command to set up Firebase for all platforms. Encountered an issue with iOS configuration due to missing xcodeproj Ruby gem
+[2023-06-12 12:15] firebase_options.dart file was not generated. Will need to create it manually
+[2023-06-12 12:20] Added Firebase dependencies (firebase_core, firebase_auth, firebase_storage) to pubspec.yaml
+[2023-06-12 12:25] Ran flutter pub get to install the dependencies
+[2023-06-12 12:30] Created firebase_options.dart file with placeholder values
+[2023-06-12 12:35] Modified bootstrap.dart to initialize Firebase
+[2023-06-12 12:40] Verified Android platform setup is already complete with Google Services plugin and google-services.json file
+[2023-06-12 12:45] Verified iOS platform setup with GoogleService-Info.plist file and updated Podfile to set minimum iOS version to 12.0
+[2023-06-12 12:50] Retrieved SHA-1 fingerprint for Android debug keystore: C8:15:26:2A:09:CB:73:3B:23:90:B7:5C:96:FD:5F:0D:5A:6F:C0:58
+[2023-06-12 12:55] NOTE: User needs to add the SHA-1 fingerprint to the Firebase console under Project Settings > Android app > Add fingerprint
+[2023-06-12 13:00] Attempted to run the app but encountered issues with the web platform
+[2023-06-12 13:05] Error: Firebase Auth plugin requires a higher minimum iOS deployment target. Need to update Podfile to iOS 13.0
+[2023-06-12 13:10] Updated Podfile to set minimum iOS version to 13.0

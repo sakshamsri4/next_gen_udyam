@@ -4,6 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:next_gen/counter/counter.dart';
 
 void main() {
+  // Initialize Flutter binding for tests
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('CounterCubit', () {
     test('initial state is 0', () {
       expect(CounterCubit().state, equals(0));

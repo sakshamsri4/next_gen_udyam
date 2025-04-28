@@ -11,6 +11,9 @@ import '../../helpers/helpers.dart';
 class MockCounterCubit extends MockCubit<int> implements CounterCubit {}
 
 void main() {
+  // Initialize Flutter binding for tests
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('CounterPage', () {
     testWidgets('renders CounterView', (tester) async {
       await tester.pumpApp(const CounterPage());

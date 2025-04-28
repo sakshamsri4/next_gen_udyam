@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>91032840429-mi0vep6nqklv7mgml89f38m50em03enp.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.91032840429-mi0vep6nqklv7mgml89f38m50em03enp</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDlhFumhQ8ice4gh_utX2T5c5q1I-0ZZ4Q</string>
+	<key>GCM_SENDER_ID</key>
+	<string>91032840429</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.udyam.nextgen.next-gen</string>
+	<key>PROJECT_ID</key>
+	<string>next-gen-udyam</string>
+	<key>STORAGE_BUCKET</key>
+	<string>next-gen-udyam.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:91032840429:ios:3175a209c09c9edcb884e4</string>
+</dict>
+</plist>
