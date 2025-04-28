@@ -58,7 +58,7 @@ CRED's design has evolved through four major systems, each with distinct charact
 
 ### 1. Topaz (2018)
 - **Style**: Minimalist, illustrative
-- **Characteristics**: 
+- **Characteristics**:
   - Flat and reductionist minimalism
   - Typography highlighting numbers
   - High-performance payment system
@@ -78,7 +78,7 @@ CRED's design has evolved through four major systems, each with distinct charact
 - **Style**: Neumorphism, physical
 - **Characteristics**:
   - First commercial implementation of neumorphism
-  - Fully customizable, back-end driven system
+  - Fully customizable, backend driven system
   - Hyper-componentized design system
   - Physical metaphor-driven UI
   - "Synth" UI library
