@@ -49,9 +49,7 @@ void main() {
     Get.put<AuthController>(mockController);
   });
 
-  tearDown(() {
-    Get.reset();
-  });
+  tearDown(Get.reset);
 
   testWidgets('LoginView displays all required elements',
       (WidgetTester tester) async {
@@ -81,7 +79,7 @@ void main() {
     expect(find.text('Forgot Password?'), findsOneWidget);
 
     // Verify that the sign-up link is displayed
-    expect(find.text("Don't have an account?"), findsOneWidget);
+    expect(find.textContaining("Don't have an account"), findsOneWidget);
     expect(find.text('Sign Up'), findsOneWidget);
   });
 

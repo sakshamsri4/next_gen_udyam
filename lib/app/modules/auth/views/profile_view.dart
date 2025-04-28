@@ -36,9 +36,8 @@ class ProfileView extends GetView<AuthController> {
         }
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
 
@@ -83,7 +82,7 @@ class ProfileView extends GetView<AuthController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -133,9 +132,9 @@ class ProfileView extends GetView<AuthController> {
 
               // Edit Profile Button
               NeoPopButton(
-                color: AppTheme.primaryColor,
+                color: AppTheme.electricBlue,
                 onTapUp: () {
-                  // TODO: Implement edit profile functionality
+                  // TODO(auth): Implement edit profile functionality
                   Get.snackbar(
                     'Coming Soon',
                     'Edit profile functionality will be available soon!',
@@ -164,7 +163,7 @@ class ProfileView extends GetView<AuthController> {
   }
 
   void _showLogoutConfirmation(BuildContext context) {
-    Get.dialog(
+    Get.dialog<void>(
       AlertDialog(
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),

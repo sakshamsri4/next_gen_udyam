@@ -18,7 +18,7 @@ class SignupView extends GetView<AuthController> {
       ),
       body: Obx(() {
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -99,7 +99,7 @@ class SignupView extends GetView<AuthController> {
 
               // Sign Up Button
               NeoPopButton(
-                color: AppTheme.primaryColor,
+                color: AppTheme.electricBlue,
                 onTapUp: controller.isLoading.value
                     ? null
                     : () => controller.registerWithEmailAndPassword(),
@@ -152,10 +152,10 @@ class SignupView extends GetView<AuthController> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.network(
-                        'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg',
-                        height: 24,
-                        width: 24,
+                      const Icon(
+                        Icons.g_mobiledata,
+                        size: 24,
+                        color: Colors.blue,
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -174,7 +174,7 @@ class SignupView extends GetView<AuthController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Already have an account? ",
+                    'Already have an account? ',
                     style: theme.textTheme.bodyMedium,
                   ),
                   TextButton(

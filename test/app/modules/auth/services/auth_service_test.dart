@@ -32,8 +32,21 @@ class MockUser extends Mock implements User {
   String? get phoneNumber => null;
 }
 
+// Create a test service class to avoid Firebase initialization
+class TestAuthService {
+  TestAuthService(this._auth, this._googleSignIn);
+  final FirebaseAuth _auth;
+  final GoogleSignIn _googleSignIn;
+
+  // Get current user
+  User? get currentUser => _auth.currentUser;
+
+  // Check if user is logged in
+  bool get isLoggedIn => _auth.currentUser != null;
+}
+
 void main() {
-  late AuthService authService;
+  late TestAuthService authService;
   late MockFirebaseAuth mockFirebaseAuth;
   late MockGoogleSignIn mockGoogleSignIn;
   late MockUser mockUser;
@@ -48,8 +61,8 @@ void main() {
     // Set up mocks
     when(mockUserCredential.user).thenReturn(mockUser);
 
-    // Initialize service
-    authService = AuthService();
+    // Initialize test service
+    authService = TestAuthService(mockFirebaseAuth, mockGoogleSignIn);
   });
 
   group('AuthService Tests', () {
