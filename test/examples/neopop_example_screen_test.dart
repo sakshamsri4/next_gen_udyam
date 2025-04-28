@@ -1,0 +1,167 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:next_gen/examples/neopop_example_screen.dart';
+import 'package:next_gen/widgets/neopop_button.dart';
+
+void main() {
+  // Initialize Flutter binding for tests
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  group('NeoPopExampleScreen', () {
+    testWidgets('renders all section titles correctly', (tester) async {
+      // Act
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Assert
+      expect(find.text('NeoPop Examples'), findsOneWidget);
+      expect(find.text('Elevated Buttons'), findsOneWidget);
+      expect(find.text('Flat Buttons'), findsOneWidget);
+      expect(find.text('Buttons with Borders'), findsOneWidget);
+      expect(find.text('Special Effects'), findsOneWidget);
+      expect(find.text('Adjacent Buttons'), findsOneWidget);
+    });
+
+    testWidgets('renders all buttons correctly', (tester) async {
+      // Act
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Assert
+      expect(find.text('Basic Button'), findsOneWidget);
+      expect(find.text('Deep Button'), findsOneWidget);
+      expect(find.text('Flat Button'), findsOneWidget);
+      expect(find.text('Bordered Button'), findsOneWidget);
+      expect(find.text('Flat Bordered Button'), findsOneWidget);
+      expect(find.text('Shimmer Button'), findsOneWidget);
+      expect(find.text('Left'), findsOneWidget);
+      expect(find.text('Right'), findsOneWidget);
+      expect(find.text('Top Button'), findsOneWidget);
+      expect(find.text('Bottom Button'), findsOneWidget);
+
+      // We should have 10 buttons in total
+      expect(find.byType(CustomNeoPopButton), findsNWidgets(10));
+    });
+
+    testWidgets('shows snackbar when basic button is pressed', (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Basic Button'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Basic button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when deep button is pressed', (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Deep Button'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Deep button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when flat button is pressed', (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Flat Button'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Flat button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when bordered button is pressed',
+        (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Bordered Button'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Bordered button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when flat bordered button is pressed',
+        (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Flat Bordered Button'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Flat bordered button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when shimmer button is pressed',
+        (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Shimmer Button'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Shimmer button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when left button is pressed', (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Left'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Left button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when right button is pressed', (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Right'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Right button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when top button is pressed', (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Top Button'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Top button pressed!'), findsOneWidget);
+    });
+
+    testWidgets('shows snackbar when bottom button is pressed', (tester) async {
+      // Arrange
+      await tester.pumpWidget(const MaterialApp(home: NeoPopExampleScreen()));
+
+      // Act
+      await tester.tap(find.text('Bottom Button'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Bottom button pressed!'), findsOneWidget);
+    });
+  });
+}

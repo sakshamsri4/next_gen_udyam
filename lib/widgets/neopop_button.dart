@@ -1,0 +1,132 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:neopop/neopop.dart';
+
+/// A custom button widget using NeoPop design.
+///
+/// This widget wraps the NeoPopButton from the neopop package
+/// and provides a consistent styling for buttons in the app.
+class CustomNeoPopButton extends StatelessWidget {
+  /// Creates a CustomNeoPopButton.
+  ///
+  /// The [onTap], [child], and [color] parameters are required.
+  const CustomNeoPopButton({
+    required this.onTap,
+    required this.child,
+    required this.color,
+    this.onTapDown,
+    this.depth = 5,
+    this.border,
+    this.shimmer = false,
+    this.parentColor = Colors.transparent,
+    this.grandparentColor = Colors.transparent,
+    this.buttonPosition = Position.fullBottom,
+    this.animationDuration = const Duration(milliseconds: 50),
+    this.forwardDuration,
+    this.reverseDuration,
+    this.enabled = true,
+    this.disabledColor = Colors.grey,
+    this.shadowColor,
+    this.rightShadowColor,
+    this.leftShadowColor,
+    this.topShadowColor,
+    this.bottomShadowColor,
+    this.onLongPress,
+    super.key,
+  });
+
+  /// The callback that is called when the button is released.
+  final VoidCallback onTap;
+
+  /// The callback that is called when the button is pressed.
+  final VoidCallback? onTapDown;
+
+  /// The callback that is called when the button is long-pressed.
+  final VoidCallback? onLongPress;
+
+  /// The widget to display inside the button.
+  final Widget child;
+
+  /// The background color of the button.
+  final Color color;
+
+  /// The depth of the button's 3D effect.
+  final double depth;
+
+  /// Optional border for the button.
+  final Border? border;
+
+  /// Whether to apply a shimmer effect to the button.
+  final bool shimmer;
+
+  /// Button's immediate ancestor's color.
+  final Color parentColor;
+
+  /// Button's second level ancestor's color.
+  final Color grandparentColor;
+
+  /// The position of button in reference to parent view.
+  final Position buttonPosition;
+
+  /// Animation duration of the button click.
+  final Duration animationDuration;
+
+  /// If you want different forward duration for button click.
+  final Duration? forwardDuration;
+
+  /// If you want different reverse duration for button click.
+  final Duration? reverseDuration;
+
+  /// Whether the button is enabled.
+  final bool enabled;
+
+  /// Color of the button when it is disabled.
+  final Color disabledColor;
+
+  /// The base color of the shadow. The shadow colors will be derived from this.
+  final Color? shadowColor;
+
+  /// The color of the right shadow.
+  final Color? rightShadowColor;
+
+  /// The color of the left shadow.
+  final Color? leftShadowColor;
+
+  /// The color of the top shadow.
+  final Color? topShadowColor;
+
+  /// The color of the bottom shadow.
+  final Color? bottomShadowColor;
+
+  @override
+  Widget build(BuildContext context) {
+    // Create a NeoPopButton with all the properties
+    return NeoPopButton(
+      color: color,
+      onTapUp: onTap,
+      onTapDown: onTapDown ?? HapticFeedback.lightImpact,
+      onLongPress: onLongPress,
+      depth: depth,
+      border: border,
+      parentColor: parentColor,
+      grandparentColor: grandparentColor,
+      buttonPosition: buttonPosition,
+      animationDuration: animationDuration,
+      forwardDuration: forwardDuration,
+      reverseDuration: reverseDuration,
+      enabled: enabled,
+      disabledColor: disabledColor,
+      shadowColor: shadowColor,
+      rightShadowColor: rightShadowColor,
+      leftShadowColor: leftShadowColor,
+      topShadowColor: topShadowColor,
+      bottomShadowColor: bottomShadowColor,
+      child: shimmer
+          ? NeoPopShimmer(
+              shimmerColor: Colors.white.withAlpha(76), // 0.3 * 255 = 76
+              child: child,
+            )
+          : child,
+    );
+  }
+}
