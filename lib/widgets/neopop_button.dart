@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:neopop/neopop.dart';
 
+import 'package:next_gen/core/theme/app_theme.dart';
+
 /// A custom button widget using NeoPop design.
 ///
 /// This widget wraps the NeoPopButton from the neopop package
@@ -34,6 +36,124 @@ class CustomNeoPopButton extends StatelessWidget {
     this.onLongPress,
     super.key,
   });
+
+  /// Creates a primary button with the app's theme.
+  factory CustomNeoPopButton.primary({
+    required VoidCallback onTap,
+    required Widget child,
+    double depth = 8,
+    bool shimmer = false,
+    Color? parentColor,
+    bool enabled = true,
+    VoidCallback? onTapDown,
+    VoidCallback? onLongPress,
+  }) {
+    return CustomNeoPopButton(
+      onTap: onTap,
+      onTapDown: onTapDown,
+      onLongPress: onLongPress,
+      color: AppTheme.electricBlue,
+      depth: depth,
+      shimmer: shimmer,
+      parentColor: parentColor ?? Colors.transparent,
+      enabled: enabled,
+      child: child,
+    );
+  }
+
+  /// Creates a secondary button with the app's theme.
+  factory CustomNeoPopButton.secondary({
+    required VoidCallback onTap,
+    required Widget child,
+    double depth = 5,
+    bool shimmer = false,
+    Color? parentColor,
+    bool enabled = true,
+    VoidCallback? onTapDown,
+    VoidCallback? onLongPress,
+  }) {
+    return CustomNeoPopButton(
+      onTap: onTap,
+      onTapDown: onTapDown,
+      onLongPress: onLongPress,
+      color: AppTheme.lavender,
+      depth: depth,
+      shimmer: shimmer,
+      parentColor: parentColor ?? Colors.transparent,
+      enabled: enabled,
+      child: child,
+    );
+  }
+
+  /// Creates a danger button with the app's theme.
+  factory CustomNeoPopButton.danger({
+    required VoidCallback onTap,
+    required Widget child,
+    double depth = 5,
+    bool shimmer = false,
+    Color? parentColor,
+    bool enabled = true,
+    VoidCallback? onTapDown,
+    VoidCallback? onLongPress,
+  }) {
+    return CustomNeoPopButton(
+      onTap: onTap,
+      onTapDown: onTapDown,
+      onLongPress: onLongPress,
+      color: AppTheme.coralRed,
+      depth: depth,
+      shimmer: shimmer,
+      parentColor: parentColor ?? Colors.transparent,
+      enabled: enabled,
+      child: child,
+    );
+  }
+
+  /// Creates a success button with the app's theme.
+  factory CustomNeoPopButton.success({
+    required VoidCallback onTap,
+    required Widget child,
+    double depth = 5,
+    bool shimmer = false,
+    Color? parentColor,
+    bool enabled = true,
+    VoidCallback? onTapDown,
+    VoidCallback? onLongPress,
+  }) {
+    return CustomNeoPopButton(
+      onTap: onTap,
+      onTapDown: onTapDown,
+      onLongPress: onLongPress,
+      color: AppTheme.mintGreen,
+      depth: depth,
+      shimmer: shimmer,
+      parentColor: parentColor ?? Colors.transparent,
+      enabled: enabled,
+      child: child,
+    );
+  }
+
+  /// Creates a flat button with the app's theme.
+  factory CustomNeoPopButton.flat({
+    required VoidCallback onTap,
+    required Widget child,
+    Color? color,
+    Color? parentColor,
+    bool enabled = true,
+    VoidCallback? onTapDown,
+    VoidCallback? onLongPress,
+  }) {
+    return CustomNeoPopButton(
+      onTap: onTap,
+      onTapDown: onTapDown,
+      onLongPress: onLongPress,
+      color: color ?? Colors.white,
+      depth: 0,
+      parentColor: parentColor ?? Colors.transparent,
+      enabled: enabled,
+      child: child,
+    );
+  }
 
   /// The callback that is called when the button is released.
   final VoidCallback onTap;

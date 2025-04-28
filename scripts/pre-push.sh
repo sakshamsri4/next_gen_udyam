@@ -76,6 +76,20 @@ if ! flutter test ; then
 fi
 echo -e "${GREEN}Tests passed.${NC}"
 
+# Check code coverage
+if command -v lcov &> /dev/null && command -v genhtml &> /dev/null; then
+  echo -e "${YELLOW}Running code coverage check...${NC}"
+  if ! ./scripts/check_coverage.sh ; then
+    echo -e "${RED}Error: Code coverage is below the minimum threshold (90%).${NC}"
+    echo -e "${YELLOW}Please add more tests to increase coverage.${NC}"
+    exit 1
+  fi
+  echo -e "${GREEN}Code coverage check passed.${NC}"
+else
+  echo -e "${YELLOW}lcov or genhtml not found, skipping code coverage check.${NC}"
+  echo -e "${YELLOW}Consider installing lcov with 'brew install lcov' or 'apt-get install lcov' for better quality checks.${NC}"
+fi
+
 # Check for spell checking tool
 if command -v cspell &> /dev/null; then
   echo -e "${YELLOW}Running spell check...${NC}"
