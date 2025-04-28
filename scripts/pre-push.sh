@@ -29,11 +29,16 @@ if [[ -f "$ACTIVITY_LOG" ]]; then
     # Check if there are code changes
     CODE_CHANGES=$(git diff --name-only --cached | grep -E '\.(dart|yaml|json|md)$' | grep -v "$ACTIVITY_LOG")
     if [[ -n "$CODE_CHANGES" ]]; then
-      echo -e "${YELLOW}Warning: You have code changes but haven't updated the activity log.${NC}"
+      echo -e "${RED}Warning: You have code changes but haven't updated the activity log.${NC}"
       echo -e "${YELLOW}Changed files:${NC}"
       echo "$CODE_CHANGES"
       echo -e "${YELLOW}Please update $ACTIVITY_LOG before pushing.${NC}"
-      
+      echo -e "${YELLOW}Remember to include:${NC}"
+      echo -e "  - ${GREEN}What${NC} changes were made"
+      echo -e "  - ${GREEN}Why${NC} the changes were necessary"
+      echo -e "  - ${GREEN}How${NC} the solution works"
+      echo -e "  - Any ${GREEN}lessons learned${NC} or ${GREEN}best practices${NC} applied"
+
       # Ask for confirmation
       read -p "Do you want to continue without updating the activity log? (y/N) " -n 1 -r
       echo

@@ -1,6 +1,6 @@
 # Makefile for Next Gen Udyam project
 
-.PHONY: setup format format-all analyze test coverage lint fix-lint clean check pre-push feature bugfix hotfix docs spell-check extract-terms
+.PHONY: setup format format-all analyze test coverage lint fix-lint clean check pre-push feature bugfix hotfix docs spell-check extract-terms generate-icons outdated unused
 
 # Setup the project and git hooks
 setup:
@@ -115,3 +115,23 @@ spell-check:
 # Extract technical terms for spell checking
 extract-terms:
 	@./scripts/extract_technical_terms.sh
+
+# Generate app icons for all platforms
+generate-icons:
+	@chmod +x scripts/generate_app_icons.sh
+	@./scripts/generate_app_icons.sh
+
+# Check for outdated dependencies
+outdated:
+	@echo "Checking for outdated dependencies..."
+	@flutter pub outdated
+
+# Check for unused dependencies
+unused:
+	@echo "Checking for unused dependencies..."
+	@if command -v flutter_package_analyzer > /dev/null; then \
+		flutter_package_analyzer; \
+	else \
+		echo "flutter_package_analyzer not found. Install with 'dart pub global activate flutter_package_analyzer'"; \
+		exit 1; \
+	fi

@@ -115,6 +115,7 @@
     - pre-push.sh: Runs checks before pushing (format, analyze, test, spell check)
     - format_all.sh: Formats all Dart files in the project
     - extract_technical_terms.sh: Extracts technical terms for spell checking
+    - generate_app_icons.sh: Generates app icons for all platforms
   - Created Makefile with common development commands:
     - setup: Sets up the project and git hooks
     - format/format-all: Formats code
@@ -125,6 +126,9 @@
     - check: Runs all checks
     - feature/bugfix/hotfix/docs: Creates branches with proper naming
     - spell-check/extract-terms: Manages spell checking
+    - generate-icons: Generates app icons for all platforms
+    - outdated: Checks for outdated dependencies
+    - unused: Checks for unused dependencies
   - Added .cspell.json for spell checking configuration
   - Updated git_workflow.md with Makefile commands and best practices
   - Made all scripts executable with proper permissions
@@ -133,3 +137,23 @@
   - Successfully tested the setup process
   - Removed test_coverage dependency due to compatibility issues
   - Committed changes with proper conventional commit message
+
+- Enhanced documentation and workflow enforcement:
+  - Added comprehensive Rules and Guidelines to activity_log.md:
+    - Documentation Rules for consistent record-keeping
+    - Code Quality Rules emphasizing SOLID and DRY principles
+    - Testing Rules for Test-Driven Development
+    - Git Workflow Rules for better version control
+    - Performance Rules for optimized app performance
+  - Created activity_log_template.md with standardized format for entries:
+    - Issue Description section for clear problem statements
+    - Root Cause Analysis section for understanding issues
+    - Attempted Solutions section for documenting trials
+    - Working Solution section for implemented fixes
+    - Benefits section for documenting improvements
+    - Lessons Learned section for knowledge retention
+  - Enhanced pre-push.sh with stronger activity log enforcement:
+    - Added detailed guidance on what to include in log entries
+    - Improved warning messages with color-coded information
+    - Added reminders about documenting what, why, and how
+    - Encouraged documenting lessons learned and best practices

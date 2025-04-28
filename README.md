@@ -60,18 +60,22 @@ This project uses a comprehensive set of tools to ensure code quality and consis
 #### Makefile Commands
 
 ```sh
-make setup       # Set up the project and git hooks
-make format      # Format code using dart format
-make format-all  # Format all Dart files
-make analyze     # Run Flutter analyzer
-make test        # Run tests
-make coverage    # Run tests with coverage
-make lint        # Run linter checks
-make fix-lint    # Fix linter issues automatically
-make clean       # Clean the project
-make check       # Run all checks (format, analyze, test)
-make pre-push    # Run pre-push checks
-make spell-check # Run spell check
+make setup          # Set up the project and git hooks
+make format         # Format code using dart format
+make format-all     # Format all Dart files
+make analyze        # Run Flutter analyzer
+make test           # Run tests
+make coverage       # Run tests with coverage
+make lint           # Run linter checks
+make fix-lint       # Fix linter issues automatically
+make clean          # Clean the project
+make check          # Run all checks (format, analyze, test)
+make pre-push       # Run pre-push checks
+make spell-check    # Run spell check
+make extract-terms  # Extract technical terms for spell checking
+make generate-icons # Generate app icons for all platforms
+make outdated       # Check for outdated dependencies
+make unused         # Check for unused dependencies
 ```
 
 #### Git Workflow
