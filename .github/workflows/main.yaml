@@ -25,6 +25,7 @@ jobs:
     with:
       flutter_channel: stable
       flutter_version: '3.16.0'
+      min_coverage: 90
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
