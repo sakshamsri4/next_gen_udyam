@@ -11,9 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Install cspell
-        run: npm install -g cspell
-      
+
       - name: Run cspell
-        run: cspell "**/*.{dart,md,yaml,json}" --no-progress
+        uses: streetsidesoftware/cspell-action@v6
+        with:
+          config: '.cspell.json'
+          files: "**/*.{dart,md,yaml,json}"
+          inline: warning
+          incremental_files_only: false
