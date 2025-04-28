@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:next_gen/app/middleware/auth_guard.dart';
+import 'package:next_gen/app/middleware/auth_middleware.dart';
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';
 import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/profile_view.dart';
@@ -9,7 +11,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const initialRoute = Routes.home;
+  static const initialRoute = Routes.auth;
 
   static final routes = <GetPage<dynamic>>[
     GetPage<dynamic>(
@@ -18,16 +20,19 @@ class AppPages {
       binding: BindingsBuilder<dynamic>(() {
         // Add any bindings needed for home screen
       }),
+      middlewares: [AuthGuard()],
     ),
     GetPage<dynamic>(
       name: _Paths.auth,
       page: () => const AuthView(),
       binding: AuthBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage<dynamic>(
       name: _Paths.profile,
       page: () => const ProfileView(),
       binding: AuthBinding(),
+      middlewares: [AuthGuard()],
     ),
   ];
 }
