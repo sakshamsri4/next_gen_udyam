@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:next_gen/core/storage/storage_service.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
 import 'package:next_gen/examples/neopop_example_screen.dart';
@@ -21,6 +22,9 @@ void main() async {
   } else {
     debugPrint('Skipping Firebase initialization for web demo');
   }
+
+  // Initialize Hive
+  await StorageService.init();
 
   // Initialize theme controller
   Get.put(ThemeController());
