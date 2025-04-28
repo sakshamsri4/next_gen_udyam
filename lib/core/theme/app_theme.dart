@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 /// App theme configuration implementing NeoPOP design system
 class AppTheme {
   // Private constructor to prevent instantiation
+  // ignore: unused_element
   AppTheme._();
 
   /// Primary color palette based on NeoPOP design system

@@ -24,6 +24,7 @@ class ThemeController extends GetxController {
   }
 
   /// Load theme preference from shared preferences
+  // ignore: unused_element
   Future<void> _loadThemePreference() async {
     _prefs.value = await SharedPreferences.getInstance();
     _isDarkMode.value = _prefs.value?.getBool('isDarkMode') ?? false;
