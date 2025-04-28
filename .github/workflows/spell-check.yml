@@ -28,3 +28,4 @@ jobs:
           files: "{lib,test,docs}/**/*.{dart,md,yaml,json}"
           inline: warning
           incremental_files_only: false
+          root: "."

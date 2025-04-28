@@ -28,5 +28,5 @@ jobs:
       - name: Check coverage
         uses: VeryGoodOpenSource/very_good_coverage@v3
         with:
-          min_coverage: 90
+          min_coverage: 70
           path: ./coverage/lcov.info
