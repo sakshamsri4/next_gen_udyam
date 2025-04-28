@@ -1,0 +1,35 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "augment",
+    "codebase",
+    "dartdoc",
+    "dartdocs",
+    "firestore",
+    "glassmorphic",
+    "lcov",
+    "neopop",
+    "pubspec",
+    "udyam"
+  ],
+  "ignorePaths": [
+    "build/**",
+    ".dart_tool/**",
+    ".github/**",
+    ".idea/**",
+    ".vscode/**",
+    "android/**",
+    "ios/**",
+    "macos/**",
+    "windows/**",
+    "linux/**",
+    "web/**",
+    "coverage/**",
+    "node_modules/**",
+    "*.lock",
+    "*.g.dart",
+    "*.freezed.dart",
+    "*.mocks.dart"
+  ]
+}

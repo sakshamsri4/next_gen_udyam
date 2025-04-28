@@ -12,6 +12,22 @@ NextGen App by Udyam
 
 ## Getting Started 🚀
 
+### Project Setup
+
+To set up the project with all necessary tools and git hooks, run:
+
+```sh
+make setup
+```
+
+This will:
+- Install dependencies
+- Set up git hooks for pre-commit and pre-push
+- Format all Dart files
+- Prepare the development environment
+
+### Running the App
+
 This project contains 3 flavors:
 
 - development
@@ -33,11 +49,61 @@ $ flutter run --flavor production --target lib/main_production.dart
 
 _\*Next Gen works on iOS, Android, Web, and Windows._
 
+### Development Workflow
+
+This project uses a comprehensive set of tools to ensure code quality and consistency:
+
+- **Pre-commit hook**: Automatically formats Dart files before committing
+- **Pre-push hook**: Runs checks before pushing (format, analyze, test, spell check)
+- **Makefile**: Provides commands for common development tasks
+
+#### Makefile Commands
+
+```sh
+make setup       # Set up the project and git hooks
+make format      # Format code using dart format
+make format-all  # Format all Dart files
+make analyze     # Run Flutter analyzer
+make test        # Run tests
+make coverage    # Run tests with coverage
+make lint        # Run linter checks
+make fix-lint    # Fix linter issues automatically
+make clean       # Clean the project
+make check       # Run all checks (format, analyze, test)
+make pre-push    # Run pre-push checks
+make spell-check # Run spell check
+```
+
+#### Git Workflow
+
+For detailed git workflow guidelines, see [docs/git_workflow.md](docs/git_workflow.md).
+
+To create branches with proper naming conventions:
+
+```sh
+make feature     # Create a feature branch
+make bugfix      # Create a bugfix branch
+make hotfix      # Create a hotfix branch
+make docs        # Create a documentation branch
+```
+
 ---
 
 ## Running Tests 🧪
 
-To run all unit and widget tests use the following command:
+To run all unit and widget tests, you can use the Makefile command:
+
+```sh
+make test
+```
+
+For tests with coverage:
+
+```sh
+make coverage
+```
+
+Alternatively, you can use the Flutter commands directly:
 
 ```sh
 $ flutter test --coverage --test-randomize-ordering-seed random
@@ -52,6 +118,8 @@ $ genhtml coverage/lcov.info -o coverage/
 # Open Coverage Report
 $ open coverage/index.html
 ```
+
+The `make coverage` command will automatically generate the coverage report if you have lcov installed.
 
 ---
 

@@ -107,3 +107,27 @@
   - Updated augment_rules.md with the requirement to include "use context 7 MCP server" in prompts
   - Added dedicated section for Context 7 in augment_rules.md
   - Established requirement to always include the Context 7 phrase in prompts to Augment Code
+
+- Implemented comprehensive development workflow automation:
+  - Created scripts directory with utility scripts:
+    - pre-commit.sh: Automatically formats Dart files before committing
+    - pre-push.sh: Runs checks before pushing (format, analyze, test, spell check)
+    - format_all.sh: Formats all Dart files in the project
+    - extract_technical_terms.sh: Extracts technical terms for spell checking
+  - Created Makefile with common development commands:
+    - setup: Sets up the project and git hooks
+    - format/format-all: Formats code
+    - analyze: Runs Flutter analyzer
+    - test/coverage: Runs tests with optional coverage
+    - lint/fix-lint: Runs and fixes linter issues
+    - clean: Cleans the project
+    - check: Runs all checks
+    - feature/bugfix/hotfix/docs: Creates branches with proper naming
+    - spell-check/extract-terms: Manages spell checking
+  - Added .cspell.json for spell checking configuration
+  - Updated git_workflow.md with Makefile commands and best practices
+  - Made all scripts executable with proper permissions
+  - Added comprehensive documentation for all scripts and commands
+  - Updated README.md with development workflow information
+  - Successfully tested the setup process
+  - Removed test_coverage dependency due to compatibility issues

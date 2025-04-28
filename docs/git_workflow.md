@@ -54,10 +54,24 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 
 ### Before Pushing
 
-1. Run all checks locally:
+1. Run all checks locally using the Makefile:
    ```bash
-   flutter analyze
-   flutter test
+   make pre-push
+   ```
+
+   This will run:
+   - Code formatting check
+   - Flutter analyzer
+   - Flutter tests
+   - Spell check (if cspell is installed)
+   - Activity log update check
+
+   You can also run individual checks:
+   ```bash
+   make format      # Format code
+   make analyze     # Run Flutter analyzer
+   make test        # Run tests
+   make spell-check # Run spell check
    ```
 
 2. Rebase on the latest `main` if needed:
@@ -134,3 +148,58 @@ For critical production issues:
 2. Make the minimal necessary changes.
 3. Follow the normal PR process, but mark it as high priority.
 4. After merging, ensure the fix is also applied to any in-progress feature branches.
+
+## Makefile Helpers
+
+To streamline the Git workflow process, this project includes several Makefile targets that automate common Git operations:
+
+### Creating Branches
+
+Instead of manually typing the git commands to create branches, you can use:
+
+```bash
+make feature    # Create a feature branch
+make bugfix     # Create a bugfix branch
+make hotfix     # Create a hotfix branch
+make docs       # Create a documentation branch
+```
+
+Each command will:
+1. Prompt you for relevant information (feature name, issue number, etc.)
+2. Pull the latest changes from the main branch
+3. Create a new branch with the appropriate naming convention
+4. Switch to the new branch
+
+### Example Usage:
+```
+$ make feature
+Enter feature name (e.g., add-login): user-authentication
+# Creates and checks out: feature/user-authentication
+
+$ make bugfix
+Enter issue number: 123
+Enter brief description: fix-login-crash
+# Creates and checks out: bugfix/123-fix-login-crash
+```
+
+### Development Workflow Commands
+
+The Makefile also includes commands for common development tasks:
+
+```bash
+make setup       # Set up the project and git hooks
+make format      # Format code using dart format
+make format-all  # Format all Dart files
+make analyze     # Run Flutter analyzer
+make test        # Run tests
+make coverage    # Run tests with coverage
+make lint        # Run linter checks
+make fix-lint    # Fix linter issues automatically
+make clean       # Clean the project
+make check       # Run all checks (format, analyze, test)
+make pre-push    # Run pre-push checks
+make spell-check # Run spell check
+make extract-terms # Extract technical terms for spell checking
+```
+
+These commands help maintain code quality and consistency across the project.
