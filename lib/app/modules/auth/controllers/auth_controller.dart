@@ -62,11 +62,11 @@ class AuthController extends GetxController {
     if (user != null) {
       isLoggedIn.value = true;
       this.user.value = UserModel.fromFirebaseUser(user);
-      Get.offAllNamed('/home');
+      Get.offAllNamed<dynamic>('/home');
     } else {
       isLoggedIn.value = false;
       this.user.value = null;
-      Get.offAllNamed('/auth');
+      Get.offAllNamed<dynamic>('/auth');
     }
   }
 

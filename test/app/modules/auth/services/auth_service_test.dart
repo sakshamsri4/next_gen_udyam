@@ -2,8 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mockito/mockito.dart';
-import 'package:next_gen/app/modules/auth/models/user_model.dart';
-import 'package:next_gen/app/modules/auth/services/auth_service.dart';
 
 // Mock classes
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
@@ -34,9 +32,8 @@ class MockUser extends Mock implements User {
 
 // Create a test service class to avoid Firebase initialization
 class TestAuthService {
-  TestAuthService(this._auth, this._googleSignIn);
+  TestAuthService(this._auth);
   final FirebaseAuth _auth;
-  final GoogleSignIn _googleSignIn;
 
   // Get current user
   User? get currentUser => _auth.currentUser;
@@ -48,13 +45,11 @@ class TestAuthService {
 void main() {
   late TestAuthService authService;
   late MockFirebaseAuth mockFirebaseAuth;
-  late MockGoogleSignIn mockGoogleSignIn;
   late MockUser mockUser;
   late MockUserCredential mockUserCredential;
 
   setUp(() {
     mockFirebaseAuth = MockFirebaseAuth();
-    mockGoogleSignIn = MockGoogleSignIn();
     mockUser = MockUser();
     mockUserCredential = MockUserCredential();
 
@@ -62,7 +57,7 @@ void main() {
     when(mockUserCredential.user).thenReturn(mockUser);
 
     // Initialize test service
-    authService = TestAuthService(mockFirebaseAuth, mockGoogleSignIn);
+    authService = TestAuthService(mockFirebaseAuth);
   });
 
   group('AuthService Tests', () {

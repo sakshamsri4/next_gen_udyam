@@ -187,7 +187,7 @@ class LoginView extends GetView<AuthController> {
   }
 
   void _showForgotPasswordDialog(BuildContext context) {
-    Get.dialog(
+    Get.dialog<void>(
       AlertDialog(
         title: const Text('Reset Password'),
         content: Column(

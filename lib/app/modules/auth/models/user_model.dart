@@ -1,9 +1,46 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:hive/hive.dart';
 
 part 'user_model.g.dart';
 
 @HiveType(typeId: 0)
 class UserModel {
+  // Constructor
+  UserModel({
+    required this.uid,
+    required this.email,
+    this.displayName,
+    this.photoUrl,
+    this.emailVerified = false,
+    this.phoneNumber,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
+
+  // Factory constructors
+  factory UserModel.fromFirebaseUser(firebase.User user) {
+    return UserModel(
+      uid: user.uid,
+      email: user.email ?? '',
+      displayName: user.displayName,
+      photoUrl: user.photoURL,
+      emailVerified: user.emailVerified,
+      phoneNumber: user.phoneNumber,
+    );
+  }
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      uid: map['uid'] as String,
+      email: map['email'] as String,
+      displayName: map['displayName'] as String?,
+      photoUrl: map['photoUrl'] as String?,
+      emailVerified: map['emailVerified'] as bool,
+      phoneNumber: map['phoneNumber'] as String?,
+      createdAt: DateTime.parse(map['createdAt'] as String),
+    );
+  }
+
+  // Fields
   @HiveField(0)
   final String uid;
 
@@ -25,27 +62,6 @@ class UserModel {
   @HiveField(6)
   final DateTime createdAt;
 
-  UserModel({
-    required this.uid,
-    required this.email,
-    this.displayName,
-    this.photoUrl,
-    this.emailVerified = false,
-    this.phoneNumber,
-    DateTime? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now();
-
-  factory UserModel.fromFirebaseUser(dynamic user) {
-    return UserModel(
-      uid: user.uid,
-      email: user.email ?? '',
-      displayName: user.displayName,
-      photoUrl: user.photoURL,
-      emailVerified: user.emailVerified,
-      phoneNumber: user.phoneNumber,
-    );
-  }
-
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -56,18 +72,6 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'createdAt': createdAt.toIso8601String(),
     };
-  }
-
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      uid: map['uid'] as String,
-      email: map['email'] as String,
-      displayName: map['displayName'] as String?,
-      photoUrl: map['photoUrl'] as String?,
-      emailVerified: map['emailVerified'] as bool,
-      phoneNumber: map['phoneNumber'] as String?,
-      createdAt: DateTime.parse(map['createdAt'] as String),
-    );
   }
 
   UserModel copyWith({

@@ -1,17 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final String _userBoxName = 'user_box';
+  // Factory constructor
+  factory AuthService() => _instance;
+  // Private constructor
+  AuthService._internal();
 
   // Singleton pattern
   static final AuthService _instance = AuthService._internal();
-  factory AuthService() => _instance;
-  AuthService._internal();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final String _userBoxName = 'user_box';
 
   // Get current user
   User? get currentUser => _auth.currentUser;
@@ -24,7 +28,9 @@ class AuthService {
 
   // Register with email and password
   Future<UserCredential> registerWithEmailAndPassword(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -36,7 +42,7 @@ class AuthService {
 
       // Save user to Hive
       if (credential.user != null) {
-        await _saveUserToHive(UserModel.fromFirebaseUser(credential.user));
+        await _saveUserToHive(UserModel.fromFirebaseUser(credential.user!));
       }
 
       return credential;
@@ -47,7 +53,9 @@ class AuthService {
 
   // Sign in with email and password
   Future<UserCredential> signInWithEmailAndPassword(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -56,7 +64,7 @@ class AuthService {
 
       // Save user to Hive
       if (credential.user != null) {
-        await _saveUserToHive(UserModel.fromFirebaseUser(credential.user));
+        await _saveUserToHive(UserModel.fromFirebaseUser(credential.user!));
       }
 
       return credential;
@@ -69,15 +77,14 @@ class AuthService {
   Future<UserCredential?> signInWithGoogle() async {
     try {
       // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
         return null; // User canceled the sign-in flow
       }
 
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -90,7 +97,7 @@ class AuthService {
 
       // Save user to Hive
       if (userCredential.user != null) {
-        await _saveUserToHive(UserModel.fromFirebaseUser(userCredential.user));
+        await _saveUserToHive(UserModel.fromFirebaseUser(userCredential.user!));
       }
 
       return userCredential;
@@ -125,7 +132,7 @@ class AuthService {
       final box = await Hive.openBox<UserModel>(_userBoxName);
       await box.put('current_user', user);
     } catch (e) {
-      print('Error saving user to Hive: $e');
+      debugPrint('Error saving user to Hive: $e');
     }
   }
 
@@ -135,7 +142,7 @@ class AuthService {
       final box = await Hive.openBox<UserModel>(_userBoxName);
       return box.get('current_user');
     } catch (e) {
-      print('Error getting user from Hive: $e');
+      debugPrint('Error getting user from Hive: $e');
       return null;
     }
   }
@@ -146,7 +153,7 @@ class AuthService {
       final box = await Hive.openBox<UserModel>(_userBoxName);
       await box.delete('current_user');
     } catch (e) {
-      print('Error clearing user from Hive: $e');
+      debugPrint('Error clearing user from Hive: $e');
     }
   }
 }
