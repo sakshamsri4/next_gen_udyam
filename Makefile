@@ -1,6 +1,6 @@
 # Makefile for Next Gen Udyam project
 
-.PHONY: setup install-tools format format-all analyze test coverage lint fix-lint clean check pre-push feature bugfix hotfix docs spell-check extract-terms generate-icons outdated unused
+.PHONY: setup install-tools format format-all analyze test coverage check-coverage lint fix-lint clean check pre-push feature bugfix hotfix docs spell-check extract-terms generate-icons outdated unused
 
 # Setup the project and git hooks
 setup:
@@ -62,9 +62,18 @@ coverage:
 		echo "Generating coverage report..."; \
 		genhtml coverage/lcov.info -o coverage/html; \
 		echo "Coverage report generated at coverage/html/index.html"; \
+		if command -v open >/dev/null 2>&1; then \
+			echo "Opening coverage report in browser..."; \
+			open coverage/html/index.html; \
+		fi; \
 	else \
 		echo "genhtml not found. Install lcov to generate HTML reports."; \
 	fi
+
+# Check if code coverage meets the minimum threshold
+check-coverage:
+	@echo "Checking code coverage..."
+	@./scripts/check_coverage.sh
 
 # Run linter checks
 lint:
@@ -82,8 +91,8 @@ clean:
 	@flutter clean
 	@rm -rf coverage
 
-# Run all checks (format, analyze, test, spell-check)
-check: format analyze test spell-check
+# Run all checks (format, analyze, test, spell-check, coverage)
+check: format analyze test spell-check check-coverage
 	@echo "All checks passed!"
 
 # Run pre-push checks

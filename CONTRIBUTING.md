@@ -19,7 +19,7 @@ Before you begin, ensure you have the following installed:
    ```sh
    # macOS
    brew install lcov
-   
+
    # Ubuntu/Debian
    sudo apt-get install lcov
    ```
@@ -86,6 +86,22 @@ Check test coverage with:
 make coverage
 ```
 
+Check if code coverage meets the minimum threshold (90%):
+```sh
+make check-coverage
+```
+
+#### Code Coverage Requirements
+
+We maintain a minimum code coverage threshold of 90%. This ensures that our codebase is well-tested and reduces the risk of regressions. The pre-push hook will check if your changes meet this requirement before allowing you to push to the repository.
+
+To view the coverage report in your browser:
+```sh
+make coverage
+```
+
+If your coverage is below 90%, you'll need to add more tests to cover the missing code paths.
+
 ### Pull Request Process
 
 1. Create a feature branch from the main branch:
@@ -114,11 +130,18 @@ make coverage
 
 2. **Pre-push Hook Failures**:
    - Make sure you have cspell installed: `npm install -g cspell`.
+   - Make sure you have lcov installed: `brew install lcov` or `apt-get install lcov`.
    - Run `make check` to identify issues before pushing.
 
 3. **Test Failures**:
    - Run `flutter test -v` to see detailed test output.
    - Check for flaky tests that might need to be fixed.
+
+4. **Coverage Failures**:
+   - Run `make coverage` to generate a coverage report.
+   - Look at the HTML report to identify which parts of the code need more tests.
+   - Focus on adding tests for uncovered code paths.
+   - Run `make check-coverage` to verify your improvements.
 
 ## Additional Resources
 
