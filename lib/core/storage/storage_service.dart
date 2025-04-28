@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/core/storage/theme_settings.dart';
 
 /// Service for handling storage operations using Hive
@@ -34,10 +35,13 @@ class StorageService {
     }
 
     // Register adapters
-    Hive.registerAdapter(ThemeSettingsAdapter());
+    Hive
+      ..registerAdapter(ThemeSettingsAdapter())
+      ..registerAdapter(UserModelAdapter());
 
     // Open boxes
     await Hive.openBox<ThemeSettings>(themeSettingsBoxName);
+    await Hive.openBox<UserModel>('user_box');
   }
 
   /// Default implementation for getting theme settings
