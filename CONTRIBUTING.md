@@ -86,21 +86,21 @@ Check test coverage with:
 make coverage
 ```
 
-Check if code coverage meets the minimum threshold (90%):
+Check if code coverage meets the minimum threshold (85%):
 ```sh
 make check-coverage
 ```
 
 #### Code Coverage Requirements
 
-We maintain a minimum code coverage threshold of 90%. This ensures that our codebase is well-tested and reduces the risk of regressions. The pre-push hook will check if your changes meet this requirement before allowing you to push to the repository.
+We maintain a minimum code coverage threshold of 85%. This ensures that our codebase is well-tested and reduces the risk of regressions. The pre-push hook will check if your changes meet this requirement before allowing you to push to the repository.
 
 To view the coverage report in your browser:
 ```sh
 make coverage
 ```
 
-If your coverage is below 90%, you'll need to add more tests to cover the missing code paths.
+If your coverage is below 85%, you'll need to add more tests to cover the missing code paths.
 
 ### Pull Request Process
 

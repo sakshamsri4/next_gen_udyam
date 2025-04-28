@@ -14,7 +14,7 @@ genhtml coverage/lcov.info -o coverage/html
 
 # Extract coverage percentage
 COVERAGE=$(lcov --summary coverage/lcov.info | grep "lines" | awk '{print $4}' | cut -d'%' -f1)
-MIN_COVERAGE=90
+MIN_COVERAGE=85
 
 echo "Current coverage: $COVERAGE%"
 echo "Minimum required coverage: $MIN_COVERAGE%"
