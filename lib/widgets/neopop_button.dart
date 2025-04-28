@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:neopop/neopop.dart';
 
 import 'package:next_gen/core/theme/app_theme.dart';
-import 'package:next_gen/core/theme/neopop_theme.dart';
 
 /// A custom button widget using NeoPop design.
 ///

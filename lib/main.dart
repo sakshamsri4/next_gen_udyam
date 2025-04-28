@@ -1,10 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
-
-import 'core/theme/app_theme.dart';
-import 'core/theme/theme_controller.dart';
-import 'examples/neopop_example_screen.dart';
+import 'package:next_gen/core/theme/app_theme.dart';
+import 'package:next_gen/core/theme/theme_controller.dart';
+import 'package:next_gen/examples/neopop_example_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,9 +11,10 @@ void main() async {
   // Initialize Firebase
   try {
     await Firebase.initializeApp();
-    print('Firebase initialized successfully');
+    // Firebase initialized successfully
   } catch (e) {
-    print('Failed to initialize Firebase: $e');
+    // Failed to initialize Firebase
+    debugPrint('Firebase initialization error: $e');
   }
 
   // Initialize theme controller
@@ -52,11 +52,11 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Next Gen Job Portal'),
         actions: [
           IconButton(
-            icon: Obx(() => Icon(
-                  themeController.isDarkMode
-                      ? Icons.light_mode
-                      : Icons.dark_mode,
-                )),
+            icon: Obx(
+              () => Icon(
+                themeController.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              ),
+            ),
             onPressed: themeController.toggleTheme,
           ),
         ],
@@ -73,7 +73,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
-                Get.to(() => const NeoPopExampleScreen());
+                Get.to<void>(() => const NeoPopExampleScreen());
               },
               child: const Text('View NeoPOP Examples'),
             ),

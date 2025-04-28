@@ -57,7 +57,9 @@ void main() {
 
       // Test app bar theme
       expect(
-          theme.appBarTheme.backgroundColor, equals(const Color(0xFF1A2138)));
+        theme.appBarTheme.backgroundColor,
+        equals(const Color(0xFF1A2138)),
+      );
       expect(theme.appBarTheme.foregroundColor, equals(AppTheme.pureWhite));
       expect(theme.appBarTheme.elevation, equals(0));
 

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'app_theme.dart';
 
 /// Controller for managing app theme
 class ThemeController extends GetxController {
