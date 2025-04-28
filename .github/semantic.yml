@@ -1,0 +1,26 @@
+# Configuration for the semantic pull request check
+# See: https://github.com/amannn/action-semantic-pull-request
+
+# Always validate the PR title, and ignore the commits
+titleOnly: true
+
+# By default types specified in commitizen/conventional-commit-types is used.
+# See: https://github.com/commitizen/conventional-commit-types/blob/v3.0.0/index.json
+types:
+  - feat
+  - fix
+  - docs
+  - style
+  - refactor
+  - perf
+  - test
+  - build
+  - ci
+  - chore
+  - revert
+
+# Allow use of Merge commits (e.g. "Merge branch 'master' into feature/add-foo")
+allowMergeCommits: true
+
+# Allow use of Revert commits (e.g. "Revert 'feat: add foo'")
+allowRevertCommits: true

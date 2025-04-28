@@ -4,7 +4,7 @@ version: 1.0.0+1
 publish_to: none
 
 environment:
-  sdk: ^3.5.0
+  sdk: ">=3.2.0 <4.0.0"
 
 dependencies:
   bloc: ^8.1.4
@@ -16,7 +16,7 @@ dependencies:
   flutter_bloc: ^8.1.6
   flutter_localizations:
     sdk: flutter
-  intl: ^0.19.0
+  intl: ">=0.18.1 <0.20.0"
   neopop: ^1.0.2
 
 dev_dependencies:
@@ -26,8 +26,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   mocktail: ^1.0.4
-  test_coverage: ^0.6.0
-  very_good_analysis: ^6.0.0
+  very_good_analysis: ^5.1.0
 
 flutter:
   uses-material-design: true
