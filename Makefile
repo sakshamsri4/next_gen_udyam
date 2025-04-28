@@ -1,6 +1,6 @@
 # Makefile for Next Gen Udyam project
 
-.PHONY: setup format format-all analyze test coverage lint fix-lint clean check pre-push feature bugfix hotfix docs spell-check extract-terms generate-icons outdated unused
+.PHONY: setup install-tools format format-all analyze test coverage lint fix-lint clean check pre-push feature bugfix hotfix docs spell-check extract-terms generate-icons outdated unused
 
 # Setup the project and git hooks
 setup:
@@ -12,6 +12,28 @@ setup:
 	@flutter pub get
 	@./scripts/format_all.sh
 	@echo "Setup complete!"
+	@echo "NOTE: For full functionality, run 'make install-tools' to install required external tools."
+
+# Install required external tools
+install-tools:
+	@echo "Installing required external tools..."
+	@if command -v npm > /dev/null; then \
+		echo "Installing cspell..."; \
+		npm install -g cspell; \
+	else \
+		echo "npm not found. Please install Node.js and npm first."; \
+		exit 1; \
+	fi
+	@if command -v brew > /dev/null; then \
+		echo "Installing lcov using Homebrew..."; \
+		brew install lcov; \
+	elif command -v apt-get > /dev/null; then \
+		echo "Installing lcov using apt-get..."; \
+		sudo apt-get install -y lcov; \
+	else \
+		echo "Could not install lcov automatically. Please install it manually."; \
+	fi
+	@echo "Tools installation complete!"
 
 # Format code using dart format
 format:
@@ -60,8 +82,8 @@ clean:
 	@flutter clean
 	@rm -rf coverage
 
-# Run all checks (format, analyze, test)
-check: format analyze test
+# Run all checks (format, analyze, test, spell-check)
+check: format analyze test spell-check
 	@echo "All checks passed!"
 
 # Run pre-push checks
