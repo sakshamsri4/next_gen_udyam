@@ -8,12 +8,12 @@ class AuthGuard extends GetMiddleware {
   RouteSettings? redirect(String? route) {
     // Get the auth controller
     final authController = Get.find<AuthController>();
-    
+
     // If the user is not logged in, redirect to auth page
     if (!authController.isLoggedIn.value) {
       return const RouteSettings(name: Routes.auth);
     }
-    
+
     return null;
   }
 }
