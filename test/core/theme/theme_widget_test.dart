@@ -58,7 +58,7 @@ void main() {
             expect(customPrimaryStyle.parentColor, equals(Colors.white));
 
             // Test NeoPopButtonStyle constructor
-            final border = Border.all(color: Colors.black);
+            final border = Border.all();
             final buttonStyle = NeoPopButtonStyle(
               color: Colors.blue,
               depth: 5,
@@ -73,7 +73,7 @@ void main() {
             expect(buttonStyle.grandparentColor, equals(Colors.grey));
 
             // Test NeoPopCardStyle constructor
-            final cardBorder = Border.all(color: Colors.black);
+            final cardBorder = Border.all();
             final customCardStyle = NeoPopCardStyle(
               color: Colors.blue,
               depth: 5,
