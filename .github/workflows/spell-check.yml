@@ -1,0 +1,19 @@
+name: Spell Check
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  spell-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install cspell
+        run: npm install -g cspell
+      
+      - name: Run cspell
+        run: cspell "**/*.{dart,md,yaml,json}" --no-progress
