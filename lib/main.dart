@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
@@ -8,13 +9,17 @@ import 'package:next_gen/examples/neopop_example_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  try {
-    await Firebase.initializeApp();
-    // Firebase initialized successfully
-  } catch (e) {
-    // Failed to initialize Firebase
-    debugPrint('Firebase initialization error: $e');
+  // Initialize Firebase (skip for web demo)
+  if (!kIsWeb) {
+    try {
+      await Firebase.initializeApp();
+      // Firebase initialized successfully
+    } catch (e) {
+      // Failed to initialize Firebase
+      debugPrint('Firebase initialization error: $e');
+    }
+  } else {
+    debugPrint('Skipping Firebase initialization for web demo');
   }
 
   // Initialize theme controller
