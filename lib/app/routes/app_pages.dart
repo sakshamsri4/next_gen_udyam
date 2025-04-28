@@ -9,23 +9,23 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const initialRoute = Routes.HOME;
+  static const initialRoute = Routes.home;
 
   static final routes = <GetPage<dynamic>>[
     GetPage<dynamic>(
-      name: _Paths.HOME,
+      name: _Paths.home,
       page: () => const HomeScreen(),
       binding: BindingsBuilder<dynamic>(() {
         // Add any bindings needed for home screen
       }),
     ),
     GetPage<dynamic>(
-      name: _Paths.AUTH,
+      name: _Paths.auth,
       page: () => const AuthView(),
       binding: AuthBinding(),
     ),
     GetPage<dynamic>(
-      name: _Paths.PROFILE,
+      name: _Paths.profile,
       page: () => const ProfileView(),
       binding: AuthBinding(),
     ),
@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () => Get.toNamed<dynamic>(_Paths.PROFILE),
+            onPressed: () => Get.toNamed<dynamic>(_Paths.profile),
           ),
         ],
       ),

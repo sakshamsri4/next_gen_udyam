@@ -2,14 +2,14 @@ part of 'app_pages.dart';
 
 abstract class Routes {
   Routes._();
-  static const HOME = _Paths.HOME;
-  static const AUTH = _Paths.AUTH;
-  static const PROFILE = _Paths.PROFILE;
+  static const home = _Paths.home;
+  static const auth = _Paths.auth;
+  static const profile = _Paths.profile;
 }
 
 abstract class _Paths {
   _Paths._();
-  static const HOME = '/home';
-  static const AUTH = '/auth';
-  static const PROFILE = '/profile';
+  static const home = '/home';
+  static const auth = '/auth';
+  static const profile = '/profile';
 }
