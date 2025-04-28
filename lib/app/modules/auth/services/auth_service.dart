@@ -8,13 +8,33 @@ class AuthService {
   // Factory constructor
   factory AuthService() => _instance;
   // Private constructor
-  AuthService._internal();
+  AuthService._internal() {
+    // Initialize GoogleSignIn with appropriate configuration
+    if (kIsWeb) {
+      // For web, we'll disable Google Sign-In for now
+      // We'll need to add the client ID in index.html later
+      _googleSignIn = GoogleSignIn(
+        scopes: [
+          'email',
+          'profile',
+        ],
+      );
+    } else {
+      // For mobile platforms
+      _googleSignIn = GoogleSignIn(
+        scopes: [
+          'email',
+          'profile',
+        ],
+      );
+    }
+  }
 
   // Singleton pattern
   static final AuthService _instance = AuthService._internal();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  late final GoogleSignIn _googleSignIn;
   final String _userBoxName = 'user_box';
 
   // Get current user
@@ -76,32 +96,56 @@ class AuthService {
   // Sign in with Google
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      // Trigger the authentication flow
-      final googleUser = await _googleSignIn.signIn();
+      if (kIsWeb) {
+        // For web, use Firebase's built-in Google auth provider
+        // This avoids the need for a client ID in the web app
+        final googleProvider = GoogleAuthProvider()
+          ..addScope('email')
+          ..addScope('profile');
 
-      if (googleUser == null) {
-        return null; // User canceled the sign-in flow
+        // Sign in with popup
+        final userCredential = await _auth.signInWithPopup(googleProvider);
+
+        // Save user to Hive
+        if (userCredential.user != null) {
+          await _saveUserToHive(
+            UserModel.fromFirebaseUser(userCredential.user!),
+          );
+        }
+
+        return userCredential;
+      } else {
+        // For mobile platforms, use the GoogleSignIn package
+        // Trigger the authentication flow
+        final googleUser = await _googleSignIn.signIn();
+
+        if (googleUser == null) {
+          return null; // User canceled the sign-in flow
+        }
+
+        // Obtain the auth details from the request
+        final googleAuth = await googleUser.authentication;
+
+        // Create a new credential
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        // Sign in to Firebase with the Google credential
+        final userCredential = await _auth.signInWithCredential(credential);
+
+        // Save user to Hive
+        if (userCredential.user != null) {
+          await _saveUserToHive(
+            UserModel.fromFirebaseUser(userCredential.user!),
+          );
+        }
+
+        return userCredential;
       }
-
-      // Obtain the auth details from the request
-      final googleAuth = await googleUser.authentication;
-
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // Sign in to Firebase with the Google credential
-      final userCredential = await _auth.signInWithCredential(credential);
-
-      // Save user to Hive
-      if (userCredential.user != null) {
-        await _saveUserToHive(UserModel.fromFirebaseUser(userCredential.user!));
-      }
-
-      return userCredential;
     } catch (e) {
+      debugPrint('Error signing in with Google: $e');
       rethrow;
     }
   }

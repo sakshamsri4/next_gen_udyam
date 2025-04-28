@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
-import 'package:next_gen/app/routes/app_pages.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
@@ -63,11 +62,13 @@ class AuthController extends GetxController {
     if (user != null) {
       isLoggedIn.value = true;
       this.user.value = UserModel.fromFirebaseUser(user);
-      Get.offAllNamed<dynamic>(Routes.home);
+      // Use the actual path string
+      Get.offAllNamed<dynamic>('/home');
     } else {
       isLoggedIn.value = false;
       this.user.value = null;
-      Get.offAllNamed<dynamic>(Routes.auth);
+      // Use the actual path string
+      Get.offAllNamed<dynamic>('/auth');
     }
   }
 
