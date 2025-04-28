@@ -36,7 +36,7 @@ class MockHive {
         });
       }
 
-      _boxes[name] = box as MockBox<dynamic>;
+      _boxes[name] = box;
     }
 
     return _boxes[name]! as MockBox<T>;
