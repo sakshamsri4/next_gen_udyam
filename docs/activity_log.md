@@ -227,3 +227,27 @@
     - Resolved issues with context handling in tests
     - Fixed test structure for better reliability
     - Ensured 100% test coverage for theme components
+
+## [2025-04-29]
+- Task: Refactor LoginView based on CRED Design Evaluation
+  - **Issue Description**:
+    - The LoginView needed updates to better align with CRED design principles, improve responsiveness, and enhance visual hierarchy based on a provided evaluation.
+
+  - **Attempted Solutions**:
+    1. Searched for `CustomNeoPopButton` as recommended, but the widget was not found in the codebase.
+    2. Attempted to add `shimmer: true` to the primary `NeoPopButton` as suggested by the evaluation and documentation.
+
+  - **Working Solution**:
+    - Refactored `lib/app/modules/auth/views/login_view.dart`:
+      - Replaced fixed `SizedBox` heights with relative spacing using `LayoutBuilder` and `constraints.maxHeight`.
+      - Styled `TextField`s (email, password, and in the forgot password dialog) according to `neopop_style_guide.md` (fill color, border radius, border colors, padding).
+      - Set `depth` (8 for primary, 5 for secondary) and `parentColor` on `NeoPopButton` widgets.
+      - Removed the `shimmer` parameter from `NeoPopButton` as it caused a compile error (parameter not defined in the package).
+      - Increased font weight for the screen title, "Forgot Password?", and "Sign Up" links to improve hierarchy.
+      - Used `AppTheme` colors for consistency.
+
+  - **Lessons Learned**:
+    - Always verify widget parameters against the actual package implementation, as documentation might be outdated or inaccurate (e.g., `shimmer` parameter in `NeoPopButton`).
+    - `LayoutBuilder` is effective for creating responsive spacing relative to the available screen dimensions.
+    - Consistent styling across the main view and dialogs improves user experience.
+    - If a recommended custom component (`CustomNeoPopButton`) doesn't exist, adapt using the available base components.

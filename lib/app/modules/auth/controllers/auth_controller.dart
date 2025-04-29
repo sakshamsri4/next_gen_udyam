@@ -1,8 +1,12 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
+import 'package:next_gen/app/modules/auth/views/auth_view.dart';
+import 'package:next_gen/app/routes/app_pages.dart';
+import 'package:next_gen/core/services/logger_service.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
@@ -22,12 +26,15 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    log.i('Initializing AuthController');
 
     // Listen to Firebase auth state changes
     firebaseUser.bindStream(_authService.authStateChanges);
+    log.d('Set up listener for Firebase auth state changes');
 
     // Update logged in status when Firebase user changes
     ever(firebaseUser, _setInitialScreen);
+    log.d('Set up observer for Firebase user changes');
 
     // Check if user is already logged in from Hive
     _loadUserFromHive();
@@ -43,15 +50,29 @@ class AuthController extends GetxController {
 
   // Load user from Hive if available
   Future<void> _loadUserFromHive() async {
+    log.d('Loading user from local storage');
     isLoading.value = true;
     try {
       final savedUser = await _authService.getUserFromHive();
       if (savedUser != null) {
+        log.i('User loaded from local storage: ${savedUser.uid}');
         user.value = savedUser;
         isLoggedIn.value = true;
+      } else {
+        log.d('No user found in local storage');
       }
-    } catch (e) {
-      errorMessage.value = 'Error loading user data';
+    } catch (e, stackTrace) {
+      // Handle Hive initialization error gracefully
+      if (e.toString().contains('initialize Hive')) {
+        log.w(
+          'Hive not initialized yet, skipping local storage check',
+          e,
+          stackTrace,
+        );
+      } else {
+        log.e('Error loading user from local storage', e, stackTrace);
+        errorMessage.value = 'Error loading user data';
+      }
     } finally {
       isLoading.value = false;
     }
@@ -60,25 +81,46 @@ class AuthController extends GetxController {
   // Set initial screen based on auth state
   void _setInitialScreen(User? user) {
     if (user != null) {
+      log.i('User authenticated: ${user.uid}');
       isLoggedIn.value = true;
       this.user.value = UserModel.fromFirebaseUser(user);
-      // Use the actual path string
-      Get.offAllNamed<dynamic>('/home');
+
+      // Only navigate if GetMaterialApp is initialized
+      if (Get.isRegistered<GetMaterialController>()) {
+        log.d('Navigating to home screen');
+        Get.offAll<dynamic>(() => const HomeScreen());
+      } else {
+        log.d('GetMaterialApp not initialized yet, skipping navigation');
+      }
     } else {
+      log.i('User not authenticated');
       isLoggedIn.value = false;
       this.user.value = null;
-      // Use the actual path string
-      Get.offAllNamed<dynamic>('/auth');
+
+      // Only navigate if GetMaterialApp is initialized
+      // and we're not already on the auth page
+      if (Get.isRegistered<GetMaterialController>() &&
+          Get.currentRoute != '/auth') {
+        log.d('Navigating to auth screen');
+        Get.offAll<dynamic>(() => const AuthView());
+      } else {
+        log.d(
+          'GetMaterialApp not initialized or already on auth page, '
+          'skipping navigation',
+        );
+      }
     }
   }
 
   // Register with email and password
   Future<void> registerWithEmailAndPassword() async {
+    log.i('Attempting to register user with email: ${emailController.text}');
     isLoading.value = true;
     errorMessage.value = '';
 
     try {
       if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+        log.w('Registration failed: Email or password is empty');
         errorMessage.value = 'Email and password cannot be empty';
         return;
       }
@@ -88,20 +130,29 @@ class AuthController extends GetxController {
         passwordController.text.trim(),
       );
 
+      log.i('User registered successfully');
+
       // Clear form fields
       _clearFormFields();
 
-      // Show success message
-      Get.snackbar(
-        'Success',
-        'Registration successful. Please verify your email.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+      // Show success message with awesome snackbar
+      const snackBar = SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Success!',
+          message: 'Registration successful. Please verify your email.',
+          contentType: ContentType.success,
+        ),
       );
-    } on FirebaseAuthException catch (e) {
+
+      ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
+    } on FirebaseAuthException catch (e, stackTrace) {
+      log.e('Firebase Auth error during registration', e, stackTrace);
       _handleFirebaseAuthError(e);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      log.e('Unexpected error during registration', e, stackTrace);
       errorMessage.value = 'An unexpected error occurred';
     } finally {
       isLoading.value = false;
@@ -184,14 +235,19 @@ class AuthController extends GetxController {
 
       await _authService.resetPassword(emailController.text.trim());
 
-      // Show success message
-      Get.snackbar(
-        'Success',
-        'Password reset email sent. Please check your inbox.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+      // Show success message with awesome snackbar
+      const snackBar = SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Success!',
+          message: 'Password reset email sent. Please check your inbox.',
+          contentType: ContentType.success,
+        ),
       );
+
+      ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
     } on FirebaseAuthException catch (e) {
       _handleFirebaseAuthError(e);
     } catch (e) {
