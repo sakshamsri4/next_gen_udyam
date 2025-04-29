@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   bloc: ^8.1.4
-  firebase_auth: any
+  firebase_auth: 5.5.3
   firebase_core: any
   firebase_storage: any
   flutter:
