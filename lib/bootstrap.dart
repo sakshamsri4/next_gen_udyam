@@ -30,8 +30,8 @@ class AppBlocObserver extends BlocObserver {
   void onError(BlocBase<dynamic> bloc, Object error, StackTrace stackTrace) {
     // Use LoggerService if available, otherwise fallback to log
     try {
-      final logger = Get.find<LoggerService>();
-      logger.e('Bloc onError(${bloc.runtimeType})', error, stackTrace);
+      Get.find<LoggerService>()
+          .e('Bloc onError(${bloc.runtimeType})', error, stackTrace);
     } catch (_) {
       dev.log('onError(${bloc.runtimeType}, $error, $stackTrace)');
     }
@@ -44,8 +44,7 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
 
   // Initialize Logger Service first
   // Use put instead of lazyPut if it needs to be available immediately
-  Get.put(LoggerService(), permanent: true);
-  final logger = Get.find<LoggerService>();
+  final logger = Get.put(LoggerService(), permanent: true);
   logger.i('Logger Service Initialized');
 
   FlutterError.onError = (details) {
@@ -63,9 +62,9 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     logger.i('Firebase Initialized Successfully');
+    logger.i('Initializing Hive...');
 
     // Initialize Hive
-    logger.i('Initializing Hive...');
     await Hive.initFlutter(); // Initialize Hive for Flutter
 
     // Register Adapters for custom objects

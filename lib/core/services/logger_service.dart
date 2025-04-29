@@ -14,21 +14,23 @@ class LoggerService {
   // Logger instance with custom configuration
   final Logger _logger = Logger(
     printer: PrettyPrinter(
-      printTime: true, // Should each log print contain a timestamp
+      // Use dateTimeFormat instead of printTime
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
-    // Only log in debug mode
-    level: kDebugMode ? Level.verbose : Level.nothing,
+    // Only log in debug mode, use trace and off instead of verbose and nothing
+    level: kDebugMode ? Level.trace : Level.off,
   );
 
-  /// Log a verbose message.
+  /// Log a trace message.
   ///
   /// Use for detailed information that is only valuable for debugging.
-  Future<void> v(
+  /// This replaces the deprecated verbose level.
+  void t(
     String message, [
     dynamic error,
     StackTrace? stackTrace,
-  ]) async {
-    _logger.v(message, error: error, stackTrace: stackTrace);
+  ]) {
+    _logger.t(message, error: error, stackTrace: stackTrace);
   }
 
   /// Log a debug message.
