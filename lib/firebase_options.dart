@@ -32,49 +32,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDXMnLYQqLVLKGUqZZIbzZUTXMnTQUZXAE',
+    apiKey: 'AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE',
     appId: '1:91032840429:web:a9e9e9f9f9f9f9f9f9f9f9',
     messagingSenderId: '91032840429',
     projectId: 'next-gen-udyam',
     authDomain: 'next-gen-udyam.firebaseapp.com',
-    storageBucket: 'next-gen-udyam.appspot.com',
+    storageBucket: 'next-gen-udyam.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDXMnLYQqLVLKGUqZZIbzZUTXMnTQUZXAE',
-    appId: '1:91032840429:android:a9e9e9f9f9f9f9f9f9f9f9',
+    apiKey: 'AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE',
+    appId: '1:91032840429:android:a63734335340c355b884e4',
     messagingSenderId: '91032840429',
     projectId: 'next-gen-udyam',
-    storageBucket: 'next-gen-udyam.appspot.com',
+    storageBucket: 'next-gen-udyam.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDXMnLYQqLVLKGUqZZIbzZUTXMnTQUZXAE',
-    appId: '1:91032840429:ios:a9e9e9f9f9f9f9f9f9f9f9',
+    apiKey: 'AIzaSyDlhFumhQ8ice4gh_utX2T5c5q1I-0ZZ4Q',
+    appId: '1:91032840429:ios:3175a209c09c9edcb884e4',
     messagingSenderId: '91032840429',
     projectId: 'next-gen-udyam',
-    storageBucket: 'next-gen-udyam.appspot.com',
+    storageBucket: 'next-gen-udyam.firebasestorage.app',
     iosClientId:
-        '91032840429-a9e9e9f9f9f9f9f9f9f9f9f9f9f9f9f9.apps.googleusercontent.com',
-    iosBundleId: 'com.udyam.nextgen.nextGen',
+        '91032840429-mi0vep6nqklv7mgml89f38m50em03enp.apps.googleusercontent.com',
+    iosBundleId: 'com.udyam.nextgen.next-gen',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDXMnLYQqLVLKGUqZZIbzZUTXMnTQUZXAE',
+    apiKey: 'AIzaSyDlhFumhQ8ice4gh_utX2T5c5q1I-0ZZ4Q',
     appId: '1:91032840429:macos:a9e9e9f9f9f9f9f9f9f9f9f9f9f9f9f9',
     messagingSenderId: '91032840429',
     projectId: 'next-gen-udyam',
-    storageBucket: 'next-gen-udyam.appspot.com',
+    storageBucket: 'next-gen-udyam.firebasestorage.app',
     iosClientId:
-        '91032840429-a9e9e9f9f9f9f9f9f9f9f9f9f9f9f9f9.apps.googleusercontent.com',
-    iosBundleId: 'com.udyam.nextgen.nextGen.RunnerTests',
+        '91032840429-mi0vep6nqklv7mgml89f38m50em03enp.apps.googleusercontent.com',
+    iosBundleId: 'com.example.myApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDXMnLYQqLVLKGUqZZIbzZUTXMnTQUZXAE',
+    apiKey: 'AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE',
     appId: '1:91032840429:windows:a9e9e9f9f9f9f9f9f9f9f9f9f9f9f9f9',
     messagingSenderId: '91032840429',
     projectId: 'next-gen-udyam',
-    storageBucket: 'next-gen-udyam.appspot.com',
+    storageBucket: 'next-gen-udyam.firebasestorage.app',
   );
 }

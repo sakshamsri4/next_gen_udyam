@@ -67,6 +67,9 @@ lib/
 **Tasks:**
 1. Write failing tests for authentication functionality
 2. Implement AuthController with Firebase Authentication
+   - Email/password authentication
+   - Google Sign-In integration
+   - User session management
 3. Create login and signup pages using NeoPOP design
 4. Implement form validation with error handling
 5. Add animations for transitions and loading states
@@ -89,24 +92,44 @@ dependencies:
   firebase_auth: ^4.0.0
   google_sign_in: ^6.0.0
   neopop: ^1.0.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 ```
 
 **Test Cases:**
-- Unit tests for AuthController (login, register, logout)
+- Unit tests for AuthController (email login, Google login, register, logout)
 - Widget tests for LoginPage and SignupPage
 - Integration tests for full authentication flow
+- Mock tests for Google Sign-In
+- Session persistence tests with Hive
 
 **UI Components:**
 - Login form with email and password fields
 - Signup form with name, email, and password
 - Password reset functionality
-- Social login buttons (Google)
+- Google Sign-In button with NeoPOP styling
+- Email verification workflow
 - Loading indicators with NeoPOP styling
 - Error messages with proper styling
+- Session management UI (logged in state)
+
+**Authentication Flow:**
+1. Email/Password Authentication
+   - Registration with email verification
+   - Login with credential validation
+   - Password reset functionality
+   - Session persistence using Hive
+2. Google Sign-In
+   - OAuth consent flow
+   - User profile retrieval
+   - Account linking (if email exists)
+   - Session persistence using Hive
 
 **Deliverables:**
-- Fully functional authentication system
+- Fully functional authentication system with multiple providers
 - NeoPOP styled login and signup pages
+- Google authentication integration
+- Session management with Hive
 - Comprehensive test suite with 90%+ coverage
 
 ### 3. Resume Upload Module (3-4 days)
