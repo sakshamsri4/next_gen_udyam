@@ -25,14 +25,9 @@ class FirebaseOptions {
     this.authDomain,
     this.storageBucket,
   });
-  final String apiKey;
-  final String appId;
-  final String messagingSenderId;
-  final String projectId;
-  final String? authDomain;
-  final String? storageBucket;
 
-  static FirebaseOptions get currentPlatform {
+  // Constructor for default platform options
+  factory FirebaseOptions.forCurrentPlatform() {
     return FirebaseOptions(
       apiKey: 'AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE',
       appId: '1:91032840429:web:a9e9e9f9f9f9f9f9f9f9f9',
@@ -42,6 +37,16 @@ class FirebaseOptions {
       storageBucket: 'next-gen-udyam.firebasestorage.app',
     );
   }
+  final String apiKey;
+  final String appId;
+  final String messagingSenderId;
+  final String projectId;
+  final String? authDomain;
+  final String? storageBucket;
+
+  // Static getter for backward compatibility
+  static FirebaseOptions get currentPlatform =>
+      FirebaseOptions.forCurrentPlatform();
 }
 
 // Firebase Auth stub
