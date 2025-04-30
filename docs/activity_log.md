@@ -251,3 +251,34 @@
     - `LayoutBuilder` is effective for creating responsive spacing relative to the available screen dimensions.
     - Consistent styling across the main view and dialogs improves user experience.
     - If a recommended custom component (`CustomNeoPopButton`) doesn't exist, adapt using the available base components.
+
+- Task: Update CI/CD Configuration and Fix Code Coverage Issues
+  - **Issue Description**:
+    - CI build failing due to low code coverage (36.8% vs. required 85%)
+    - Flutter version in GitHub workflows needed updating
+    - SDK version requirement in pubspec.yaml needed adjustment for compatibility
+
+  - **Root Cause Analysis**:
+    - The pre-commit and pre-push hooks were not checking code coverage before allowing commits to be pushed
+    - Existing tests were not comprehensive enough to achieve the required 85% coverage
+    - Many files in the auth module, core theme, storage service, middleware, and routes had low or no test coverage
+
+  - **Working Solution**:
+    - Updated Flutter version in GitHub workflows from 3.16.0/3.22.2 to 3.29.3
+    - Changed SDK requirement in pubspec.yaml from ">=3.6.0 <4.0.0" to ">=3.2.0 <4.0.0" for compatibility
+    - Enhanced pre-push hook to check code coverage before pushing:
+      - Added code to run tests with coverage and verify minimum 85% coverage
+      - Added helpful error messages with instructions for generating coverage reports
+    - Created a plan to improve test coverage for:
+      - Auth module (models, services, controllers, views)
+      - Core theme files
+      - Storage service files
+      - Middleware files
+      - Routes files
+      - Logger service
+
+  - **Lessons Learned**:
+    - Always run code coverage checks locally before pushing changes
+    - Maintain comprehensive tests for all code, especially generated code
+    - Include code coverage checks in pre-push hooks to catch issues early
+    - Keep CI configuration in sync with local development environment
