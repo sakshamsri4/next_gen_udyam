@@ -11,6 +11,9 @@ import 'package:next_gen/core/services/logger_service.dart';
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
 
+  // Getter for testing
+  AuthService get authService => _authService;
+
   // Observable variables
   final Rx<User?> firebaseUser = Rx<User?>(null);
   final Rx<UserModel?> user = Rx<UserModel?>(null);
@@ -125,7 +128,7 @@ class AuthController extends GetxController {
         return;
       }
 
-      await _authService.registerWithEmailAndPassword(
+      await authService.registerWithEmailAndPassword(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
@@ -170,7 +173,7 @@ class AuthController extends GetxController {
         return;
       }
 
-      await _authService.signInWithEmailAndPassword(
+      await authService.signInWithEmailAndPassword(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
@@ -192,7 +195,7 @@ class AuthController extends GetxController {
     errorMessage.value = '';
 
     try {
-      final userCredential = await _authService.signInWithGoogle();
+      final userCredential = await authService.signInWithGoogle();
 
       if (userCredential == null) {
         // User canceled the sign-in flow
@@ -212,7 +215,7 @@ class AuthController extends GetxController {
     isLoading.value = true;
 
     try {
-      await _authService.signOut();
+      await authService.signOut();
       user.value = null;
       isLoggedIn.value = false;
     } catch (e) {
@@ -233,7 +236,7 @@ class AuthController extends GetxController {
         return;
       }
 
-      await _authService.resetPassword(emailController.text.trim());
+      await authService.resetPassword(emailController.text.trim());
 
       // Show success message with awesome snackbar
       const snackBar = SnackBar(
