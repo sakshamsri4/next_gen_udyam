@@ -13,6 +13,13 @@ class ThemeSettings {
 
   /// Whether the app is in dark mode
   bool isDarkMode;
+
+  /// Creates a copy of this ThemeSettings with specified attributes replaced
+  ThemeSettings copyWith({bool? isDarkMode}) {
+    return ThemeSettings(
+      isDarkMode: isDarkMode ?? this.isDarkMode,
+    );
+  }
 }
 
 /// Adapter for ThemeSettings to be used with Hive
