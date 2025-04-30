@@ -24,15 +24,14 @@
      - **D**urability: Design should be resilient to content changes and future updates.
 
 3. **Testing Rules:**
-   - Follow Test-Driven Development (TDD) principles:
-     - Write tests before implementing features (Red-Green-Refactor cycle).
-     - Start with failing tests (Red).
-     - Implement the minimum code to make tests pass (Green).
-     - Refactor code while keeping tests passing (Refactor).
+   - Follow minimal testing approach:
+     - Focus on testing critical functionality and user flows.
+     - Prioritize manual testing across different devices and platforms.
+     - Test responsive behavior on different screen sizes.
    - Ensure all tests are independent and don't rely on other tests.
    - Mock external dependencies to isolate the component being tested.
-   - Test both happy paths and edge cases/error conditions.
-   - Maintain a minimum test coverage threshold of 30%.
+   - Test both happy paths and edge cases/error conditions for critical flows.
+   - Maintain a minimum test coverage threshold of 5%.
    - Run the full test suite locally before pushing changes.
    - Document test failures and their resolutions in this log.
 
@@ -255,3 +254,42 @@
     - Implemented theme switching with GetX
     - Added Firebase initialization
     - Created basic home screen with navigation to NeoPOP examples
+
+## [2024-07-21]
+- Updated project development approach:
+  - **Issue Description**:
+    - Need to prioritize rapid development over comprehensive testing
+    - Current TDD approach was slowing down development
+    - Need to focus on responsive UI for Android, iOS, and web platforms
+    - Need to maintain CRED design guidelines while speeding up development
+
+  - **Working Solution**:
+    - Updated docs/project_roadmap.md with new development approach:
+      - Removed TDD-first approach in favor of rapid development
+      - Reduced test coverage requirement from 90%+ to 5%
+      - Added emphasis on responsive UI for all platforms
+      - Updated time estimates to reflect faster development
+      - Added responsive_builder and other UI packages to dependencies
+      - Added specific responsive UI guidelines
+      - Reduced total estimated time from 4-6 weeks to 3-5 weeks
+    - Renamed docs/tdd_guidelines.md to docs/testing_guidelines.md:
+      - Updated with new minimal testing approach
+      - Added focus on manual testing across different devices
+      - Added responsive testing guidelines
+      - Removed Red-Green-Refactor cycle requirement
+      - Added examples for testing responsive layouts
+    - Updated CI/CD pipeline requirements:
+      - Reduced test coverage requirement to 5%
+      - Simplified test requirements for PRs
+
+  - **Benefits**:
+    - Faster development cycle for quicker feature delivery
+    - More focus on user experience across different platforms
+    - Better alignment with project priorities
+    - More realistic timeline for project completion
+
+  - **Lessons Learned**:
+    - Adapt development approach to project requirements
+    - Balance quality and speed based on project priorities
+    - Focus testing efforts on critical functionality
+    - Document approach changes for team alignment
