@@ -16,9 +16,12 @@ STAGED_DART_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\
 
 # Apply Dart fixes and format Dart files
 if [[ -n "$STAGED_DART_FILES" ]]; then
-  # Apply Dart fixes
+  # Apply Dart fixes - process files one by one
   echo -e "${YELLOW}Applying Dart fixes...${NC}"
-  echo "$STAGED_DART_FILES" | xargs dart fix --apply
+  for file in $STAGED_DART_FILES; do
+    echo -e "Computing fixes in ${file}..."
+    dart fix --apply "$file"
+  done
 
   # Format Dart files
   echo -e "${YELLOW}Formatting Dart files...${NC}"
