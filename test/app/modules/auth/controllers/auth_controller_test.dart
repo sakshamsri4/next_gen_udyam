@@ -23,28 +23,33 @@ class TestAuthService implements AuthService {
   Future<void> Function()? _mockSignOut;
   Future<void> Function(String)? _mockResetPassword;
 
-  // Setters for mock functions
+  // Mock function setters - we don't need getters for testing
+  // ignore: avoid_setters_without_getters
   set mockSignInWithEmailAndPasswordFn(
-    Future<UserCredential> Function(String, String) fn,
+    Future<UserCredential> Function(String, String)? fn,
   ) {
     _mockSignInWithEmailAndPassword = fn;
   }
 
+  // ignore: avoid_setters_without_getters
   set mockRegisterWithEmailAndPasswordFn(
-    Future<UserCredential> Function(String, String) fn,
+    Future<UserCredential> Function(String, String)? fn,
   ) {
     _mockRegisterWithEmailAndPassword = fn;
   }
 
-  set mockSignInWithGoogleFn(Future<UserCredential?> Function() fn) {
+  // ignore: avoid_setters_without_getters
+  set mockSignInWithGoogleFn(Future<UserCredential?> Function()? fn) {
     _mockSignInWithGoogle = fn;
   }
 
-  set mockSignOutFn(Future<void> Function() fn) {
+  // ignore: avoid_setters_without_getters
+  set mockSignOutFn(Future<void> Function()? fn) {
     _mockSignOut = fn;
   }
 
-  set mockResetPasswordFn(Future<void> Function(String) fn) {
+  // ignore: avoid_setters_without_getters
+  set mockResetPasswordFn(Future<void> Function(String)? fn) {
     _mockResetPassword = fn;
   }
 
