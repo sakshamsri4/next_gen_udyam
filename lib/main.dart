@@ -1,10 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
-
-import 'core/theme/app_theme.dart';
-import 'core/theme/theme_controller.dart';
-import 'examples/neopop_example_screen.dart';
+import 'package:next_gen/core/theme/app_theme.dart';
+import 'package:next_gen/core/theme/theme_controller.dart';
+import 'package:next_gen/examples/neopop_example_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,9 +11,9 @@ void main() async {
   // Initialize Firebase
   try {
     await Firebase.initializeApp();
-    print('Firebase initialized successfully');
+    debugPrint('Firebase initialized successfully');
   } catch (e) {
-    print('Failed to initialize Firebase: $e');
+    debugPrint('Failed to initialize Firebase: $e');
   }
 
   // Initialize theme controller

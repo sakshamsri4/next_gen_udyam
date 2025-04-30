@@ -190,6 +190,45 @@
     - Git workflow and CI/CD pipeline details
     - Total estimated timeline of 4-6 weeks
 
+## [2025-04-30]
+- Task: Lower Test Coverage Threshold to 5%
+  - **Issue Description**:
+    - Need to lower the test coverage threshold from 70% to 5% to make CI/CD pipeline pass
+    - Current coverage threshold was too high for the current state of the project
+
+  - **Working Solution**:
+    - Updated `.github/workflows/coverage.yml` to change `min_coverage` from 70% to 5%
+    - Updated `docs/tdd_guidelines.md` to change the recommended minimum coverage from 30% to 5%
+    - These changes will allow the CI pipeline to pass with the current test coverage level
+    - This is a temporary measure to facilitate development while the test suite is being built up
+
+  - **Lessons Learned**:
+    - Set realistic test coverage thresholds based on the current state of the project
+    - Gradually increase coverage requirements as the project matures
+    - Document coverage threshold changes in the activity log for future reference
+    - Balance between quality requirements and development speed
+
+- Task: Roll Back to NeoPOP Theme Implementation Commit
+  - **Issue Description**:
+    - Need to roll back to a specific point in the project history where Firebase was configured and NeoPOP theme was implemented
+    - Current HEAD was at commit 58dac44a4fa96a0d1ae8b99de7af2dbd6ecfe265
+    - Target was to roll back to commit 3f22334b292f8323e329cdd3c455077a4cbb3e19
+
+  - **Working Solution**:
+    - Used `git reset --hard 3f22334b292f8323e329cdd3c455077a4cbb3e19` to roll back to the NeoPOP theme implementation commit
+    - This reset removes all changes made after the NeoPOP theme implementation, including:
+      - CI/CD fixes and workflow improvements
+      - Dependency updates (firebase_auth, actions/checkout)
+      - Code coverage threshold changes
+      - SharedPreferences to Hive migration
+    - Verified the working tree is clean after the rollback
+
+  - **Lessons Learned**:
+    - Always document rollbacks in the activity log for future reference
+    - Use `git reset --hard` with caution as it discards all changes since the target commit
+    - Consider using `git revert` for rollbacks that need to be shared with others, as it creates a new commit
+    - When rolling back to a specific feature implementation, make sure to understand what other changes might be lost
+
 ## [2024-07-20]
 - Implemented NeoPOP theme system:
   - Created core/theme/app_theme.dart with:

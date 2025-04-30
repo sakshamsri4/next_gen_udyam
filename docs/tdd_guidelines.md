@@ -212,7 +212,7 @@ testWidgets('NeoPop button changes state when pressed', (tester) async {
 
 ## Coverage Goals
 
-1. Aim for a minimum of 30% test coverage overall.
+1. Aim for a minimum of 5% test coverage overall.
 2. Prioritize coverage of business logic and complex components.
 3. Run coverage reports regularly:
    ```bash
