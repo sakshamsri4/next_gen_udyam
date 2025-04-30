@@ -8,6 +8,23 @@ import 'package:next_gen/core/services/logger_service.dart';
 class AuthService {
   // Factory constructor
   factory AuthService() => _instance;
+
+  // Constructor for testing
+  @visibleForTesting
+  factory AuthService.test({
+    FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
+  }) {
+    final service = AuthService._internal();
+    if (firebaseAuth != null) {
+      service._auth = firebaseAuth;
+    }
+    if (googleSignIn != null) {
+      service._googleSignIn = googleSignIn;
+    }
+    return service;
+  }
+
   // Private constructor
   AuthService._internal() {
     // Initialize GoogleSignIn with appropriate configuration
@@ -34,8 +51,9 @@ class AuthService {
   // Singleton pattern
   static final AuthService _instance = AuthService._internal();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  late final GoogleSignIn _googleSignIn;
+  // Changed from final to late so it can be mocked in tests
+  late FirebaseAuth _auth = FirebaseAuth.instance;
+  late GoogleSignIn _googleSignIn;
   final String _userBoxName = 'user_box';
 
   // Get current user
@@ -43,6 +61,9 @@ class AuthService {
 
   // Check if user is logged in
   bool get isLoggedIn => _auth.currentUser != null;
+
+  // Check if current user has verified email
+  bool get isEmailVerified => _auth.currentUser?.emailVerified ?? false;
 
   // Stream of auth changes
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -201,6 +222,98 @@ class AuthService {
       log.e('Failed to send password reset email to: $email', e, stackTrace);
       rethrow;
     }
+  }
+
+  // Send email verification to current user
+  Future<void> sendEmailVerification() async {
+    log.i('Attempting to send email verification');
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        await user.sendEmailVerification();
+        log.i('Verification email sent successfully to: ${user.email}');
+      } else {
+        throw Exception('No user logged in');
+      }
+    } catch (e, stackTrace) {
+      log.e('Failed to send verification email', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  // Update user profile
+  Future<void> updateUserProfile({
+    String? displayName,
+    String? photoURL,
+  }) async {
+    log.i('Attempting to update user profile');
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        if (displayName != null) {
+          await user.updateDisplayName(displayName);
+          log.d('Display name updated to: $displayName');
+        }
+
+        if (photoURL != null) {
+          await user.updatePhotoURL(photoURL);
+          log.d('Photo URL updated to: $photoURL');
+        }
+
+        // Reload user to get updated profile
+        await user.reload();
+
+        // Update user in Hive
+        if (_auth.currentUser != null) {
+          await _saveUserToHive(UserModel.fromFirebaseUser(_auth.currentUser!));
+          log.d('Updated user data saved to local storage');
+        }
+
+        log.i('User profile updated successfully');
+      } else {
+        throw Exception('No user logged in');
+      }
+    } catch (e, stackTrace) {
+      log.e('Failed to update user profile', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  // Get current Firebase user as UserModel
+  Future<UserModel?> getUserFromFirebase() async {
+    log.d('Getting current user from Firebase');
+    final user = _auth.currentUser;
+    if (user != null) {
+      return UserModel.fromFirebaseUser(user);
+    }
+    return null;
+  }
+
+  // Get user-friendly error message from FirebaseAuthException
+  String getErrorMessage(dynamic error) {
+    if (error is FirebaseAuthException) {
+      switch (error.code) {
+        case 'user-not-found':
+          return 'The email address was not found. Please check and try again.';
+        case 'wrong-password':
+          return 'The password is incorrect. Please try again.';
+        case 'email-already-in-use':
+          return 'This email is already in use. Please use a different email or try to sign in.';
+        case 'weak-password':
+          return 'The password is too weak. Please use a stronger password.';
+        case 'invalid-email':
+          return 'The email is invalid. Please enter a valid email address.';
+        case 'user-disabled':
+          return 'This account has been disabled. Please contact support.';
+        case 'too-many-requests':
+          return 'Too many attempts. Please try again later.';
+        case 'operation-not-allowed':
+          return 'This operation is not allowed. Please contact support.';
+        default:
+          return 'Unknown error occurred: ${error.message}';
+      }
+    }
+    return 'An unexpected error occurred. Please try again later.';
   }
 
   // Save user to Hive
