@@ -1,9 +1,33 @@
+// **************************************************************************
+// IMPORTANT: THIS IS A SAMPLE IMPLEMENTATION FOR REFERENCE ONLY
+// **************************************************************************
+//
+// This file demonstrates how to implement a responsive job card
+// using the recommended packages. It is NOT meant to be compiled as part
+// of the project and contains code that will not compile without the
+// required dependencies.
+//
+// Required packages:
+// - responsive_builder: ^0.7.0
+// - flutter_animate: ^4.2.0
+// - cached_network_image: ^3.3.0
+// - flutter_slidable: ^3.0.0
+// - neopop: ^1.0.2 (already included)
+//
+// To use this implementation in your project:
+// 1. Add the required packages to your pubspec.yaml
+// 2. Copy the relevant parts of this code to your project
+// 3. Modify as needed to fit your specific requirements
+// **************************************************************************
+
 import 'package:flutter/material.dart';
-import 'package:responsive_builder/responsive_builder.dart';
 import 'package:neopop/neopop.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+
+// The following imports would be needed for actual implementation
+// import 'package:responsive_builder/responsive_builder.dart';
+// import 'package:flutter_animate/flutter_animate.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:flutter_slidable/flutter_slidable.dart';
 
 /// A responsive job card that adapts to different screen sizes.
 ///
