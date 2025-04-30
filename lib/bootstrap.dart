@@ -4,14 +4,13 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:bloc/bloc.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart'; // Import GetX
 import 'package:hive_flutter/hive_flutter.dart'; // Import Hive Flutter
 import 'package:next_gen/app/modules/auth/models/user_model.dart'; // Import UserModel
 import 'package:next_gen/app/modules/auth/services/auth_service.dart'; // Import AuthService
 import 'package:next_gen/core/services/logger_service.dart'; // Import LoggerService
-import 'package:next_gen/firebase_options.dart';
+import 'package:next_gen/firebase_imports.dart'; // Import conditional Firebase imports
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -60,9 +59,8 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
 
   try {
     logger.i('Initializing Firebase...');
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    // Use our conditional Firebase initialization
+    await initializeFirebase();
     logger.i('Firebase Initialized Successfully');
     logger.i('Initializing Hive...');
 

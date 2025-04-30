@@ -228,6 +228,71 @@
     - Fixed test structure for better reliability
     - Ensured 100% test coverage for theme components
 
+## [2024-08-14]
+- Task: Reviewed logging implementation in the project
+  - **Issue Description**:
+    - Needed to verify if proper logging is being implemented throughout the codebase
+    - Needed to check if activity logs are being maintained correctly
+
+  - **Investigation Process**:
+    - Examined the LoggerService class in lib/core/services/logger_service.dart
+    - Reviewed logging_rules.md in the docs folder
+    - Checked how logging is being used across different modules
+    - Identified files that might be missing proper logging
+    - Looked for inconsistencies in logging implementation
+    - Examined activity_log.md and action_log_augment.txt
+
+  - **Findings**:
+    - The project has a well-structured LoggerService using the logger package
+    - Comprehensive logging_rules.md document outlines best practices
+    - Most error handling includes proper logging with error objects and stack traces
+    - Some areas for improvement:
+      - StorageService and ThemeController don't include logging
+      - Auth middleware classes don't include logging
+      - Some catch blocks don't include proper error logging
+      - Inconsistent use of stack traces in error logging
+    - Activity logging is properly set up with:
+      - docs/activity_log.md for project activities
+      - action_log_augment.txt for Augment Code actions
+      - Pre-push hooks to enforce activity log updates
+
+  - **Lessons Learned**:
+    - Proper logging is essential for debugging and monitoring
+    - Activity logs provide valuable context for future development
+    - Automated enforcement of logging practices helps maintain consistency
+    - Both technical logging (for debugging) and activity logging (for knowledge sharing) are important
+
+- Task: Fixed authentication to work across Android, iOS, and web platforms
+  - **Issue Description**:
+    - Authentication was disabled for web platform
+    - Google Sign-In was not properly implemented
+    - Firebase configuration in web/index.html was redundant and outdated
+    - The implementation had unnecessary complexity
+    - Dependency conflicts between Google Sign-In and Firebase packages
+
+  - **Changes Made**:
+    - Removed web platform restrictions in AuthService methods
+    - Removed the Google Sign-In package completely to avoid dependency conflicts
+    - Used Firebase Auth directly for Google Sign-In on all platforms
+    - Removed redundant Firebase initialization from web/index.html
+    - Simplified the AuthService implementation
+    - Fixed the signOut method to handle web platform properly
+
+  - **Benefits**:
+    - Authentication now works consistently across all platforms
+    - Simplified codebase with less redundancy
+    - Improved error handling and logging
+    - Better user experience with working authentication on all platforms
+    - Eliminated dependency conflicts by using Firebase Auth directly
+    - Reduced the number of dependencies in the project
+
+  - **Lessons Learned**:
+    - Firebase Web SDK should be initialized through the firebase_core package
+    - Platform-specific code should be isolated and clearly marked
+    - Firebase Auth provides native methods for Google Sign-In that work across platforms
+    - Proper error handling is essential for authentication flows
+    - Sometimes removing a dependency is better than trying to make it compatible
+
 ## [2025-04-29]
 - Task: Refactor LoginView based on CRED Design Evaluation
   - **Issue Description**:

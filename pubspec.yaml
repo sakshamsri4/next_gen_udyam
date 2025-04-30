@@ -9,9 +9,10 @@ environment:
 dependencies:
   awesome_snackbar_content: ^0.1.5
   bloc: ^9.0.0
-  firebase_auth: any
-  firebase_core: any
-  firebase_storage: any
+  cloud_firestore: ^4.8.0
+  firebase_auth: ^4.6.0
+  firebase_core: ^2.13.0
+  firebase_storage: ^11.2.0
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.0
@@ -19,10 +20,10 @@ dependencies:
     sdk: flutter
   font_awesome_flutter: ^10.8.0
   get: ^4.6.5
-  google_sign_in: ^6.3.0
+  # Removed google_sign_in to avoid dependency conflicts
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  intl: ">=0.18.1 <0.20.0"
+  intl: any
   logger: ^2.0.2+1
   neopop: ^1.0.2
 

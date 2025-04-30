@@ -1,6 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/foundation.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/core/services/logger_service.dart';
@@ -12,52 +11,27 @@ class AuthService {
   // Constructor for testing
   @visibleForTesting
   factory AuthService.test({
-    FirebaseAuth? firebaseAuth,
-    GoogleSignIn? googleSignIn,
+    firebase.FirebaseAuth? firebaseAuth,
   }) {
     final service = AuthService._internal();
     if (firebaseAuth != null) {
       service._auth = firebaseAuth;
     }
-    if (googleSignIn != null) {
-      service._googleSignIn = googleSignIn;
-    }
     return service;
   }
 
   // Private constructor
-  AuthService._internal() {
-    // Initialize GoogleSignIn with appropriate configuration
-    if (kIsWeb) {
-      // For web, we'll disable Google Sign-In for now
-      // We'll need to add the client ID in index.html later
-      _googleSignIn = GoogleSignIn(
-        scopes: [
-          'email',
-          'profile',
-        ],
-      );
-    } else {
-      // For mobile platforms
-      _googleSignIn = GoogleSignIn(
-        scopes: [
-          'email',
-          'profile',
-        ],
-      );
-    }
-  }
+  AuthService._internal();
 
   // Singleton pattern
   static final AuthService _instance = AuthService._internal();
 
   // Changed from final to late so it can be mocked in tests
-  late FirebaseAuth _auth = FirebaseAuth.instance;
-  late GoogleSignIn _googleSignIn;
+  late firebase.FirebaseAuth _auth = firebase.FirebaseAuth.instance;
   final String _userBoxName = 'user_box';
 
   // Get current user
-  User? get currentUser => _auth.currentUser;
+  firebase.User? get currentUser => _auth.currentUser;
 
   // Check if user is logged in
   bool get isLoggedIn => _auth.currentUser != null;
@@ -66,10 +40,10 @@ class AuthService {
   bool get isEmailVerified => _auth.currentUser?.emailVerified ?? false;
 
   // Stream of auth changes
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<firebase.User?> get authStateChanges => _auth.authStateChanges();
 
   // Register with email and password
-  Future<UserCredential> registerWithEmailAndPassword(
+  Future<firebase.UserCredential> registerWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -100,7 +74,7 @@ class AuthService {
   }
 
   // Sign in with email and password
-  Future<UserCredential> signInWithEmailAndPassword(
+  Future<firebase.UserCredential> signInWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -127,71 +101,38 @@ class AuthService {
   }
 
   // Sign in with Google
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<firebase.UserCredential?> signInWithGoogle() async {
     log.i('Attempting to sign in with Google');
     try {
+      firebase.UserCredential? userCredential;
+
+      // Use Firebase Auth directly with Google provider
+      final googleProvider = firebase.GoogleAuthProvider()
+        ..addScope('email')
+        ..addScope('profile');
+
       if (kIsWeb) {
         log.d('Using web-specific Google sign-in flow');
-        // For web, use Firebase's built-in Google auth provider
-        // This avoids the need for a client ID in the web app
-        final googleProvider = GoogleAuthProvider()
-          ..addScope('email')
-          ..addScope('profile');
-
-        // Sign in with popup
-        final userCredential = await _auth.signInWithPopup(googleProvider);
-        log.i(
-          'User signed in with Google successfully:'
-          ' ${userCredential.user?.uid}',
-        );
-
-        // Save user to Hive
-        if (userCredential.user != null) {
-          await _saveUserToHive(
-            UserModel.fromFirebaseUser(userCredential.user!),
-          );
-          log.d('User data saved to local storage');
-        }
-
-        return userCredential;
+        userCredential = await _auth.signInWithPopup(googleProvider);
       } else {
         log.d('Using mobile-specific Google sign-in flow');
-        // For mobile platforms, use the GoogleSignIn package
-        // Trigger the authentication flow
-        final googleUser = await _googleSignIn.signIn();
+        userCredential = await _auth.signInWithProvider(googleProvider);
+      }
 
-        if (googleUser == null) {
-          log.w('Google sign-in canceled by user');
-          return null; // User canceled the sign-in flow
-        }
-
-        log.d('Google sign-in successful, obtaining auth details');
-        // Obtain the auth details from the request
-        final googleAuth = await googleUser.authentication;
-
-        // Create a new credential
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        // Sign in to Firebase with the Google credential
-        final userCredential = await _auth.signInWithCredential(credential);
+      if (userCredential.user != null) {
         log.i(
           'User signed in with Google successfully:'
           ' ${userCredential.user?.uid}',
         );
 
         // Save user to Hive
-        if (userCredential.user != null) {
-          await _saveUserToHive(
-            UserModel.fromFirebaseUser(userCredential.user!),
-          );
-          log.d('User data saved to local storage');
-        }
-
-        return userCredential;
+        await _saveUserToHive(
+          UserModel.fromFirebaseUser(userCredential.user!),
+        );
+        log.d('User data saved to local storage');
       }
+
+      return userCredential;
     } catch (e, stackTrace) {
       log.e('Error signing in with Google', e, stackTrace);
       rethrow;
@@ -202,8 +143,9 @@ class AuthService {
   Future<void> signOut() async {
     log.i('Attempting to sign out user');
     try {
-      await _googleSignIn.signOut();
+      // Sign out from Firebase
       await _auth.signOut();
+      // Clear local storage
       await _clearUserFromHive();
       log.i('User signed out successfully');
     } catch (e, stackTrace) {
@@ -291,14 +233,15 @@ class AuthService {
 
   // Get user-friendly error message from FirebaseAuthException
   String getErrorMessage(dynamic error) {
-    if (error is FirebaseAuthException) {
+    if (error is firebase.FirebaseAuthException) {
       switch (error.code) {
         case 'user-not-found':
           return 'The email address was not found. Please check and try again.';
         case 'wrong-password':
           return 'The password is incorrect. Please try again.';
         case 'email-already-in-use':
-          return 'This email is already in use. Please use a different email or try to sign in.';
+          return 'This email is already in use. '
+              'Please use a different email or try to sign in.';
         case 'weak-password':
           return 'The password is too weak. Please use a stronger password.';
         case 'invalid-email':

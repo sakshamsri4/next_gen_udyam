@@ -1,5 +1,5 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
@@ -15,7 +15,7 @@ class AuthController extends GetxController {
   AuthService get authService => _authService;
 
   // Observable variables
-  final Rx<User?> firebaseUser = Rx<User?>(null);
+  final Rx<firebase.User?> firebaseUser = Rx<firebase.User?>(null);
   final Rx<UserModel?> user = Rx<UserModel?>(null);
   final RxBool isLoading = false.obs;
   final RxBool isLoggedIn = false.obs;
@@ -82,7 +82,7 @@ class AuthController extends GetxController {
   }
 
   // Set initial screen based on auth state
-  void _setInitialScreen(User? user) {
+  void _setInitialScreen(firebase.User? user) {
     if (user != null) {
       log.i('User authenticated: ${user.uid}');
       isLoggedIn.value = true;
@@ -151,7 +151,7 @@ class AuthController extends GetxController {
       );
 
       ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
-    } on FirebaseAuthException catch (e, stackTrace) {
+    } on firebase.FirebaseAuthException catch (e, stackTrace) {
       log.e('Firebase Auth error during registration', e, stackTrace);
       _handleFirebaseAuthError(e);
     } catch (e, stackTrace) {
@@ -180,7 +180,7 @@ class AuthController extends GetxController {
 
       // Clear form fields
       _clearFormFields();
-    } on FirebaseAuthException catch (e) {
+    } on firebase.FirebaseAuthException catch (e) {
       _handleFirebaseAuthError(e);
     } catch (e) {
       errorMessage.value = 'An unexpected error occurred';
@@ -201,7 +201,7 @@ class AuthController extends GetxController {
         // User canceled the sign-in flow
         errorMessage.value = 'Google sign-in was canceled';
       }
-    } on FirebaseAuthException catch (e) {
+    } on firebase.FirebaseAuthException catch (e) {
       _handleFirebaseAuthError(e);
     } catch (e) {
       errorMessage.value = 'An unexpected error occurred during Google sign-in';
@@ -251,7 +251,7 @@ class AuthController extends GetxController {
       );
 
       ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
-    } on FirebaseAuthException catch (e) {
+    } on firebase.FirebaseAuthException catch (e) {
       _handleFirebaseAuthError(e);
     } catch (e) {
       errorMessage.value = 'An unexpected error occurred';
@@ -261,7 +261,7 @@ class AuthController extends GetxController {
   }
 
   // Handle Firebase Auth errors
-  void _handleFirebaseAuthError(FirebaseAuthException e) {
+  void _handleFirebaseAuthError(firebase.FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
         errorMessage.value = 'No user found with this email';
