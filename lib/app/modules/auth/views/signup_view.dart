@@ -305,7 +305,7 @@ class SignupView extends GetView<AuthController> {
                             ),
                             TextButton(
                               onPressed: () =>
-                                  Get.toNamed<dynamic>(Routes.LOGIN),
+                                  Get.toNamed<dynamic>(Routes.login),
                               child: Text(
                                 'Sign In',
                                 style: TextStyle(

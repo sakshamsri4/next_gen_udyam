@@ -229,7 +229,7 @@ class AuthController extends GetxController {
 
       // Navigate to home
       log.d('Navigating to home screen');
-      await Get.offAllNamed<dynamic>(Routes.HOME);
+      await Get.offAllNamed<dynamic>(Routes.home);
     } on FirebaseAuthException catch (e) {
       log.e('Firebase Auth Exception during login', e, e.stackTrace);
       var errorMessage = 'An error occurred. Please try again.';
@@ -306,7 +306,7 @@ class AuthController extends GetxController {
 
       // Navigate to home
       log.d('Navigating to home screen');
-      await Get.offAllNamed<dynamic>(Routes.HOME);
+      await Get.offAllNamed<dynamic>(Routes.home);
 
       Get.snackbar(
         'Success',
@@ -459,7 +459,7 @@ class AuthController extends GetxController {
         ..i('Google sign-in successful for user: ${userCredential.user?.uid}')
         // Navigate to home
         ..d('Navigating to home screen');
-      await Get.offAllNamed<dynamic>(Routes.HOME);
+      await Get.offAllNamed<dynamic>(Routes.home);
     } catch (e, stackTrace) {
       log.e('Error during Google sign-in', e, stackTrace);
       Get.snackbar(
@@ -504,7 +504,7 @@ class AuthController extends GetxController {
       resetAllLoadingStates();
 
       log.i('Sign out successful, navigating to login screen');
-      await Get.offAllNamed<dynamic>(Routes.LOGIN);
+      await Get.offAllNamed<dynamic>(Routes.login);
     } catch (e, stackTrace) {
       log.e('Error during sign out', e, stackTrace);
       Get.snackbar(

@@ -144,7 +144,7 @@ class _LoginViewState extends State<LoginView> {
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
                                   onPressed: () => Get.toNamed<dynamic>(
-                                    Routes.FORGOT_PASSWORD,
+                                    Routes.forgotPassword,
                                   ),
                                   child: Text(
                                     'Forgot Password?',
@@ -295,7 +295,7 @@ class _LoginViewState extends State<LoginView> {
                             ),
                             TextButton(
                               onPressed: () =>
-                                  Get.toNamed<dynamic>(Routes.SIGNUP),
+                                  Get.toNamed<dynamic>(Routes.signup),
                               child: Text(
                                 'Sign Up',
                                 style: TextStyle(
