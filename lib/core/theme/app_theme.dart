@@ -28,8 +28,6 @@ class AppTheme {
       primary: electricBlue,
       secondary: lavender,
       error: coralRed,
-      background: lightGray,
-      surface: pureWhite,
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: electricBlue,
@@ -126,7 +124,6 @@ class AppTheme {
       primary: electricBlue,
       secondary: lavender,
       error: coralRed,
-      background: navyBlue,
       surface: Color(0xFF1A2138), // Slightly lighter than navyBlue
     ),
     appBarTheme: const AppBarTheme(
