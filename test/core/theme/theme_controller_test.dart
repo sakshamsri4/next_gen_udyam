@@ -29,15 +29,15 @@ void main() {
   tearDown(Get.reset);
 
   group('ThemeController', () {
-    testWidgets('initial theme is light', (WidgetTester tester) async {
+    testWidgets('initial theme is dark', (WidgetTester tester) async {
       await tester.pumpWidget(
         GetMaterialApp(
           home: Container(),
         ),
       );
 
-      expect(controller.isDarkMode, isFalse);
-      expect(controller.theme, equals(AppTheme.lightTheme));
+      expect(controller.isDarkMode, isTrue);
+      expect(controller.theme, equals(AppTheme.darkTheme));
     });
 
     testWidgets('toggleTheme changes theme mode', (WidgetTester tester) async {
@@ -47,20 +47,20 @@ void main() {
         ),
       );
 
-      // Initially light
-      expect(controller.isDarkMode, isFalse);
-
-      // Toggle to dark
-      controller.toggleTheme();
-      await tester.pump();
+      // Initially dark
       expect(controller.isDarkMode, isTrue);
-      expect(controller.theme, equals(AppTheme.darkTheme));
 
-      // Toggle back to light
+      // Toggle to light
       controller.toggleTheme();
       await tester.pump();
       expect(controller.isDarkMode, isFalse);
       expect(controller.theme, equals(AppTheme.lightTheme));
+
+      // Toggle back to dark
+      controller.toggleTheme();
+      await tester.pump();
+      expect(controller.isDarkMode, isTrue);
+      expect(controller.theme, equals(AppTheme.darkTheme));
     });
 
     testWidgets('setLightMode sets theme to light',
@@ -90,10 +90,12 @@ void main() {
         ),
       );
 
-      // Initially light
+      // Set to light first
+      controller.setLightMode();
+      await tester.pump();
       expect(controller.isDarkMode, isFalse);
 
-      // Set to dark
+      // Then set to dark
       controller.setDarkMode();
       await tester.pump();
       expect(controller.isDarkMode, isTrue);
