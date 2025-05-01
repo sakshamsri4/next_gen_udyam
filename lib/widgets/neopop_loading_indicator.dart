@@ -112,20 +112,12 @@ class _NeoPopLoadingPainter extends CustomPainter {
       transform: GradientRotation(animation.value * 2 * math.pi),
     ).createShader(rect);
 
-    // Create path for the arc
-    final path = Path()
-      ..addArc(
-        Rect.fromCircle(center: center, radius: radius),
-        0,
-        2 * math.pi,
-      );
-
     // Draw the background track
     canvas.drawCircle(
       center,
       radius,
       Paint()
-        ..color = primaryColor.withOpacity(0.15)
+        ..color = primaryColor.withAlpha(38) // 0.15 opacity = 38/255
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth,
     );

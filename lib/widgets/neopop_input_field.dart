@@ -112,8 +112,9 @@ class _NeoPopInputFieldState extends State<NeoPopInputField> {
   @override
   void dispose() {
     if (widget.focusNode == null) {
-      _focusNode.removeListener(_handleFocusChange);
-      _focusNode.dispose();
+      _focusNode
+        ..removeListener(_handleFocusChange)
+        ..dispose();
     }
     super.dispose();
   }

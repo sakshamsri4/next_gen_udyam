@@ -73,8 +73,8 @@ class ForgotPasswordView extends GetView<AuthController> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                "Enter your email address and we'll send you a link "
-                                'to reset your password.',
+                                "Enter your email address and we'll send you\n"
+                                'a link to reset your password.',
                                 style: Theme.of(context).textTheme.bodyLarge,
                                 textAlign: TextAlign.center,
                               ),

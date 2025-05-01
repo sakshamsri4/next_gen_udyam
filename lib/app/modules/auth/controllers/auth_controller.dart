@@ -48,8 +48,11 @@ class AuthController extends GetxController {
     _auth = FirebaseAuth.instance;
     _googleSignIn = GoogleSignIn(
       // Use the web client ID from the Firebase console
-      clientId:
-          '91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com',
+      clientId: const String.fromEnvironment(
+        'GOOGLE_CLIENT_ID',
+        defaultValue: '91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65'
+            '.apps.googleusercontent.com',
+      ),
     );
 
     // Reset all loading states
@@ -286,14 +289,13 @@ class AuthController extends GetxController {
         password: passwordController.text,
       );
 
-      log.i('User created with ID: ${userCredential.user?.uid}');
+      log
+        ..i('User created with ID: ${userCredential.user?.uid}')
+        // Update display name and reload user profile
+        ..d('Updating display name for user')
+        ..d('Reloading user profile');
 
-      // Update display name
-      log.d('Updating display name for user');
       await userCredential.user?.updateDisplayName(nameController.text.trim());
-
-      // Reload user to get updated profile
-      log.d('Reloading user profile');
       await userCredential.user?.reload();
 
       // Clear form
@@ -360,7 +362,8 @@ class AuthController extends GetxController {
 
     try {
       log.i(
-        'Attempting password reset for email: ${resetEmailController.text.trim()}',
+        'Attempting password reset for email:'
+        ' ${resetEmailController.text.trim()}',
       );
       isResetLoading.value = true;
 
@@ -452,10 +455,10 @@ class AuthController extends GetxController {
       // Sign in to Firebase with the Google credential
       final userCredential = await _auth.signInWithCredential(credential);
 
-      log.i('Google sign-in successful for user: ${userCredential.user?.uid}');
-
-      // Navigate to home
-      log.d('Navigating to home screen');
+      log
+        ..i('Google sign-in successful for user: ${userCredential.user?.uid}')
+        // Navigate to home
+        ..d('Navigating to home screen');
       await Get.offAllNamed<dynamic>(Routes.HOME);
     } catch (e, stackTrace) {
       log.e('Error during Google sign-in', e, stackTrace);

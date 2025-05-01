@@ -15,14 +15,20 @@ class LoggerService {
   /// Logger instance
   final Logger _logger = Logger(
     printer: PrettyPrinter(
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
-    level: kDebugMode ? Level.verbose : Level.info,
+    level: kDebugMode ? Level.trace : Level.info,
   );
 
-  /// Log a verbose message
+  /// Log a trace message (formerly verbose)
+  void t(String message, [dynamic error, StackTrace? stackTrace]) {
+    _logger.t(message, error: error, stackTrace: stackTrace);
+  }
+
+  /// Log a verbose message (deprecated, use t() instead)
+  @Deprecated('Use t() instead')
   void v(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.v(message, error: error, stackTrace: stackTrace);
+    _logger.t(message, error: error, stackTrace: stackTrace);
   }
 
   /// Log a debug message

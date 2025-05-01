@@ -50,11 +50,15 @@ class _HomeViewState extends State<HomeView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Obx(
-                () => Text(
-                  'Welcome, ${authController.user.value?.displayName ?? 'User'}!',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                  textAlign: TextAlign.center,
-                ),
+                () {
+                  final userName =
+                      authController.user.value?.displayName ?? 'User';
+                  return Text(
+                    'Welcome, $userName!',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                    textAlign: TextAlign.center,
+                  );
+                },
               ),
               const SizedBox(height: 16),
               Text(
@@ -65,7 +69,7 @@ class _HomeViewState extends State<HomeView> {
               const SizedBox(height: 32),
               CustomNeoPopButton.primary(
                 onTap: () {
-                  // TODO: Navigate to job listings
+                  // TODO(dev): Navigate to job listings
                   Get.snackbar(
                     'Coming Soon',
                     'Job listings feature is under development.',
@@ -88,7 +92,7 @@ class _HomeViewState extends State<HomeView> {
               const SizedBox(height: 16),
               CustomNeoPopButton.secondary(
                 onTap: () {
-                  // TODO: Navigate to resume upload
+                  // TODO(dev): Navigate to resume upload
                   Get.snackbar(
                     'Coming Soon',
                     'Resume upload feature is under development.',
