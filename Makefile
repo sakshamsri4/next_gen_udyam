@@ -1,6 +1,6 @@
 # Makefile for Next Gen Udyam project
 
-.PHONY: setup format format-all analyze test coverage lint fix-lint clean check pre-push feature bugfix hotfix docs spell-check extract-terms generate-icons outdated unused
+.PHONY: setup install-tools format format-all analyze test coverage check-coverage lint fix-lint clean check pre-push feature bugfix hotfix docs spell-check extract-terms generate-icons outdated unused
 
 # Setup the project and git hooks
 setup:
@@ -12,6 +12,28 @@ setup:
 	@flutter pub get
 	@./scripts/format_all.sh
 	@echo "Setup complete!"
+	@echo "NOTE: For full functionality, run 'make install-tools' to install required external tools."
+
+# Install required external tools
+install-tools:
+	@echo "Installing required external tools..."
+	@if command -v npm > /dev/null; then \
+		echo "Installing cspell..."; \
+		npm install -g cspell; \
+	else \
+		echo "npm not found. Please install Node.js and npm first."; \
+		exit 1; \
+	fi
+	@if command -v brew > /dev/null; then \
+		echo "Installing lcov using Homebrew..."; \
+		brew install lcov; \
+	elif command -v apt-get > /dev/null; then \
+		echo "Installing lcov using apt-get..."; \
+		sudo apt-get install -y lcov; \
+	else \
+		echo "Could not install lcov automatically. Please install it manually."; \
+	fi
+	@echo "Tools installation complete!"
 
 # Format code using dart format
 format:
@@ -40,9 +62,18 @@ coverage:
 		echo "Generating coverage report..."; \
 		genhtml coverage/lcov.info -o coverage/html; \
 		echo "Coverage report generated at coverage/html/index.html"; \
+		if command -v open >/dev/null 2>&1; then \
+			echo "Opening coverage report in browser..."; \
+			open coverage/html/index.html; \
+		fi; \
 	else \
 		echo "genhtml not found. Install lcov to generate HTML reports."; \
 	fi
+
+# Check if code coverage meets the minimum threshold
+check-coverage:
+	@echo "Checking code coverage..."
+	@./scripts/check_coverage.sh
 
 # Run linter checks
 lint:
@@ -60,8 +91,8 @@ clean:
 	@flutter clean
 	@rm -rf coverage
 
-# Run all checks (format, analyze, test)
-check: format analyze test
+# Run all checks (format, analyze, test, spell-check, coverage)
+check: format analyze test spell-check check-coverage
 	@echo "All checks passed!"
 
 # Run pre-push checks

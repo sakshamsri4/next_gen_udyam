@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class TestApp extends StatelessWidget {
   const TestApp({super.key});
 
@@ -17,6 +18,7 @@ class TestApp extends StatelessWidget {
     );
   }
 }
+
 
 void main() {
   // Initialize Flutter binding for tests
@@ -36,6 +38,7 @@ void main() {
       await tester.pumpWidget(const TestApp());
       expect(find.byType(MaterialApp), findsOneWidget);
       expect(find.text('Test App'), findsOneWidget);
+
     });
   });
 }

@@ -1,22 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:next_gen/core/storage/storage_service.dart';
+import 'package:next_gen/core/storage/theme_settings.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-// Mock SharedPreferences
-class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late ThemeController controller;
+  final mockThemeSettings = ThemeSettings();
+
+  // Store original implementations
+  final originalInitImpl = StorageService.initImpl;
+  final originalGetThemeSettingsImpl = StorageService.getThemeSettingsImpl;
+  final originalSaveThemeSettingsImpl = StorageService.saveThemeSettingsImpl;
 
   setUp(() {
-    // Set up SharedPreferences mock
-    SharedPreferences.setMockInitialValues({});
+    // Replace implementations with test versions
+    StorageService.initImpl = () async {
+      // No-op for testing
+    };
+
+    StorageService.getThemeSettingsImpl = () {
+      return mockThemeSettings;
+    };
+
+    StorageService.saveThemeSettingsImpl = (settings) async {
+      mockThemeSettings.isDarkMode = settings.isDarkMode;
+    };
+
+    // Reset mock state
+    mockThemeSettings.isDarkMode = false;
 
     // Initialize GetX
     Get.reset();
@@ -26,7 +42,14 @@ void main() {
     Get.put(controller);
   });
 
-  tearDown(Get.reset);
+  tearDown(() {
+    // Restore original implementations
+    StorageService.initImpl = originalInitImpl;
+    StorageService.getThemeSettingsImpl = originalGetThemeSettingsImpl;
+    StorageService.saveThemeSettingsImpl = originalSaveThemeSettingsImpl;
+
+    Get.reset();
+  });
 
   group('ThemeController', () {
     testWidgets('initial theme is dark', (WidgetTester tester) async {

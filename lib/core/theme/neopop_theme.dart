@@ -5,6 +5,7 @@ import 'package:next_gen/core/theme/app_theme.dart';
 /// Helper class for NeoPOP styling
 class NeoPopTheme {
   // Private constructor to prevent instantiation
+  // ignore: unused_element
   NeoPopTheme._();
 
   /// Primary button style

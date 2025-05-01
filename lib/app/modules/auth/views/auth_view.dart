@@ -20,5 +20,6 @@ class AuthView extends GetView<AuthController> {
         ),
       ),
     );
+
   }
 }

@@ -26,6 +26,24 @@ This will:
 - Format all Dart files
 - Prepare the development environment
 
+#### Required Tools
+
+In addition to Flutter and Dart, this project requires the following tools:
+
+- **cspell**: For spell checking (required for pre-push checks)
+  ```sh
+  npm install -g cspell
+  ```
+
+- **lcov**: For generating coverage reports
+  ```sh
+  # macOS
+  brew install lcov
+
+  # Ubuntu/Debian
+  sudo apt-get install lcov
+  ```
+
 ### Running the App
 
 This project contains 3 flavors:
@@ -53,9 +71,10 @@ _\*Next Gen works on iOS, Android, Web, and Windows._
 
 This project uses a comprehensive set of tools to ensure code quality and consistency:
 
-- **Pre-commit hook**: Automatically formats Dart files before committing
+- **Pre-commit hook**: Automatically formats Dart files and runs spell check before committing
 - **Pre-push hook**: Runs checks before pushing (format, analyze, test, spell check)
 - **Makefile**: Provides commands for common development tasks
+- **Spell Checking**: Ensures consistent spelling across the codebase (see `.cspell.json` for custom dictionary)
 
 #### Makefile Commands
 

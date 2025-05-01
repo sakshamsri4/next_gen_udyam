@@ -15,13 +15,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
+          flutter-version: '3.29.3'
           channel: 'stable'
+          cache: false
+
+      - name: Verify Flutter/Dart versions
+        run: |
+          flutter --version
+          dart --version
 
       - name: Install dependencies
         run: flutter pub get
@@ -33,4 +39,4 @@ jobs:
         uses: VeryGoodOpenSource/very_good_coverage@v3
         with:
           min_coverage: 5
-          path: ./coverage/lcov.info
+

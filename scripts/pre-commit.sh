@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Pre-commit hook to automatically format Dart files
-# This script will format all staged Dart files before committing
+# Pre-commit hook to run checks before committing
+# This script will run various checks to ensure code quality
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -11,32 +11,57 @@ NC='\033[0m' # No Color
 
 echo -e "${YELLOW}Running pre-commit hook...${NC}"
 
-# Get all staged Dart files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.dart$')
+# Get list of staged Dart files
+STAGED_DART_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.dart$')
 
-# Exit if no Dart files are staged
-if [[ -z "$STAGED_FILES" ]]; then
-  echo -e "${GREEN}No Dart files to format.${NC}"
-  exit 0
+# Apply Dart fixes and format Dart files
+if [[ -n "$STAGED_DART_FILES" ]]; then
+  # Apply Dart fixes - process files one by one
+  echo -e "${YELLOW}Applying Dart fixes...${NC}"
+  for file in $STAGED_DART_FILES; do
+    echo -e "Computing fixes in ${file}..."
+    dart fix --apply "$file"
+  done
+
+  # Format Dart files
+  echo -e "${YELLOW}Formatting Dart files...${NC}"
+  echo "$STAGED_DART_FILES" | xargs dart format
+
+  # Re-add the files to staging
+  echo "$STAGED_DART_FILES" | xargs git add
+  echo -e "${GREEN}Dart files fixed and formatted.${NC}"
+else
+  echo -e "${YELLOW}No Dart files to fix or format.${NC}"
 fi
 
-# Check if dart format is available
-if ! command -v dart &> /dev/null; then
-  echo -e "${RED}Error: dart command not found.${NC}"
-  echo -e "${YELLOW}Please make sure Flutter SDK is installed and in your PATH.${NC}"
-  exit 1
-fi
+# Check for spell checking tool and run it on staged files
+if command -v cspell &> /dev/null; then
+  STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(dart|md|yaml|json)$')
 
-echo -e "${YELLOW}Formatting staged Dart files...${NC}"
+  if [[ -n "$STAGED_FILES" ]]; then
+    echo -e "${YELLOW}Running spell check on staged files...${NC}"
+    SPELL_ERRORS=0
 
-# Format each staged Dart file
-for FILE in $STAGED_FILES; do
-  if [[ -f "$FILE" ]]; then
-    echo -e "  ${GREEN}Formatting:${NC} $FILE"
-    dart format "$FILE" --line-length=80
-    git add "$FILE"
+    for file in $STAGED_FILES; do
+      if ! cspell "$file" --no-progress; then
+        SPELL_ERRORS=1
+      fi
+    done
+
+    if [[ $SPELL_ERRORS -eq 1 ]]; then
+      echo -e "${RED}Error: Spell check found issues.${NC}"
+      echo -e "${YELLOW}Please fix the spelling issues before committing.${NC}"
+      echo -e "${YELLOW}You can add words to .cspell.json if they are valid technical terms.${NC}"
+      exit 1
+    fi
+
+    echo -e "${GREEN}Spell check passed.${NC}"
+  else
+    echo -e "${YELLOW}No files to spell check.${NC}"
   fi
-done
+else
+  echo -e "${YELLOW}cspell not found, skipping spell check.${NC}"
+  echo -e "${YELLOW}Consider installing cspell with 'npm install -g cspell' for better quality checks.${NC}"
+fi
 
-echo -e "${GREEN}Pre-commit formatting complete.${NC}"
 exit 0

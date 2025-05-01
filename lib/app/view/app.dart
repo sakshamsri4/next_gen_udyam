@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
+
 import 'package:next_gen/l10n/l10n.dart';
 
 class App extends StatelessWidget {
@@ -13,6 +14,7 @@ class App extends StatelessWidget {
     // Initialize theme controller
     Get.put(ThemeController());
     final themeController = ThemeController.to;
+
 
     return GetMaterialApp(
       title: 'Next Gen Job Portal',
@@ -25,6 +27,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+
     );
   }
 }
