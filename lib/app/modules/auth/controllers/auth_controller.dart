@@ -8,12 +8,8 @@ import 'package:next_gen/core/services/logger_service.dart';
 
 class AuthController extends GetxController {
   // Firebase instances
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    // Use the web client ID from the Firebase console
-    clientId:
-        '91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com',
-  );
+  late FirebaseAuth _auth;
+  late GoogleSignIn _googleSignIn;
 
   // User state
   final Rx<User?> user = Rx<User?>(null);
@@ -35,6 +31,7 @@ class AuthController extends GetxController {
   // UI state
   final isLoading = false.obs;
   final isResetLoading = false.obs;
+  final isSignOutLoading = false.obs;
   final isPasswordVisible = false.obs;
   final isConfirmPasswordVisible = false.obs;
 
@@ -46,20 +43,62 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    // Initialize Firebase Auth
+    _auth = FirebaseAuth.instance;
+    _googleSignIn = GoogleSignIn(
+      // Use the web client ID from the Firebase console
+      clientId:
+          '91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com',
+    );
+
+    // Reset all loading states
+    isLoading.value = false;
+    isResetLoading.value = false;
+    isSignOutLoading.value = false;
+
     // Listen to auth state changes
     user.value = _auth.currentUser;
     _auth.authStateChanges().listen((User? firebaseUser) {
       user.value = firebaseUser;
     });
+
+    log.d('AuthController initialized with loading states reset');
   }
 
   @override
   void onClose() {
-    nameController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    resetEmailController.dispose();
+    // Safely dispose controllers if they haven't been disposed already
+    try {
+      nameController.dispose();
+    } catch (e) {
+      log.d('nameController already disposed');
+    }
+
+    try {
+      emailController.dispose();
+    } catch (e) {
+      log.d('emailController already disposed');
+    }
+
+    try {
+      passwordController.dispose();
+    } catch (e) {
+      log.d('passwordController already disposed');
+    }
+
+    try {
+      confirmPasswordController.dispose();
+    } catch (e) {
+      log.d('confirmPasswordController already disposed');
+    }
+
+    try {
+      resetEmailController.dispose();
+    } catch (e) {
+      log.d('resetEmailController already disposed');
+    }
+
     super.onClose();
   }
 
@@ -187,7 +226,7 @@ class AuthController extends GetxController {
 
       // Navigate to home
       log.d('Navigating to home screen');
-      await Get.offAllNamed(Routes.HOME);
+      await Get.offAllNamed<dynamic>(Routes.HOME);
     } on FirebaseAuthException catch (e) {
       log.e('Firebase Auth Exception during login', e, e.stackTrace);
       var errorMessage = 'An error occurred. Please try again.';
@@ -265,7 +304,7 @@ class AuthController extends GetxController {
 
       // Navigate to home
       log.d('Navigating to home screen');
-      await Get.offAllNamed(Routes.HOME);
+      await Get.offAllNamed<dynamic>(Routes.HOME);
 
       Get.snackbar(
         'Success',
@@ -321,7 +360,8 @@ class AuthController extends GetxController {
 
     try {
       log.i(
-          'Attempting password reset for email: ${resetEmailController.text.trim()}');
+        'Attempting password reset for email: ${resetEmailController.text.trim()}',
+      );
       isResetLoading.value = true;
 
       log.d('Calling Firebase sendPasswordResetEmail');
@@ -344,7 +384,7 @@ class AuthController extends GetxController {
 
       // Go back to login
       log.d('Navigating back to login screen');
-      Get.back();
+      Get.back<dynamic>();
     } on FirebaseAuthException catch (e) {
       log.e('Firebase Auth Exception during password reset', e, e.stackTrace);
       var errorMessage = 'An error occurred. Please try again.';
@@ -416,7 +456,7 @@ class AuthController extends GetxController {
 
       // Navigate to home
       log.d('Navigating to home screen');
-      await Get.offAllNamed(Routes.HOME);
+      await Get.offAllNamed<dynamic>(Routes.HOME);
     } catch (e, stackTrace) {
       log.e('Error during Google sign-in', e, stackTrace);
       Get.snackbar(
@@ -432,17 +472,36 @@ class AuthController extends GetxController {
     }
   }
 
+  // Reset sign out loading state
+  void resetSignOutLoading() {
+    isSignOutLoading.value = false;
+    log.d('Sign out loading state reset');
+  }
+
+  // Reset all loading states
+  void resetAllLoadingStates() {
+    isLoading.value = false;
+    isResetLoading.value = false;
+    isSignOutLoading.value = false;
+    log.d('All loading states reset');
+  }
+
   Future<void> signOut() async {
     try {
       log.i('Attempting to sign out user');
+      isSignOutLoading.value = true;
+
       log.d('Signing out from Firebase');
       await _auth.signOut();
 
       log.d('Signing out from Google');
       await _googleSignIn.signOut();
 
+      // Reset all loading states before navigation
+      resetAllLoadingStates();
+
       log.i('Sign out successful, navigating to login screen');
-      await Get.offAllNamed(Routes.LOGIN);
+      await Get.offAllNamed<dynamic>(Routes.LOGIN);
     } catch (e, stackTrace) {
       log.e('Error during sign out', e, stackTrace);
       Get.snackbar(
@@ -452,6 +511,7 @@ class AuthController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+      resetAllLoadingStates();
     }
   }
 }

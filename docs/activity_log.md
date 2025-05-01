@@ -341,3 +341,247 @@
     - Maintain consistent styling across related screens
     - Implement proper dark mode with consideration for contrast and readability
     - Document UI changes in the activity log for future reference
+
+## [2024-07-23]
+- Fixed Firebase Authentication API Key Issue:
+  - **Issue Description**:
+    - Unable to create an account due to Firebase authentication error
+    - Error message: `[firebase_auth/api-key-not-valid.-please-pass-a-valid-api-key.]`
+    - Firebase web authentication was failing with invalid API key
+    - Web configuration was using incorrect API key and configuration values
+
+  - **Root Cause Analysis**:
+    - The Firebase configuration in `firebase_options.dart` was using placeholder values
+    - The web API key in the configuration was incorrect (`AIzaSyDXMnLYQqLVLKGUqZZIbzZUTXMnTQUZXAE`)
+    - The correct web API key from Firebase console is `AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE`
+    - The web app ID and storage bucket values were also incorrect
+    - The web/index.html file was missing proper Firebase SDK initialization
+
+  - **Working Solution**:
+    - Updated Firebase web configuration in `firebase_options.dart`:
+      - Corrected the API key to `AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE`
+      - Updated app ID to `1:91032840429:web:81ce18c1120eef75b884e4`
+      - Corrected storage bucket to `next-gen-udyam.firebasestorage.app`
+    - Enhanced web/index.html with proper Firebase configuration:
+      - Added Firebase SDK initialization with correct configuration
+      - Added Google Sign-In client ID meta tag
+      - Implemented proper module imports for Firebase web SDK
+    - Verified the configuration matches the Firebase console values
+
+  - **Benefits**:
+    - Fixed account creation functionality for web platform
+    - Properly configured Firebase for web authentication
+    - Ensured consistent configuration across platforms
+    - Improved error handling for authentication failures
+
+  - **Lessons Learned**:
+    - Always verify Firebase configuration values against the Firebase console
+    - Ensure proper web SDK initialization for Firebase web authentication
+    - Test authentication flows on all platforms (Android, iOS, web)
+    - Document configuration changes in the activity log for future reference
+    - Use the correct API keys for each platform (web, Android, iOS)
+
+- Fixed TextEditingController Disposal Issues:
+  - **Issue Description**:
+    - After fixing Firebase authentication, encountered errors with TextEditingControllers
+    - Error message: `A TextEditingController was used after being disposed`
+    - This occurred when navigating between auth screens (login, signup, forgot password)
+    - The error was causing UI glitches and potential crashes
+
+  - **Root Cause Analysis**:
+    - GetX was disposing controllers in the `onClose()` method when navigating between screens
+    - But the controllers were still being referenced by widgets after disposal
+    - The issue was related to how GetX manages controller lifecycle with `lazyPut`
+    - The service worker initialization in web/index.html was also outdated
+
+  - **Working Solution**:
+    - Updated AuthController's `onClose()` method with safe disposal:
+      - Added try-catch blocks around each controller disposal
+      - Added logging for disposal errors
+    - Modified AuthBinding to use permanent controller:
+      - Changed from `Get.lazyPut()` to `Get.put(permanent: true)`
+      - This prevents controller disposal when navigating between auth screens
+    - Fixed navigation methods with explicit type arguments:
+      - Updated all `Get.offAllNamed()` and `Get.back()` calls with `<dynamic>` type
+      - This resolves type inference warnings
+    - Updated web/index.html with modern Flutter web initialization:
+      - Replaced deprecated service worker registration
+      - Added proper Flutter.js initialization
+      - Added serviceWorkerVersion variable
+
+  - **Benefits**:
+    - Eliminated TextEditingController disposal errors
+    - Improved navigation between auth screens
+    - Fixed web initialization warnings
+    - Enhanced error handling and logging
+    - Improved overall app stability
+
+  - **Lessons Learned**:
+    - Use permanent controllers for screens that share the same controller
+    - Always handle controller disposal safely with try-catch blocks
+    - Use explicit type arguments for GetX navigation methods
+    - Keep web initialization code up to date with Flutter's recommendations
+    - Test navigation flows thoroughly to catch lifecycle issues
+
+- Fixed Logout Loading Indicator Issue:
+  - **Issue Description**:
+    - When logging out, the loading indicator kept spinning indefinitely
+    - The user was unable to see when the logout process completed
+    - This created a poor user experience and confusion
+
+  - **Root Cause Analysis**:
+    - The signOut method in AuthController was using isLoading.value which was shared with other operations
+    - The loading state wasn't being properly reset before navigation
+    - The HomeView wasn't properly handling the loading state lifecycle
+    - Firebase instances were defined as final, preventing proper initialization in onInit
+
+  - **Working Solution**:
+    - Created a dedicated isSignOutLoading state variable:
+      - Added a new Rx<bool> specifically for sign out operations
+      - This prevents conflicts with other loading operations
+    - Updated the signOut method in AuthController:
+      - Used isSignOutLoading.value instead of the shared isLoading.value
+      - Reset loading state before navigation to prevent state persistence
+      - Added proper error handling to reset loading state on errors
+    - Added a resetSignOutLoading method to AuthController:
+      - Created a dedicated method to reset the sign out loading state
+      - This can be called from any view to ensure proper state
+    - Converted HomeView to StatefulWidget:
+      - Changed from StatelessWidget to StatefulWidget
+      - Added initState to reset the loading state when the view is initialized
+      - This ensures the loading state is reset even if navigation is interrupted
+    - Made Firebase instances late variables:
+      - Changed from final to late variables
+      - This allows proper initialization in onInit
+      - Added client ID for Google Sign-In in initialization
+
+  - **Benefits**:
+    - Fixed the infinite loading indicator issue
+    - Improved separation of concerns with dedicated loading states
+    - Enhanced error handling and recovery
+    - Ensured proper state management across navigation
+    - Improved code organization and maintainability
+
+  - **Lessons Learned**:
+    - Use dedicated state variables for different operations
+    - Reset loading states before navigation, not just in finally blocks
+    - Convert to StatefulWidget when initialization logic is needed
+    - Use late variables instead of final for dependencies that need initialization
+    - Always test edge cases like interrupted navigation and error scenarios
+
+- Enhanced Loading Indicators Across Auth Module:
+  - **Issue Description**:
+    - Loading indicators across the app had inconsistent styling
+    - Some loading indicators were too large for their containers
+    - The sign out button had a colorful, attractive loading indicator that looked better than others
+    - Needed to create a consistent, visually appealing loading experience
+
+  - **Implementation Details**:
+    - Updated all loading indicators to match the sign out button's style:
+      - Standardized size to 20x20 pixels (reduced from 24x24)
+      - Used consistent strokeWidth of 2 for a more elegant spinner
+      - Removed unnecessary Center widgets for cleaner code
+    - Applied themed colors to match each button's context:
+      - White spinners for primary buttons (login, signup, reset password)
+      - Red spinners for Google sign-in buttons to match Google's brand color
+    - Added loading state handling to Google buttons:
+      - Wrapped Google buttons with Obx for reactive updates
+      - Disabled buttons during loading to prevent multiple clicks
+      - Added proper callback typing with arrow functions
+
+  - **Benefits**:
+    - Created a consistent, polished loading experience across the app
+    - Improved visual feedback during async operations
+    - Enhanced user experience with appropriately sized and colored indicators
+    - Prevented potential race conditions from multiple button clicks
+    - Made the UI feel more cohesive and professionally designed
+
+  - **Lessons Learned**:
+    - Consistent loading indicators improve perceived quality of the app
+    - Small UI details like spinner size and color make a big difference
+    - Matching indicator colors to button context creates a more cohesive experience
+    - Properly handling loading states for all buttons prevents user errors
+    - Standardizing UI patterns makes the codebase more maintainable
+
+## [2024-07-24]
+- Implemented Custom NeoPOP Loading Indicator:
+  - **Issue Description**:
+    - The default CircularProgressIndicator looked basic and didn't match the app's NeoPOP design
+    - Loading indicators across the app needed a more visually appealing and consistent style
+    - Web loading experience was poor with no initial loading indicator
+    - Needed a custom loading indicator that follows NeoPOP design principles
+
+  - **Implementation Details**:
+    - Created a custom NeoPopLoadingIndicator widget:
+      - Implemented a custom painter for a visually appealing animation
+      - Added gradient colors that match the app's theme
+      - Made size, colors, and stroke width customizable
+      - Used SingleTickerProviderStateMixin for smooth animations
+      - Added proper disposal of animation controllers
+    - Enhanced web loading experience:
+      - Added custom CSS-based loading indicator to web/index.html
+      - Created a branded loading screen with app name
+      - Added smooth transition from loading screen to app
+      - Used consistent colors with the app's theme
+    - Updated all loading indicators across the app:
+      - Replaced CircularProgressIndicator with NeoPopLoadingIndicator in login view
+      - Updated signup view with the new loading indicator
+      - Enhanced forgot password view with consistent loading style
+      - Updated home view's sign out button with the new indicator
+      - Made Google sign-in buttons use themed loading indicators
+
+  - **Benefits**:
+    - Created a visually distinctive loading experience that matches NeoPOP design
+    - Improved perceived performance with engaging loading animations
+    - Enhanced brand consistency across all loading states
+    - Improved web loading experience with branded initial loading screen
+    - Made the app feel more polished and professionally designed
+
+  - **Lessons Learned**:
+    - Custom loading indicators significantly improve perceived app quality
+    - Web loading experience is an important part of the overall UX
+    - Consistent animation styles help create a cohesive design language
+    - Small UI details like loading indicators contribute greatly to brand identity
+    - Using custom painters provides more control over animations than built-in widgets
+
+## [2024-07-25]
+- Fixed Persistent Loading Indicator After Sign Out:
+  - **Issue Description**:
+    - After signing out and returning to the login screen, the loading indicator continued to spin
+    - This affected both the primary login button and Google sign-in button
+    - The issue created a confusing user experience as it appeared the app was still processing
+    - Users couldn't tell if they needed to wait or could proceed with login
+
+  - **Root Cause Analysis**:
+    - The `isLoading` state variable was shared between login and Google sign-in methods
+    - When signing out, only the `isSignOutLoading` state was being reset, not the `isLoading` state
+    - The LoginView was a StatelessWidget with no initialization logic to reset states
+    - The loading state persisted across navigation due to the permanent controller binding
+
+  - **Working Solution**:
+    - Added a comprehensive `resetAllLoadingStates()` method to AuthController:
+      - Created a single method to reset all loading state variables
+      - Made it accessible for use in different parts of the app
+      - Added proper logging for debugging
+    - Converted LoginView to StatefulWidget:
+      - Changed from StatelessWidget to StatefulWidget
+      - Added initState method to initialize controller and reset states
+      - Called `resetAllLoadingStates()` when the login view is initialized
+    - Updated signOut method to use the new reset method:
+      - Replaced individual state reset with the comprehensive method
+      - Updated both the success path and error handling path
+      - Ensured all loading states are reset before navigation
+
+  - **Benefits**:
+    - Fixed the persistent loading indicator issue after sign out
+    - Improved user experience by providing clear visual feedback
+    - Enhanced state management with a more comprehensive approach
+    - Prevented potential state conflicts between different loading operations
+    - Made the code more maintainable with centralized state reset logic
+
+  - **Lessons Learned**:
+    - Always reset all relevant state variables when navigating between screens
+    - Use StatefulWidget when initialization logic is needed
+    - Create comprehensive state reset methods instead of resetting individual states
+    - Test navigation flows thoroughly, especially back navigation
+    - Consider how shared state variables might affect different parts of the app

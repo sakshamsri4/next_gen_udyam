@@ -9,10 +9,27 @@ import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
 import 'package:next_gen/widgets/neopop_card.dart';
 import 'package:next_gen/widgets/neopop_input_field.dart';
+import 'package:next_gen/widgets/neopop_loading_indicator.dart';
 import 'package:next_gen/widgets/nextgen_logo.dart';
 
-class LoginView extends GetView<AuthController> {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  late final AuthController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.find<AuthController>();
+
+    // Reset all loading states when the login view is initialized
+    controller.resetAllLoadingStates();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,16 +177,8 @@ class LoginView extends GetView<AuthController> {
                                     ),
                                     child: Obx(
                                       () => controller.isLoading.value
-                                          ? const SizedBox(
-                                              height: 24,
-                                              width: 24,
-                                              child: Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: Colors.white,
-                                                  strokeWidth: 2,
-                                                ),
-                                              ),
+                                          ? const NeoPopLoadingIndicator(
+                                              color: Colors.white,
                                             )
                                           : const Center(
                                               child: Text(
@@ -230,32 +239,43 @@ class LoginView extends GetView<AuthController> {
                         const SizedBox(height: 32),
 
                         // Google Sign In Button
-                        CustomNeoPopButton.flat(
-                          onTap: controller.signInWithGoogle,
-                          color:
-                              isDarkMode ? AppTheme.darkSurface2 : Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const FaIcon(
-                                  FontAwesomeIcons.google,
-                                  size: 20,
-                                  color: Colors.red,
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'Sign in with Google',
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? AppTheme.offWhite
-                                        : Colors.black87,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
+                        Obx(
+                          () => CustomNeoPopButton.flat(
+                            onTap: controller.isLoading.value
+                                ? () {}
+                                : () => controller.signInWithGoogle(),
+                            color: isDarkMode
+                                ? AppTheme.darkSurface2
+                                : Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: controller.isLoading.value
+                                  ? const NeoPopLoadingIndicator(
+                                      color: Colors.red,
+                                      secondaryColor: AppTheme.coralRed,
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const FaIcon(
+                                          FontAwesomeIcons.google,
+                                          size: 20,
+                                          color: Colors.red,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Sign in with Google',
+                                          style: TextStyle(
+                                            color: isDarkMode
+                                                ? AppTheme.offWhite
+                                                : Colors.black87,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                             ),
                           ),
                         ),
