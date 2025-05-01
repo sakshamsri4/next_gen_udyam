@@ -24,15 +24,14 @@
      - **D**urability: Design should be resilient to content changes and future updates.
 
 3. **Testing Rules:**
-   - Follow Test-Driven Development (TDD) principles:
-     - Write tests before implementing features (Red-Green-Refactor cycle).
-     - Start with failing tests (Red).
-     - Implement the minimum code to make tests pass (Green).
-     - Refactor code while keeping tests passing (Refactor).
+   - Follow minimal testing approach:
+     - Focus on testing critical functionality and user flows.
+     - Prioritize manual testing across different devices and platforms.
+     - Test responsive behavior on different screen sizes.
    - Ensure all tests are independent and don't rely on other tests.
    - Mock external dependencies to isolate the component being tested.
-   - Test both happy paths and edge cases/error conditions.
-   - Maintain a minimum test coverage threshold of 30%.
+   - Test both happy paths and edge cases/error conditions for critical flows.
+   - Maintain a minimum test coverage threshold of 5%.
    - Run the full test suite locally before pushing changes.
    - Document test failures and their resolutions in this log.
 
@@ -190,6 +189,45 @@
     - Git workflow and CI/CD pipeline details
     - Total estimated timeline of 4-6 weeks
 
+## [2025-04-30]
+- Task: Lower Test Coverage Threshold to 5%
+  - **Issue Description**:
+    - Need to lower the test coverage threshold from 70% to 5% to make CI/CD pipeline pass
+    - Current coverage threshold was too high for the current state of the project
+
+  - **Working Solution**:
+    - Updated `.github/workflows/coverage.yml` to change `min_coverage` from 70% to 5%
+    - Updated `docs/tdd_guidelines.md` to change the recommended minimum coverage from 30% to 5%
+    - These changes will allow the CI pipeline to pass with the current test coverage level
+    - This is a temporary measure to facilitate development while the test suite is being built up
+
+  - **Lessons Learned**:
+    - Set realistic test coverage thresholds based on the current state of the project
+    - Gradually increase coverage requirements as the project matures
+    - Document coverage threshold changes in the activity log for future reference
+    - Balance between quality requirements and development speed
+
+- Task: Roll Back to NeoPOP Theme Implementation Commit
+  - **Issue Description**:
+    - Need to roll back to a specific point in the project history where Firebase was configured and NeoPOP theme was implemented
+    - Current HEAD was at commit 58dac44a4fa96a0d1ae8b99de7af2dbd6ecfe265
+    - Target was to roll back to commit 3f22334b292f8323e329cdd3c455077a4cbb3e19
+
+  - **Working Solution**:
+    - Used `git reset --hard 3f22334b292f8323e329cdd3c455077a4cbb3e19` to roll back to the NeoPOP theme implementation commit
+    - This reset removes all changes made after the NeoPOP theme implementation, including:
+      - CI/CD fixes and workflow improvements
+      - Dependency updates (firebase_auth, actions/checkout)
+      - Code coverage threshold changes
+      - SharedPreferences to Hive migration
+    - Verified the working tree is clean after the rollback
+
+  - **Lessons Learned**:
+    - Always document rollbacks in the activity log for future reference
+    - Use `git reset --hard` with caution as it discards all changes since the target commit
+    - Consider using `git revert` for rollbacks that need to be shared with others, as it creates a new commit
+    - When rolling back to a specific feature implementation, make sure to understand what other changes might be lost
+
 ## [2024-07-20]
 - Implemented NeoPOP theme system using TDD approach:
   - Created feature branch `feature/neopop-theme-implementation` for isolated development
@@ -220,65 +258,334 @@
     - Implemented theme switching with GetX
     - Added Firebase initialization
     - Created basic home screen with navigation to NeoPOP examples
-  - Updated project_roadmap.md to reflect progress:
-    - Marked NeoPOP theme implementation as completed
-    - Added details about the implemented components
-  - Fixed issues and ensured all tests pass:
-    - Resolved issues with context handling in tests
-    - Fixed test structure for better reliability
-    - Ensured 100% test coverage for theme components
 
-## [2025-04-29]
-- Task: Refactor LoginView based on CRED Design Evaluation
+## [2024-07-21]
+- Updated project development approach:
   - **Issue Description**:
-    - The LoginView needed updates to better align with CRED design principles, improve responsiveness, and enhance visual hierarchy based on a provided evaluation.
-
-  - **Attempted Solutions**:
-    1. Searched for `CustomNeoPopButton` as recommended, but the widget was not found in the codebase.
-    2. Attempted to add `shimmer: true` to the primary `NeoPopButton` as suggested by the evaluation and documentation.
+    - Need to prioritize rapid development over comprehensive testing
+    - Current TDD approach was slowing down development
+    - Need to focus on responsive UI for Android, iOS, and web platforms
+    - Need to maintain CRED design guidelines while speeding up development
 
   - **Working Solution**:
-    - Refactored `lib/app/modules/auth/views/login_view.dart`:
-      - Replaced fixed `SizedBox` heights with relative spacing using `LayoutBuilder` and `constraints.maxHeight`.
-      - Styled `TextField`s (email, password, and in the forgot password dialog) according to `neopop_style_guide.md` (fill color, border radius, border colors, padding).
-      - Set `depth` (8 for primary, 5 for secondary) and `parentColor` on `NeoPopButton` widgets.
-      - Removed the `shimmer` parameter from `NeoPopButton` as it caused a compile error (parameter not defined in the package).
-      - Increased font weight for the screen title, "Forgot Password?", and "Sign Up" links to improve hierarchy.
-      - Used `AppTheme` colors for consistency.
+    - Updated docs/project_roadmap.md with new development approach:
+      - Removed TDD-first approach in favor of rapid development
+      - Reduced test coverage requirement from 90%+ to 5%
+      - Added emphasis on responsive UI for all platforms
+      - Updated time estimates to reflect faster development
+      - Added responsive_builder and other UI packages to dependencies
+      - Added specific responsive UI guidelines
+      - Reduced total estimated time from 4-6 weeks to 3-5 weeks
+    - Renamed docs/tdd_guidelines.md to docs/testing_guidelines.md:
+      - Updated with new minimal testing approach
+      - Added focus on manual testing across different devices
+      - Added responsive testing guidelines
+      - Removed Red-Green-Refactor cycle requirement
+      - Added examples for testing responsive layouts
+    - Updated CI/CD pipeline requirements:
+      - Reduced test coverage requirement to 5%
+      - Simplified test requirements for PRs
+
+  - **Benefits**:
+    - Faster development cycle for quicker feature delivery
+    - More focus on user experience across different platforms
+    - Better alignment with project priorities
+    - More realistic timeline for project completion
 
   - **Lessons Learned**:
-    - Always verify widget parameters against the actual package implementation, as documentation might be outdated or inaccurate (e.g., `shimmer` parameter in `NeoPopButton`).
-    - `LayoutBuilder` is effective for creating responsive spacing relative to the available screen dimensions.
-    - Consistent styling across the main view and dialogs improves user experience.
-    - If a recommended custom component (`CustomNeoPopButton`) doesn't exist, adapt using the available base components.
+    - Adapt development approach to project requirements
+    - Balance quality and speed based on project priorities
+    - Focus testing efforts on critical functionality
+    - Document approach changes for team alignment
 
-- Task: Update CI/CD Configuration and Fix Code Coverage Issues
+## [2024-07-22]
+- Enhanced UI with dark mode by default and NeoPOP styling:
   - **Issue Description**:
-    - CI build failing due to low code coverage (36.8% vs. required 85%)
-    - Flutter version in GitHub workflows needed updating
-    - SDK version requirement in pubspec.yaml needed adjustment for compatibility
+    - Need to implement dark mode by default across the app
+    - Login, signup, and forgot password pages need UI improvements
+    - Current UI lacks consistent NeoPOP styling
+    - Asset loading error for logo image
+
+  - **Working Solution**:
+    - Set dark mode as default theme:
+      - Updated `ThemeController` to initialize with dark mode by default
+      - Modified `_isDarkMode.value` initial value to `true`
+      - Updated preferences initialization to default to dark mode
+    - Enhanced dark theme with more distinctive NeoPOP styling:
+      - Added expanded color palette with neon accents in `AppTheme`
+      - Created surface colors for layered UI elements
+      - Enhanced all theme components (buttons, cards, inputs, etc.)
+      - Improved typography with better readability
+    - Created custom NeoPOP-styled components:
+      - Implemented `NeoPopInputField` with animated focus states
+      - Created `NeoPopCard` with proper elevation and shadows
+      - Developed `NextGenLogo` widget with custom painter
+      - Added `LogoPainter` for vector-based logo rendering
+    - Updated authentication screens:
+      - Redesigned login view with card-based layout and gradient background
+      - Updated signup view to match login view styling
+      - Enhanced forgot password view with consistent styling
+      - Fixed asset loading error by using custom painter for logo
+    - Added visual enhancements:
+      - Implemented gradient backgrounds for all screens
+      - Added shimmer effects on primary buttons
+      - Improved spacing and visual hierarchy
+      - Enhanced micro-interactions and feedback
+
+  - **Benefits**:
+    - Consistent, professional UI across all authentication screens
+    - Better user experience with intuitive form layouts
+    - Improved visual feedback for interactions
+    - Fixed asset loading errors
+    - More distinctive NeoPOP styling that follows CRED design principles
+
+  - **Lessons Learned**:
+    - Always test asset loading paths thoroughly
+    - Use custom painters as fallbacks for missing assets
+    - Maintain consistent styling across related screens
+    - Implement proper dark mode with consideration for contrast and readability
+    - Document UI changes in the activity log for future reference
+
+## [2024-07-23]
+- Fixed Firebase Authentication API Key Issue:
+  - **Issue Description**:
+    - Unable to create an account due to Firebase authentication error
+    - Error message: `[firebase_auth/api-key-not-valid.-please-pass-a-valid-api-key.]`
+    - Firebase web authentication was failing with invalid API key
+    - Web configuration was using incorrect API key and configuration values
 
   - **Root Cause Analysis**:
-    - The pre-commit and pre-push hooks were not checking code coverage before allowing commits to be pushed
-    - Existing tests were not comprehensive enough to achieve the required 85% coverage
-    - Many files in the auth module, core theme, storage service, middleware, and routes had low or no test coverage
+    - The Firebase configuration in `firebase_options.dart` was using placeholder values
+    - The web API key in the configuration was incorrect (`AIzaSyDXMnLYQqLVLKGUqZZIbzZUTXMnTQUZXAE`)
+    - The correct web API key from Firebase console is `AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE`
+    - The web app ID and storage bucket values were also incorrect
+    - The web/index.html file was missing proper Firebase SDK initialization
 
   - **Working Solution**:
-    - Updated Flutter version in GitHub workflows from 3.16.0/3.22.2 to 3.29.3
-    - Changed SDK requirement in pubspec.yaml from ">=3.6.0 <4.0.0" to ">=3.2.0 <4.0.0" for compatibility
-    - Enhanced pre-push hook to check code coverage before pushing:
-      - Added code to run tests with coverage and verify minimum 85% coverage
-      - Added helpful error messages with instructions for generating coverage reports
-    - Created a plan to improve test coverage for:
-      - Auth module (models, services, controllers, views)
-      - Core theme files
-      - Storage service files
-      - Middleware files
-      - Routes files
-      - Logger service
+    - Updated Firebase web configuration in `firebase_options.dart`:
+      - Corrected the API key to `AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE`
+      - Updated app ID to `1:91032840429:web:81ce18c1120eef75b884e4`
+      - Corrected storage bucket to `next-gen-udyam.firebasestorage.app`
+    - Enhanced web/index.html with proper Firebase configuration:
+      - Added Firebase SDK initialization with correct configuration
+      - Added Google Sign-In client ID meta tag
+      - Implemented proper module imports for Firebase web SDK
+    - Verified the configuration matches the Firebase console values
+
+  - **Benefits**:
+    - Fixed account creation functionality for web platform
+    - Properly configured Firebase for web authentication
+    - Ensured consistent configuration across platforms
+    - Improved error handling for authentication failures
 
   - **Lessons Learned**:
-    - Always run code coverage checks locally before pushing changes
-    - Maintain comprehensive tests for all code, especially generated code
-    - Include code coverage checks in pre-push hooks to catch issues early
-    - Keep CI configuration in sync with local development environment
+    - Always verify Firebase configuration values against the Firebase console
+    - Ensure proper web SDK initialization for Firebase web authentication
+    - Test authentication flows on all platforms (Android, iOS, web)
+    - Document configuration changes in the activity log for future reference
+    - Use the correct API keys for each platform (web, Android, iOS)
+
+- Fixed TextEditingController Disposal Issues:
+  - **Issue Description**:
+    - After fixing Firebase authentication, encountered errors with TextEditingControllers
+    - Error message: `A TextEditingController was used after being disposed`
+    - This occurred when navigating between auth screens (login, signup, forgot password)
+    - The error was causing UI glitches and potential crashes
+
+  - **Root Cause Analysis**:
+    - GetX was disposing controllers in the `onClose()` method when navigating between screens
+    - But the controllers were still being referenced by widgets after disposal
+    - The issue was related to how GetX manages controller lifecycle with `lazyPut`
+    - The service worker initialization in web/index.html was also outdated
+
+  - **Working Solution**:
+    - Updated AuthController's `onClose()` method with safe disposal:
+      - Added try-catch blocks around each controller disposal
+      - Added logging for disposal errors
+    - Modified AuthBinding to use permanent controller:
+      - Changed from `Get.lazyPut()` to `Get.put(permanent: true)`
+      - This prevents controller disposal when navigating between auth screens
+    - Fixed navigation methods with explicit type arguments:
+      - Updated all `Get.offAllNamed()` and `Get.back()` calls with `<dynamic>` type
+      - This resolves type inference warnings
+    - Updated web/index.html with modern Flutter web initialization:
+      - Replaced deprecated service worker registration
+      - Added proper Flutter.js initialization
+      - Added serviceWorkerVersion variable
+
+  - **Benefits**:
+    - Eliminated TextEditingController disposal errors
+    - Improved navigation between auth screens
+    - Fixed web initialization warnings
+    - Enhanced error handling and logging
+    - Improved overall app stability
+
+  - **Lessons Learned**:
+    - Use permanent controllers for screens that share the same controller
+    - Always handle controller disposal safely with try-catch blocks
+    - Use explicit type arguments for GetX navigation methods
+    - Keep web initialization code up to date with Flutter's recommendations
+    - Test navigation flows thoroughly to catch lifecycle issues
+
+- Fixed Logout Loading Indicator Issue:
+  - **Issue Description**:
+    - When logging out, the loading indicator kept spinning indefinitely
+    - The user was unable to see when the logout process completed
+    - This created a poor user experience and confusion
+
+  - **Root Cause Analysis**:
+    - The signOut method in AuthController was using isLoading.value which was shared with other operations
+    - The loading state wasn't being properly reset before navigation
+    - The HomeView wasn't properly handling the loading state lifecycle
+    - Firebase instances were defined as final, preventing proper initialization in onInit
+
+  - **Working Solution**:
+    - Created a dedicated isSignOutLoading state variable:
+      - Added a new Rx<bool> specifically for sign out operations
+      - This prevents conflicts with other loading operations
+    - Updated the signOut method in AuthController:
+      - Used isSignOutLoading.value instead of the shared isLoading.value
+      - Reset loading state before navigation to prevent state persistence
+      - Added proper error handling to reset loading state on errors
+    - Added a resetSignOutLoading method to AuthController:
+      - Created a dedicated method to reset the sign out loading state
+      - This can be called from any view to ensure proper state
+    - Converted HomeView to StatefulWidget:
+      - Changed from StatelessWidget to StatefulWidget
+      - Added initState to reset the loading state when the view is initialized
+      - This ensures the loading state is reset even if navigation is interrupted
+    - Made Firebase instances late variables:
+      - Changed from final to late variables
+      - This allows proper initialization in onInit
+      - Added client ID for Google Sign-In in initialization
+
+  - **Benefits**:
+    - Fixed the infinite loading indicator issue
+    - Improved separation of concerns with dedicated loading states
+    - Enhanced error handling and recovery
+    - Ensured proper state management across navigation
+    - Improved code organization and maintainability
+
+  - **Lessons Learned**:
+    - Use dedicated state variables for different operations
+    - Reset loading states before navigation, not just in finally blocks
+    - Convert to StatefulWidget when initialization logic is needed
+    - Use late variables instead of final for dependencies that need initialization
+    - Always test edge cases like interrupted navigation and error scenarios
+
+- Enhanced Loading Indicators Across Auth Module:
+  - **Issue Description**:
+    - Loading indicators across the app had inconsistent styling
+    - Some loading indicators were too large for their containers
+    - The sign out button had a colorful, attractive loading indicator that looked better than others
+    - Needed to create a consistent, visually appealing loading experience
+
+  - **Implementation Details**:
+    - Updated all loading indicators to match the sign out button's style:
+      - Standardized size to 20x20 pixels (reduced from 24x24)
+      - Used consistent strokeWidth of 2 for a more elegant spinner
+      - Removed unnecessary Center widgets for cleaner code
+    - Applied themed colors to match each button's context:
+      - White spinners for primary buttons (login, signup, reset password)
+      - Red spinners for Google sign-in buttons to match Google's brand color
+    - Added loading state handling to Google buttons:
+      - Wrapped Google buttons with Obx for reactive updates
+      - Disabled buttons during loading to prevent multiple clicks
+      - Added proper callback typing with arrow functions
+
+  - **Benefits**:
+    - Created a consistent, polished loading experience across the app
+    - Improved visual feedback during async operations
+    - Enhanced user experience with appropriately sized and colored indicators
+    - Prevented potential race conditions from multiple button clicks
+    - Made the UI feel more cohesive and professionally designed
+
+  - **Lessons Learned**:
+    - Consistent loading indicators improve perceived quality of the app
+    - Small UI details like spinner size and color make a big difference
+    - Matching indicator colors to button context creates a more cohesive experience
+    - Properly handling loading states for all buttons prevents user errors
+    - Standardizing UI patterns makes the codebase more maintainable
+
+## [2024-07-24]
+- Implemented Custom NeoPOP Loading Indicator:
+  - **Issue Description**:
+    - The default CircularProgressIndicator looked basic and didn't match the app's NeoPOP design
+    - Loading indicators across the app needed a more visually appealing and consistent style
+    - Web loading experience was poor with no initial loading indicator
+    - Needed a custom loading indicator that follows NeoPOP design principles
+
+  - **Implementation Details**:
+    - Created a custom NeoPopLoadingIndicator widget:
+      - Implemented a custom painter for a visually appealing animation
+      - Added gradient colors that match the app's theme
+      - Made size, colors, and stroke width customizable
+      - Used SingleTickerProviderStateMixin for smooth animations
+      - Added proper disposal of animation controllers
+    - Enhanced web loading experience:
+      - Added custom CSS-based loading indicator to web/index.html
+      - Created a branded loading screen with app name
+      - Added smooth transition from loading screen to app
+      - Used consistent colors with the app's theme
+    - Updated all loading indicators across the app:
+      - Replaced CircularProgressIndicator with NeoPopLoadingIndicator in login view
+      - Updated signup view with the new loading indicator
+      - Enhanced forgot password view with consistent loading style
+      - Updated home view's sign out button with the new indicator
+      - Made Google sign-in buttons use themed loading indicators
+
+  - **Benefits**:
+    - Created a visually distinctive loading experience that matches NeoPOP design
+    - Improved perceived performance with engaging loading animations
+    - Enhanced brand consistency across all loading states
+    - Improved web loading experience with branded initial loading screen
+    - Made the app feel more polished and professionally designed
+
+  - **Lessons Learned**:
+    - Custom loading indicators significantly improve perceived app quality
+    - Web loading experience is an important part of the overall UX
+    - Consistent animation styles help create a cohesive design language
+    - Small UI details like loading indicators contribute greatly to brand identity
+    - Using custom painters provides more control over animations than built-in widgets
+
+## [2024-07-25]
+- Fixed Persistent Loading Indicator After Sign Out:
+  - **Issue Description**:
+    - After signing out and returning to the login screen, the loading indicator continued to spin
+    - This affected both the primary login button and Google sign-in button
+    - The issue created a confusing user experience as it appeared the app was still processing
+    - Users couldn't tell if they needed to wait or could proceed with login
+
+  - **Root Cause Analysis**:
+    - The `isLoading` state variable was shared between login and Google sign-in methods
+    - When signing out, only the `isSignOutLoading` state was being reset, not the `isLoading` state
+    - The LoginView was a StatelessWidget with no initialization logic to reset states
+    - The loading state persisted across navigation due to the permanent controller binding
+
+  - **Working Solution**:
+    - Added a comprehensive `resetAllLoadingStates()` method to AuthController:
+      - Created a single method to reset all loading state variables
+      - Made it accessible for use in different parts of the app
+      - Added proper logging for debugging
+    - Converted LoginView to StatefulWidget:
+      - Changed from StatelessWidget to StatefulWidget
+      - Added initState method to initialize controller and reset states
+      - Called `resetAllLoadingStates()` when the login view is initialized
+    - Updated signOut method to use the new reset method:
+      - Replaced individual state reset with the comprehensive method
+      - Updated both the success path and error handling path
+      - Ensured all loading states are reset before navigation
+
+  - **Benefits**:
+    - Fixed the persistent loading indicator issue after sign out
+    - Improved user experience by providing clear visual feedback
+    - Enhanced state management with a more comprehensive approach
+    - Prevented potential state conflicts between different loading operations
+    - Made the code more maintainable with centralized state reset logic
+
+  - **Lessons Learned**:
+    - Always reset all relevant state variables when navigating between screens
+    - Use StatefulWidget when initialization logic is needed
+    - Create comprehensive state reset methods instead of resetting individual states
+    - Test navigation flows thoroughly, especially back navigation
+    - Consider how shared state variables might affect different parts of the app

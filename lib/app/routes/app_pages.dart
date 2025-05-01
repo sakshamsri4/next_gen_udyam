@@ -1,64 +1,50 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:next_gen/app/middleware/auth_guard.dart';
-import 'package:next_gen/app/middleware/auth_middleware.dart';
+
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';
 import 'package:next_gen/app/modules/auth/views/auth_view.dart';
-import 'package:next_gen/app/modules/auth/views/profile_view.dart';
+import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
+import 'package:next_gen/app/modules/auth/views/login_view.dart';
+import 'package:next_gen/app/modules/auth/views/signup_view.dart';
+import 'package:next_gen/app/modules/home/views/home_view.dart';
+
 
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
 
-  static const initialRoute = Routes.auth;
+  static const initial = Routes.login;
 
-  static final routes = <GetPage<dynamic>>[
+  static final routes = [
     GetPage<dynamic>(
       name: _Paths.home,
-      page: () => const HomeScreen(),
-      binding: BindingsBuilder<dynamic>(() {
-        // Add any bindings needed for home screen
-      }),
-      middlewares: [AuthGuard()],
+      page: () => const HomeView(),
+      binding: AuthBinding(),
+
     ),
     GetPage<dynamic>(
       name: _Paths.auth,
       page: () => const AuthView(),
       binding: AuthBinding(),
-      middlewares: [AuthMiddleware()],
     ),
     GetPage<dynamic>(
-      name: _Paths.profile,
-      page: () => const ProfileView(),
+      name: _Paths.login,
+      page: () => const LoginView(),
       binding: AuthBinding(),
-      middlewares: [AuthGuard()],
+      transition: Transition.fadeIn,
+    ),
+    GetPage<dynamic>(
+      name: _Paths.signup,
+      page: () => const SignupView(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage<dynamic>(
+      name: _Paths.forgotPassword,
+      page: () => const ForgotPasswordView(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
     ),
   ];
 }
 
-// Temporary Home Screen until we implement the actual home module
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Next Gen Job Portal'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () => Get.toNamed<dynamic>(_Paths.profile),
-          ),
-        ],
-      ),
-      body: const Center(
-        child: Text(
-          'Welcome to Next Gen Job Portal',
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
-    );
-  }
-}
