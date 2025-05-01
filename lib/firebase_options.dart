@@ -32,12 +32,12 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDXMnLYQqLVLKGUqZZIbzZUTXMnTQUZXAE',
-    appId: '1:91032840429:web:a9e9e9f9f9f9f9f9f9f9f9',
+    apiKey: 'AIzaSyCqgFjXKoh67bjYcsAbdgdMpPF7QCYpNEE',
+    appId: '1:91032840429:web:81ce18c1120eef75b884e4',
     messagingSenderId: '91032840429',
     projectId: 'next-gen-udyam',
     authDomain: 'next-gen-udyam.firebaseapp.com',
-    storageBucket: 'next-gen-udyam.appspot.com',
+    storageBucket: 'next-gen-udyam.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

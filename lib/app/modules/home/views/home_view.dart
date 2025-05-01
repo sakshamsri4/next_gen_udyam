@@ -4,15 +4,31 @@ import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
+import 'package:next_gen/widgets/neopop_loading_indicator.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
-    final themeController = ThemeController.to;
+  State<HomeView> createState() => _HomeViewState();
+}
 
+class _HomeViewState extends State<HomeView> {
+  late final AuthController authController;
+  late final ThemeController themeController;
+
+  @override
+  void initState() {
+    super.initState();
+    authController = Get.find<AuthController>();
+    themeController = ThemeController.to;
+
+    // Reset sign out loading state when the view is initialized
+    authController.resetSignOutLoading();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Next Gen Job Portal'),
@@ -29,15 +45,17 @@ class HomeView extends StatelessWidget {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Obx(() => Text(
-                    'Welcome, ${authController.user.value?.displayName ?? 'User'}!',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                    textAlign: TextAlign.center,
-                  )),
+              Obx(
+                () => Text(
+                  'Welcome, ${authController.user.value?.displayName ?? 'User'}!',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ),
               const SizedBox(height: 16),
               Text(
                 'You have successfully logged in to the Next Gen Job Portal.',
@@ -91,19 +109,36 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              CustomNeoPopButton.flat(
-                onTap: authController.signOut,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  child: Text(
-                    'Sign Out',
-                    style: TextStyle(
-                      color: AppTheme.coralRed,
-                      fontWeight: FontWeight.bold,
+              Obx(() {
+                // Use a separate function for the onTap callback
+                void handleSignOut() {
+                  if (!authController.isSignOutLoading.value) {
+                    authController.signOut();
+                  }
+                }
+
+                return CustomNeoPopButton.flat(
+                  onTap: handleSignOut,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
                     ),
+                    child: authController.isSignOutLoading.value
+                        ? const NeoPopLoadingIndicator(
+                            color: AppTheme.coralRed,
+                            secondaryColor: Colors.red,
+                          )
+                        : const Text(
+                            'Sign Out',
+                            style: TextStyle(
+                              color: AppTheme.coralRed,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
-                ),
-              ),
+                );
+              }),
             ],
           ),
         ),

@@ -7,6 +7,7 @@ import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
 import 'package:next_gen/widgets/neopop_card.dart';
 import 'package:next_gen/widgets/neopop_input_field.dart';
+import 'package:next_gen/widgets/neopop_loading_indicator.dart';
 import 'package:next_gen/widgets/nextgen_logo.dart';
 
 class ForgotPasswordView extends GetView<AuthController> {
@@ -113,13 +114,8 @@ class ForgotPasswordView extends GetView<AuthController> {
                                     ),
                                     child: Obx(
                                       () => controller.isResetLoading.value
-                                          ? const SizedBox(
-                                              height: 24,
-                                              width: 24,
-                                              child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                                strokeWidth: 2,
-                                              ),
+                                          ? const NeoPopLoadingIndicator(
+                                              color: Colors.white,
                                             )
                                           : const Center(
                                               child: Text(
