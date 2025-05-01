@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:next_gen/core/theme/app_theme.dart';
 
 /// A custom painter that draws the NextGen logo.
 class LogoPainter extends CustomPainter {
@@ -109,9 +108,7 @@ class LogoPainter extends CustomPainter {
         ),
       ),
       textDirection: TextDirection.ltr,
-    );
-
-    taglinePainter.layout(maxWidth: width);
+    )..layout(maxWidth: width);
     final taglineOffset = Offset(
       (width - taglinePainter.width) / 2,
       height * 0.8,

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';

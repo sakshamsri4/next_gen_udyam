@@ -11,8 +11,10 @@ class NeoPopLoadingIndicator extends StatefulWidget {
   ///
   /// The [size] parameter determines the size of the indicator.
   /// The [color] parameter determines the primary color of the indicator.
-  /// The [secondaryColor] parameter determines the secondary color of the indicator.
-  /// The [strokeWidth] parameter determines the width of the indicator's stroke.
+  /// The [secondaryColor] parameter determines
+  ///  the secondary color of the indicator.
+  /// The [strokeWidth] parameter determines
+  /// the width of the indicator's stroke.
   const NeoPopLoadingIndicator({
     this.size = 20.0,
     this.color,
@@ -136,22 +138,23 @@ class _NeoPopLoadingPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     // Rotate the canvas for the animation
-    canvas.save();
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate(animation.value * 2 * math.pi);
-    canvas.translate(-center.dx, -center.dy);
+    canvas
+      ..save()
+      ..translate(center.dx, center.dy)
+      ..rotate(animation.value * 2 * math.pi)
+      ..translate(-center.dx, -center.dy);
 
     // Draw the arc with varying sweep angle for animation effect
     final sweepAngle = math.sin(animation.value * math.pi) * math.pi + math.pi;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2 + animation.value * 4 * math.pi,
-      sweepAngle,
-      false,
-      arcPaint,
-    );
-
-    canvas.restore();
+    canvas
+      ..drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        -math.pi / 2 + animation.value * 4 * math.pi,
+        sweepAngle,
+        false,
+        arcPaint,
+      )
+      ..restore();
   }
 
   @override
