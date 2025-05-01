@@ -32,7 +32,7 @@ void main() {
     };
 
     // Reset mock state
-    mockThemeSettings.isDarkMode = false;
+    mockThemeSettings.isDarkMode = true;
 
     // Initialize GetX
     Get.reset();

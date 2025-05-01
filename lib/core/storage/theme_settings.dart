@@ -9,7 +9,7 @@ const themeSettingsBoxName = 'theme_settings';
 /// Model class for theme settings stored in Hive
 class ThemeSettings {
   /// Constructor for ThemeSettings
-  ThemeSettings({this.isDarkMode = false});
+  ThemeSettings({this.isDarkMode = true});
 
   /// Whether the app is in dark mode
   bool isDarkMode;

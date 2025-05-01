@@ -9,7 +9,7 @@ class ThemeController extends GetxController {
   static ThemeController get to => Get.find();
 
   final _isDarkMode = true.obs;
-  final _themeSettings = Rx<ThemeSettings>(ThemeSettings(isDarkMode: true));
+  final _themeSettings = Rx<ThemeSettings>(ThemeSettings());
 
   /// Whether the app is in dark mode
   bool get isDarkMode => _isDarkMode.value;
@@ -34,7 +34,7 @@ class ThemeController extends GetxController {
     } catch (e) {
       // If there's an error, use the default dark mode
       _isDarkMode.value = true;
-      _themeSettings.value = ThemeSettings(isDarkMode: true);
+      _themeSettings.value = ThemeSettings();
       Get.changeThemeMode(ThemeMode.dark);
     }
   }

@@ -31,8 +31,8 @@ void main() {
       // This test indirectly tests the constructor
       final controller = ThemeController();
       expect(controller, isNotNull);
-      expect(controller.isDarkMode, isFalse);
-      expect(controller.theme, equals(AppTheme.lightTheme));
+      expect(controller.isDarkMode, isTrue);
+      expect(controller.theme, equals(AppTheme.darkTheme));
     });
   });
 }
