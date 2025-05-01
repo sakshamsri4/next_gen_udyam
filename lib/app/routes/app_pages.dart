@@ -7,7 +7,6 @@ import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
 
-
 part 'app_routes.dart';
 
 class AppPages {
@@ -20,7 +19,6 @@ class AppPages {
       name: _Paths.home,
       page: () => const HomeView(),
       binding: AuthBinding(),
-
     ),
     GetPage<dynamic>(
       name: _Paths.auth,
@@ -47,4 +45,3 @@ class AppPages {
     ),
   ];
 }
-

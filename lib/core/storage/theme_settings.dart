@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
 /// Hive type ID for ThemeSettings
-const themeSettingsTypeId = 0;
+const themeSettingsTypeId = 1;
 
 /// Hive box name for theme settings
 const themeSettingsBoxName = 'theme_settings';
