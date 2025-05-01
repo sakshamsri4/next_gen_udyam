@@ -3,18 +3,18 @@ part of 'app_pages.dart';
 
 abstract class Routes {
   Routes._();
-  static const home = _Paths.HOME;
-  static const auth = _Paths.AUTH;
-  static const login = _Paths.LOGIN;
-  static const signup = _Paths.SIGNUP;
-  static const forgotPassword = _Paths.FORGOT_PASSWORD;
+  static const home = _Paths.home;
+  static const auth = _Paths.auth;
+  static const login = _Paths.login;
+  static const signup = _Paths.signup;
+  static const forgotPassword = _Paths.forgotPassword;
 }
 
 abstract class _Paths {
   _Paths._();
-  static const HOME = '/home';
-  static const AUTH = '/auth';
-  static const LOGIN = '/login';
-  static const SIGNUP = '/signup';
-  static const FORGOT_PASSWORD = '/forgot-password';
+  static const home = '/home';
+  static const auth = '/auth';
+  static const login = '/login';
+  static const signup = '/signup';
+  static const forgotPassword = '/forgot-password';
 }
