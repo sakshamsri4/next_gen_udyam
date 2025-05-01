@@ -73,21 +73,12 @@ class NextGenLogo extends StatelessWidget {
                   ),
                 ),
 
-              // Logo image
-              Image.asset(
-                'assets/images/logo.png',
-                width: size * 0.8,
-                height: size * 0.8,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  // Fallback if image asset is not found
-                  return _buildFallbackLogo(
-                    context,
-                    primaryColor,
-                    secondaryColor,
-                    textColor,
-                  );
-                },
+              // Use custom painter for logo
+              _buildFallbackLogo(
+                context,
+                primaryColor,
+                secondaryColor,
+                textColor,
               ),
             ],
           ),
