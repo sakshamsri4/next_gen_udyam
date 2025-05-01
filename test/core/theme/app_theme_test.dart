@@ -59,7 +59,6 @@ void main() {
       expect(
         theme.appBarTheme.backgroundColor,
         equals(AppTheme.darkSurface2),
-
       );
       expect(theme.appBarTheme.foregroundColor, equals(AppTheme.pureWhite));
       expect(theme.appBarTheme.elevation, equals(0));

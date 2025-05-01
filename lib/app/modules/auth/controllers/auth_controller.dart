@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
@@ -41,7 +40,6 @@ class AuthController extends GetxController {
   final isSignupButtonEnabled = false.obs;
   final isResetButtonEnabled = false.obs;
 
-
   @override
   void onInit() {
     super.onInit();
@@ -69,7 +67,6 @@ class AuthController extends GetxController {
     });
 
     log.d('AuthController initialized with loading states reset');
-
   }
 
   @override
@@ -519,6 +516,5 @@ class AuthController extends GetxController {
       );
       resetAllLoadingStates();
     }
-
   }
 }

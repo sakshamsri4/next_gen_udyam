@@ -150,7 +150,6 @@ class AppTheme {
       onSecondary: pureWhite,
       onSurface: offWhite,
       onError: pureWhite,
-
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: darkSurface2,
