@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:responsive_builder/responsive_builder.dart';
-
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
@@ -9,6 +7,7 @@ import 'package:next_gen/widgets/neopop_card.dart';
 import 'package:next_gen/widgets/neopop_input_field.dart';
 import 'package:next_gen/widgets/neopop_loading_indicator.dart';
 import 'package:next_gen/widgets/nextgen_logo.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 
 class ForgotPasswordView extends GetView<AuthController> {
   const ForgotPasswordView({super.key});

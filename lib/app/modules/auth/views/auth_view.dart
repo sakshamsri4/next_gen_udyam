@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-import '../controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 
 class AuthView extends GetView<AuthController> {
   const AuthView({super.key});

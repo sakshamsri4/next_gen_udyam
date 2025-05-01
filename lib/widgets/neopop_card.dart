@@ -79,7 +79,7 @@ class _NeoPopCardState extends State<NeoPopCard>
       duration: const Duration(milliseconds: 100),
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.98).animate(
+    _scaleAnimation = Tween<double>(begin: 1, end: 0.98).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
@@ -120,13 +120,13 @@ class _NeoPopCardState extends State<NeoPopCard>
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     // Define colors based on theme
-    final Color cardColor =
+    final cardColor =
         widget.color ?? (isDarkMode ? AppTheme.darkSurface2 : Colors.white);
 
-    final Color cardBorderColor = widget.borderColor ??
+    final cardBorderColor = widget.borderColor ??
         (isDarkMode ? AppTheme.darkSurface3 : AppTheme.lightGray);
 
-    final Color shadowColor =
+    final shadowColor =
         isDarkMode ? Colors.black.withAlpha(100) : Colors.grey.withAlpha(50);
 
     return AnimatedBuilder(
@@ -148,7 +148,6 @@ class _NeoPopCardState extends State<NeoPopCard>
                 borderRadius: BorderRadius.circular(widget.borderRadius),
                 border: Border.all(
                   color: cardBorderColor,
-                  width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -163,9 +162,10 @@ class _NeoPopCardState extends State<NeoPopCard>
                 child: widget.shimmer
                     ? _ShimmerEffect(
                         child: Padding(
-                        padding: widget.padding,
-                        child: widget.child,
-                      ))
+                          padding: widget.padding,
+                          child: widget.child,
+                        ),
+                      )
                     : Padding(
                         padding: widget.padding,
                         child: widget.child,
@@ -201,7 +201,7 @@ class _ShimmerEffectState extends State<_ShimmerEffect>
       duration: const Duration(milliseconds: 1500),
     )..repeat();
 
-    _shimmerAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
+    _shimmerAnimation = Tween<double>(begin: -1, end: 2).animate(
       CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOut),
     );
   }
@@ -224,9 +224,9 @@ class _ShimmerEffectState extends State<_ShimmerEffect>
           shaderCallback: (bounds) {
             return LinearGradient(
               colors: [
-                isDarkMode ? Colors.white24 : Colors.black12,
-                isDarkMode ? Colors.white : Colors.white,
-                isDarkMode ? Colors.white24 : Colors.black12,
+                if (isDarkMode) Colors.white24 else Colors.black12,
+                if (isDarkMode) Colors.white else Colors.white,
+                if (isDarkMode) Colors.white24 else Colors.black12,
               ],
               stops: const [0.0, 0.5, 1.0],
               begin: Alignment(_shimmerAnimation.value - 1, 0),

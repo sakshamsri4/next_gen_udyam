@@ -3,23 +3,18 @@ import 'package:logger/logger.dart';
 
 /// A service for logging messages throughout the app
 class LoggerService {
-  /// Singleton instance
-  static final LoggerService _instance = LoggerService._internal();
-
   /// Factory constructor to return the singleton instance
   factory LoggerService() => _instance;
 
   /// Internal constructor
   LoggerService._internal();
 
+  /// Singleton instance
+  static final LoggerService _instance = LoggerService._internal();
+
   /// Logger instance
   final Logger _logger = Logger(
     printer: PrettyPrinter(
-      methodCount: 2,
-      errorMethodCount: 8,
-      lineLength: 120,
-      colors: true,
-      printEmojis: true,
       printTime: true,
     ),
     level: kDebugMode ? Level.verbose : Level.info,
