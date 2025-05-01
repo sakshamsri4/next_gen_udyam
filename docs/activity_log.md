@@ -589,3 +589,69 @@
     - Create comprehensive state reset methods instead of resetting individual states
     - Test navigation flows thoroughly, especially back navigation
     - Consider how shared state variables might affect different parts of the app
+
+- Fixed Profile View Firebase User Property Issues:
+  - **Issue Description**:
+    - The ProfileView was using incorrect property names from the Firebase User class
+    - Errors included: `photoUrl` instead of `photoURL`, `email` as non-nullable, and accessing non-existent `createdAt` property
+    - These errors were causing the profile view to crash when loaded
+
+  - **Root Cause Analysis**:
+    - The ProfileView was designed for a custom UserModel but was receiving a Firebase User object
+    - Firebase User uses different property names (e.g., `photoURL` with uppercase URL)
+    - Firebase User's `email` property is nullable (String?)
+    - Firebase User doesn't have a `createdAt` property but has creation time in `metadata.creationTime`
+
+  - **Working Solution**:
+    - Updated property references to match Firebase User class:
+      - Changed `photoUrl` to `photoURL` for profile picture display
+      - Added null check for email with fallback text: `user.email ?? 'No email available'`
+      - Replaced `createdAt` with `metadata.creationTime` with proper null checking
+      - Added fallback text for when creation time is not available
+
+  - **Benefits**:
+    - Fixed all errors in the profile view
+    - Improved error handling with fallback text for null values
+    - Enhanced robustness by properly handling nullable properties
+    - Ensured the profile view works correctly with Firebase User objects
+
+  - **Lessons Learned**:
+    - Always check the actual properties and types of objects being used
+    - Add proper null handling for all nullable properties
+    - Use IDE diagnostics to identify and fix property reference issues
+    - Test views with actual data to catch these issues early
+    - Document the expected object types and properties for each view
+
+- Fixed Auth Middleware Issues:
+  - **Issue Description**:
+    - The auth middleware files had errors related to checking user login status
+    - `AuthMiddleware` was using a non-existent `isLoggedIn` property
+    - `AuthGuard` had syntax errors with cascade notation and incorrect property access
+    - These errors were preventing proper navigation and authentication flow
+
+  - **Root Cause Analysis**:
+    - The middleware was trying to access `isLoggedIn.value` which doesn't exist in AuthController
+    - The correct way to check login status is to check if `user.value` is null
+    - `AuthGuard` had a malformed condition with incorrect cascade notation (`..value`)
+    - The route name in `AuthGuard` was using `Routes.auth` which might not exist
+
+  - **Working Solution**:
+    - Updated `AuthMiddleware` to check login status correctly:
+      - Changed `if (authController.isLoggedIn.value)` to `if (authController.user.value != null)`
+      - This properly checks if a user is logged in by checking the user object
+    - Fixed `AuthGuard` with proper condition and route:
+      - Changed malformed condition to `if (authController.user.value == null)`
+      - Updated route to `Routes.login` for consistency
+
+  - **Benefits**:
+    - Fixed authentication flow for protected routes
+    - Ensured proper redirection based on login status
+    - Eliminated runtime errors in middleware
+    - Made the code more maintainable with consistent login status checking
+
+  - **Lessons Learned**:
+    - Always verify property names and access patterns
+    - Use consistent patterns for checking authentication status
+    - Test navigation flows with both authenticated and unauthenticated states
+    - Keep route names consistent across the application
+    - Use IDE diagnostics to catch and fix syntax errors

@@ -164,7 +164,7 @@ void main() {
     test('getThemeSettings() should retrieve settings from box', () {
       // Create a new implementation that overrides the default
       // one for this specific test
-      final darkSettings = ThemeSettings(isDarkMode: true);
+      final darkSettings = ThemeSettings();
 
       // Completely override the implementation for this test
       StorageService.getThemeSettingsImpl = () {
@@ -198,7 +198,7 @@ void main() {
       final settings = StorageService.getThemeSettings();
 
       // Assert
-      expect(settings.isDarkMode, false); // Check default value
+      expect(settings.isDarkMode, true); // Check default value
       verify(mockHive.box<ThemeSettings>(themeSettingsBoxName));
       verify(mockThemeBox.get('theme', defaultValue: anyNamed('defaultValue')));
     });
@@ -214,14 +214,14 @@ void main() {
       final settings = StorageService.getThemeSettings();
 
       // Assert
-      expect(settings.isDarkMode, false);
+      expect(settings.isDarkMode, true);
       verify(mockHive.box<ThemeSettings>(themeSettingsBoxName));
       verify(mockThemeBox.get('theme', defaultValue: anyNamed('defaultValue')));
     });
 
     test('saveThemeSettings() should put settings into box', () async {
       // Arrange
-      final settingsToSave = ThemeSettings(isDarkMode: true);
+      final settingsToSave = ThemeSettings();
 
       // Act
       await StorageService.saveThemeSettings(settingsToSave);

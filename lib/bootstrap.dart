@@ -6,11 +6,11 @@ import 'dart:developer' as dev;
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
-import 'package:get/get.dart'; // Import GetX
-import 'package:hive_flutter/hive_flutter.dart'; // Import Hive Flutter
-import 'package:next_gen/app/modules/auth/models/user_model.dart'; // Import UserModel
-import 'package:next_gen/app/modules/auth/services/auth_service.dart'; // Import AuthService
-import 'package:next_gen/core/services/logger_service.dart'; // Import LoggerService
+import 'package:get/get.dart';
+import 'package:next_gen/app/modules/auth/services/auth_service.dart';
+import 'package:next_gen/core/services/logger_service.dart';
+import 'package:next_gen/core/storage/storage_service.dart';
+import 'package:next_gen/core/theme/theme_controller.dart';
 import 'package:next_gen/firebase_options.dart';
 
 class AppBlocObserver extends BlocObserver {
@@ -66,18 +66,15 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
     logger.i('Firebase Initialized Successfully');
     logger.i('Initializing Hive...');
 
-    // Initialize Hive
-    await Hive.initFlutter(); // Initialize Hive for Flutter
+    // Initialize Hive using StorageService
+    logger.d('Initializing StorageService...');
+    await StorageService.init();
+    logger.i('StorageService Initialized Successfully');
 
-    // Register Adapters for custom objects
-    logger.d('Registering Hive adapters...');
-    Hive.registerAdapter(UserModelAdapter());
-
-    // Open boxes needed globally at startup
-    logger.d('Opening Hive boxes...');
-    await Hive.openBox<UserModel>('user_box');
-
-    logger.i('Hive Initialized Successfully');
+    // Initialize ThemeController
+    logger.i('Initializing ThemeController...');
+    Get.put(ThemeController(), permanent: true);
+    logger.i('ThemeController Initialized Successfully');
 
     // Initialize AuthService
     logger.i('Initializing AuthService...');

@@ -34,10 +34,18 @@ class StorageService {
       await Hive.initFlutter('next_gen_hive');
     }
 
-    // Register adapters
-    Hive
-      ..registerAdapter(ThemeSettingsAdapter())
-      ..registerAdapter(UserModelAdapter());
+    // Register adapters if not already registered
+    try {
+      Hive.registerAdapter(ThemeSettingsAdapter());
+    } catch (e) {
+      // Adapter already registered, ignore
+    }
+
+    try {
+      Hive.registerAdapter(UserModelAdapter());
+    } catch (e) {
+      // Adapter already registered, ignore
+    }
 
     // Open boxes
     await Hive.openBox<ThemeSettings>(themeSettingsBoxName);

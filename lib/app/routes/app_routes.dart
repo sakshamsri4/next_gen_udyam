@@ -1,7 +1,6 @@
 part of 'app_pages.dart';
 // DO NOT EDIT. This is code generated via package:get_cli/get_cli.dart
 
-
 abstract class Routes {
   Routes._();
   static const home = _Paths.home;
@@ -9,7 +8,6 @@ abstract class Routes {
   static const login = _Paths.login;
   static const signup = _Paths.signup;
   static const forgotPassword = _Paths.forgotPassword;
-
 }
 
 abstract class _Paths {
@@ -19,5 +17,4 @@ abstract class _Paths {
   static const login = '/login';
   static const signup = '/signup';
   static const forgotPassword = '/forgot-password';
-
 }

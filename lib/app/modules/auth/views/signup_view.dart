@@ -11,7 +11,6 @@ import 'package:next_gen/widgets/neopop_loading_indicator.dart';
 import 'package:next_gen/widgets/nextgen_logo.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
-
 class SignupView extends GetView<AuthController> {
   const SignupView({super.key});
 
@@ -328,7 +327,6 @@ class SignupView extends GetView<AuthController> {
           );
         },
       ),
-
     );
   }
 }

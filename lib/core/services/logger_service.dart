@@ -37,7 +37,6 @@ class LoggerService {
     _logger.d(message, error: error, stackTrace: stackTrace);
   }
 
-
   void i(String message, [dynamic error, StackTrace? stackTrace]) {
     _logger.i(message, error: error, stackTrace: stackTrace);
   }
@@ -50,11 +49,9 @@ class LoggerService {
     _logger.e(message, error: error, stackTrace: stackTrace);
   }
 
-
   void wtf(String message, [dynamic error, StackTrace? stackTrace]) {
     _logger.f(message, error: error, stackTrace: stackTrace);
   }
 }
-
 
 final log = LoggerService();

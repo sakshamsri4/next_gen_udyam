@@ -15,7 +15,6 @@ class App extends StatelessWidget {
     Get.put(ThemeController());
     final themeController = ThemeController.to;
 
-
     return GetMaterialApp(
       title: 'Next Gen Job Portal',
       theme: AppTheme.lightTheme,
@@ -27,7 +26,6 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-
     );
   }
 }

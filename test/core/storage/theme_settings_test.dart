@@ -6,28 +6,28 @@ void main() {
   group('ThemeSettings', () {
     test('initializes with default values', () {
       final settings = ThemeSettings();
-      expect(settings.isDarkMode, false);
+      expect(settings.isDarkMode, true);
     });
 
     test('can be initialized with custom values', () {
-      final settings = ThemeSettings(isDarkMode: true);
-      expect(settings.isDarkMode, true);
+      final settings = ThemeSettings(isDarkMode: false);
+      expect(settings.isDarkMode, false);
     });
 
     test('can create new instance with different values', () {
       final settings = ThemeSettings();
-      final newSettings = ThemeSettings(isDarkMode: true);
+      final newSettings = ThemeSettings(isDarkMode: false);
 
       // Original instance unchanged
-      expect(settings.isDarkMode, false);
+      expect(settings.isDarkMode, true);
       // New instance has new value
-      expect(newSettings.isDarkMode, true);
+      expect(newSettings.isDarkMode, false);
     });
 
     test('equality is based on values (not references)', () {
-      final settings1 = ThemeSettings(isDarkMode: true);
-      final settings2 = ThemeSettings(isDarkMode: true);
-      final settings3 = ThemeSettings();
+      final settings1 = ThemeSettings();
+      final settings2 = ThemeSettings();
+      final settings3 = ThemeSettings(isDarkMode: false);
 
       // Not testing == directly as it might not be overridden
       expect(settings1.isDarkMode, equals(settings2.isDarkMode));
@@ -36,11 +36,11 @@ void main() {
 
     test('copyWith creates a copy with updated values', () {
       final settings = ThemeSettings();
-      final newSettings = settings.copyWith(isDarkMode: true);
+      final newSettings = settings.copyWith(isDarkMode: false);
 
-      expect(newSettings.isDarkMode, true);
+      expect(newSettings.isDarkMode, false);
       // Original unchanged
-      expect(settings.isDarkMode, false);
+      expect(settings.isDarkMode, true);
     });
   });
 
@@ -51,13 +51,13 @@ void main() {
       adapter = ThemeSettingsAdapter();
     });
 
-    test('typeId should be 0', () {
+    test('typeId should be 1', () {
       expect(adapter.typeId, themeSettingsTypeId);
-      expect(themeSettingsTypeId, 0);
+      expect(themeSettingsTypeId, 1);
     });
 
     test('write should serialize ThemeSettings correctly', () {
-      final settings = ThemeSettings(isDarkMode: true);
+      final settings = ThemeSettings();
       final mockWriter = _MockBinaryWriter();
 
       adapter.write(mockWriter, settings);
@@ -66,7 +66,7 @@ void main() {
       expect(mockWriter.byteData.length, 2); // Two byte values were written
       expect(mockWriter.byteData[0], 1); // Number of fields
       expect(mockWriter.byteData[1], 0); // Field index
-      expect(mockWriter.data[0], true); // isDarkMode value
+      expect(mockWriter.data[0], true); // isDarkMode value (default is true)
     });
 
     test('read should deserialize ThemeSettings correctly', () {

@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
 /// Hive type ID for ThemeSettings
-const themeSettingsTypeId = 0;
+const themeSettingsTypeId = 1;
 
 /// Hive box name for theme settings
 const themeSettingsBoxName = 'theme_settings';
@@ -9,7 +9,7 @@ const themeSettingsBoxName = 'theme_settings';
 /// Model class for theme settings stored in Hive
 class ThemeSettings {
   /// Constructor for ThemeSettings
-  ThemeSettings({this.isDarkMode = false});
+  ThemeSettings({this.isDarkMode = true});
 
   /// Whether the app is in dark mode
   bool isDarkMode;
