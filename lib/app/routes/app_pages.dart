@@ -15,29 +15,29 @@ class AppPages {
   static const initial = Routes.login;
 
   static final routes = [
-    GetPage(
+    GetPage<dynamic>(
       name: _Paths.home,
       page: () => const HomeView(),
       binding: AuthBinding(),
     ),
-    GetPage(
+    GetPage<dynamic>(
       name: _Paths.auth,
       page: () => const AuthView(),
       binding: AuthBinding(),
     ),
-    GetPage(
+    GetPage<dynamic>(
       name: _Paths.login,
       page: () => const LoginView(),
       binding: AuthBinding(),
       transition: Transition.fadeIn,
     ),
-    GetPage(
+    GetPage<dynamic>(
       name: _Paths.signup,
       page: () => const SignupView(),
       binding: AuthBinding(),
       transition: Transition.rightToLeft,
     ),
-    GetPage(
+    GetPage<dynamic>(
       name: _Paths.forgotPassword,
       page: () => const ForgotPasswordView(),
       binding: AuthBinding(),
