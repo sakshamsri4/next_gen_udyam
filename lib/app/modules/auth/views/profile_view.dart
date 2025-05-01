@@ -46,8 +46,8 @@ class ProfileView extends GetView<AuthController> {
                 radius: 60,
                 backgroundColor: Colors.grey.shade200,
                 backgroundImage:
-                    user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
-                child: user.photoUrl == null
+                    user.photoURL != null ? NetworkImage(user.photoURL!) : null,
+                child: user.photoURL == null
                     ? Icon(
                         Icons.person,
                         size: 60,
@@ -69,7 +69,7 @@ class ProfileView extends GetView<AuthController> {
 
               // User Email
               Text(
-                user.email,
+                user.email ?? 'No email available',
                 style: theme.textTheme.bodyLarge,
               ),
 
@@ -119,7 +119,9 @@ class ProfileView extends GetView<AuthController> {
                         leading: const Icon(Icons.calendar_today),
                         title: const Text('Account Created'),
                         subtitle: Text(
-                          '${user.createdAt.day}/${user.createdAt.month}/${user.createdAt.year}',
+                          user.metadata.creationTime != null
+                              ? '${user.metadata.creationTime!.day}/${user.metadata.creationTime!.month}/${user.metadata.creationTime!.year}'
+                              : 'Date not available',
                         ),
                         contentPadding: EdgeInsets.zero,
                       ),

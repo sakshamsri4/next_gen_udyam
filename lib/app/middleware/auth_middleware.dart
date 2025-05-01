@@ -11,7 +11,7 @@ class AuthMiddleware extends GetMiddleware {
 
     // If the user is logged in, redirect to home
     // Otherwise, continue to the auth page
-    if (authController.isLoggedIn.value) {
+    if (authController.user.value != null) {
       return const RouteSettings(name: Routes.home);
     }
 
