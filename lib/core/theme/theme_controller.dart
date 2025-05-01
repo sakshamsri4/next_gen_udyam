@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemeController extends GetxController {
   static ThemeController get to => Get.find();
 
-  final _isDarkMode = false.obs;
+  final _isDarkMode = true.obs;
   final _prefs = Rx<SharedPreferences?>(null);
 
   /// Whether the app is in dark mode
@@ -26,7 +26,7 @@ class ThemeController extends GetxController {
   /// Load theme preference from shared preferences
   Future<void> _loadThemePreference() async {
     _prefs.value = await SharedPreferences.getInstance();
-    _isDarkMode.value = _prefs.value?.getBool('isDarkMode') ?? false;
+    _isDarkMode.value = _prefs.value?.getBool('isDarkMode') ?? true;
   }
 
   /// Toggle between light and dark theme

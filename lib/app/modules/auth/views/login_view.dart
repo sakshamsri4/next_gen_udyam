@@ -1,196 +1,296 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:neopop/neopop.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
+import 'package:next_gen/widgets/neopop_card.dart';
+import 'package:next_gen/widgets/neopop_input_field.dart';
+import 'package:next_gen/widgets/nextgen_logo.dart';
 
 class LoginView extends GetView<AuthController> {
   const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: ResponsiveBuilder(
         builder: (context, sizingInformation) {
-          // Determine if we're on a mobile device
-          final isMobile =
-              sizingInformation.deviceScreenType == DeviceScreenType.mobile;
+          // Responsive layout adjustments can be made based on device type
+          // Currently using the same layout for all device types
 
-          return SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 450),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Logo or App Name
-                      Text(
-                        'Next Gen',
-                        style: Theme.of(context).textTheme.displayMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Sign in to continue',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 48),
-
-                      // Email Field
-                      Obx(
-                        () => TextField(
-                          controller: controller.emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            hintText: 'Enter your email',
-                            prefixIcon: const Icon(Icons.email_outlined),
-                            errorText: controller.emailError.value.isEmpty
-                                ? null
-                                : controller.emailError.value,
-                          ),
-                          onChanged: controller.validateEmail,
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDarkMode
+                    ? [
+                        AppTheme.deepNavy,
+                        AppTheme.navyBlue,
+                        AppTheme.darkSurface1,
+                      ]
+                    : [
+                        AppTheme.lightGray,
+                        Colors.white,
+                        AppTheme.lightGray,
+                      ],
+              ),
+            ),
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 450),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Logo
+                        const Center(
+                          child: NextGenLogo(),
                         ),
-                      ),
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 40),
 
-                      // Password Field
-                      Obx(
-                        () => TextField(
-                          controller: controller.passwordController,
-                          obscureText: !controller.isPasswordVisible.value,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            hintText: 'Enter your password',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                controller.isPasswordVisible.value
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
+                        // Login Card
+                        NeoPopCard(
+                          padding: const EdgeInsets.all(24),
+                          borderRadius: 20,
+                          elevation: 12,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // Title
+                              Text(
+                                'Welcome Back',
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                                textAlign: TextAlign.center,
                               ),
-                              onPressed: controller.togglePasswordVisibility,
-                            ),
-                            errorText: controller.passwordError.value.isEmpty
-                                ? null
-                                : controller.passwordError.value,
-                          ),
-                          onChanged: controller.validatePassword,
-                        ),
-                      ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Sign in to continue your journey',
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 32),
 
-                      // Forgot Password
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () => Get.toNamed(Routes.FORGOT_PASSWORD),
-                          child: const Text('Forgot Password?'),
-                        ),
-                      ),
+                              // Email Field
+                              Obx(
+                                () => NeoPopInputField(
+                                  controller: controller.emailController,
+                                  labelText: 'Email',
+                                  hintText: 'Enter your email',
+                                  prefixIcon: const Icon(Icons.email_outlined),
+                                  errorText: controller.emailError.value.isEmpty
+                                      ? null
+                                      : controller.emailError.value,
+                                  keyboardType: TextInputType.emailAddress,
+                                  onChanged: controller.validateEmail,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
 
-                      const SizedBox(height: 24),
-
-                      // Login Button
-                      Obx(
-                        () => CustomNeoPopButton.primary(
-                          onTap: controller.isLoginButtonEnabled.value
-                              ? controller.login
-                              : () {},
-                          enabled: controller.isLoginButtonEnabled.value,
-                          child: Obx(
-                            () => controller.isLoading.value
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
+                              // Password Field
+                              Obx(
+                                () => NeoPopInputField(
+                                  controller: controller.passwordController,
+                                  labelText: 'Password',
+                                  hintText: 'Enter your password',
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      controller.isPasswordVisible.value
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
                                     ),
-                                  )
-                                : const Center(
-                                    child: Text(
-                                      'Sign In',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    onPressed:
+                                        controller.togglePasswordVisibility,
+                                  ),
+                                  errorText:
+                                      controller.passwordError.value.isEmpty
+                                          ? null
+                                          : controller.passwordError.value,
+                                  obscureText:
+                                      !controller.isPasswordVisible.value,
+                                  onChanged: controller.validatePassword,
+                                ),
+                              ),
+
+                              // Forgot Password
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () => Get.toNamed<dynamic>(
+                                    Routes.FORGOT_PASSWORD,
+                                  ),
+                                  child: Text(
+                                    'Forgot Password?',
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? AppTheme.brightElectricBlue
+                                          : AppTheme.electricBlue,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              // Login Button
+                              Obx(
+                                () => CustomNeoPopButton.primary(
+                                  onTap: controller.isLoginButtonEnabled.value
+                                      ? controller.login
+                                      : () {},
+                                  enabled:
+                                      controller.isLoginButtonEnabled.value,
+                                  depth: 10,
+                                  shimmer: true,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    child: Obx(
+                                      () => controller.isLoading.value
+                                          ? const SizedBox(
+                                              height: 24,
+                                              width: 24,
+                                              child: Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                  strokeWidth: 2,
+                                                ),
+                                              ),
+                                            )
+                                          : const Center(
+                                              child: Text(
+                                                'SIGN IN',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  letterSpacing: 1.2,
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
 
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 32),
 
-                      // Divider
-                      Row(
-                        children: [
-                          const Expanded(child: Divider()),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'OR',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                          const Expanded(child: Divider()),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Google Sign In Button
-                      CustomNeoPopButton.flat(
-                        onTap: controller.signInWithGoogle,
-                        color: Colors.white,
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        // Divider
+                        Row(
                           children: [
-                            FaIcon(
-                              FontAwesomeIcons.google,
-                              size: 20,
-                              color: Colors.red,
+                            Expanded(
+                              child: Divider(
+                                color: isDarkMode
+                                    ? AppTheme.darkSurface3
+                                    : AppTheme.slateGray.withAlpha(100),
+                                thickness: 1,
+                              ),
                             ),
-                            SizedBox(width: 12),
-                            Text(
-                              'Sign in with Google',
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w500,
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'OR',
+                                style: TextStyle(
+                                  color: isDarkMode
+                                      ? AppTheme.slateGray
+                                      : AppTheme.slateGray,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: isDarkMode
+                                    ? AppTheme.darkSurface3
+                                    : AppTheme.slateGray.withAlpha(100),
+                                thickness: 1,
                               ),
                             ),
                           ],
                         ),
-                      ),
 
-                      const SizedBox(height: 32),
+                        const SizedBox(height: 32),
 
-                      // Sign Up Link
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Don't have an account?",
-                            style: Theme.of(context).textTheme.bodyMedium,
+                        // Google Sign In Button
+                        CustomNeoPopButton.flat(
+                          onTap: controller.signInWithGoogle,
+                          color:
+                              isDarkMode ? AppTheme.darkSurface2 : Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.google,
+                                  size: 20,
+                                  color: Colors.red,
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'Sign in with Google',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? AppTheme.offWhite
+                                        : Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          TextButton(
-                            onPressed: () => Get.toNamed(Routes.SIGNUP),
-                            child: const Text('Sign Up'),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // Sign Up Link
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Don't have an account?",
+                              style: TextStyle(
+                                color: isDarkMode
+                                    ? AppTheme.offWhite
+                                    : AppTheme.navyBlue,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () =>
+                                  Get.toNamed<dynamic>(Routes.SIGNUP),
+                              child: Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  color: isDarkMode
+                                      ? AppTheme.brightElectricBlue
+                                      : AppTheme.electricBlue,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
