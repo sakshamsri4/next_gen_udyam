@@ -3,6 +3,8 @@
   "language": "en",
   "words": [
     "Abdgd",
+    "AIzaSy",
+    "appinvite",
     "architecting",
     "appspot",
     "augment",
@@ -48,6 +50,7 @@
     "LTWH",
     "lvlkg",
     "mgml",
+    "mobilesdk",
     "mocktail",
     "morphism",
     "mostrado",
@@ -100,6 +103,7 @@
     "*.lock",
     "*.g.dart",
     "*.freezed.dart",
-    "*.mocks.dart"
+    "*.mocks.dart",
+    "**/*.json"
   ]
 }
