@@ -7,6 +7,8 @@ import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
+import 'package:next_gen/app/modules/dashboard/bindings/dashboard_binding.dart';
+import 'package:next_gen/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
 import 'package:next_gen/app/modules/error/views/error_view.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
@@ -67,6 +69,13 @@ class AppPages {
       page: () => const ErrorView(),
       binding: ErrorBinding(),
       transition: Transition.fadeIn,
+    ),
+    GetPage<dynamic>(
+      name: _Paths.dashboard,
+      page: () => const DashboardView(),
+      binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
   ];
 }
