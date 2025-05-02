@@ -7,6 +7,8 @@ import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
+import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
+import 'package:next_gen/app/modules/error/views/error_view.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
 import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
@@ -58,6 +60,12 @@ class AppPages {
       name: _Paths.onboarding,
       page: () => const OnboardingView(),
       binding: OnboardingBinding(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage<dynamic>(
+      name: _Paths.error,
+      page: () => const ErrorView(),
+      binding: ErrorBinding(),
       transition: Transition.fadeIn,
     ),
   ];
