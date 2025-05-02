@@ -15,10 +15,14 @@ void main() {
     // Initialize GetX test environment
     Get.testMode = true;
 
-    // Register required services
-    Get.put(LoggerService(), permanent: true);
+    // Register services
+    Get
+      ..put(LoggerService(), permanent: true)
+      ..put(ConnectivityService(), permanent: true)
+      ..put(ErrorService(), permanent: true);
 
     // Initialize binding
+    ErrorBinding().dependencies();
   });
 
   tearDown(Get.reset);
