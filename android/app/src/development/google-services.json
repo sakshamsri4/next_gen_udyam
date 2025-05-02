@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:91032840429:android:a63734335340c355b884e4",
+        "mobilesdk_app_id": "1:91032840429:android:625f208653e021b1b884e4",
         "android_client_info": {
           "package_name": "com.udyam.nextgen.next_gen.dev"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "91032840429-0r8g2bsili07aibf9p65ele31tdummis.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.udyam.nextgen.next_gen.dev",
+            "certificate_hash": "c815262a09cb733b2390b75c96fd5f0d5a6fc058"
+          }
+        },
         {
           "client_id": "91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com",
           "client_type": 3
@@ -29,6 +37,13 @@
             {
               "client_id": "91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "91032840429-j7t01pl50ap7dr561d4na5ak14r6qace.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.myApp"
+              }
             }
           ]
         }

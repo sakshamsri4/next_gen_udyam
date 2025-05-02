@@ -59,30 +59,65 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   // Add cross-flavor configuration here
 
   try {
+    // Initialize Firebase
     logger.i('Initializing Firebase...');
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    logger.i('Firebase Initialized Successfully');
-    logger.i('Initializing Hive...');
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      logger.i('Firebase Initialized Successfully');
+    } catch (e, s) {
+      // Firebase might already be initialized, which is fine
+      logger.w(
+        'Firebase initialization issue (might be already initialized)',
+        e,
+        s,
+      );
+    }
 
     // Initialize Hive using StorageService
-    logger.d('Initializing StorageService...');
-    await StorageService.init();
-    logger.i('StorageService Initialized Successfully');
+    logger.i('Initializing Hive...');
+    try {
+      await StorageService.init();
+      logger.i('StorageService Initialized Successfully');
+    } catch (e, s) {
+      logger.e('StorageService initialization failed', e, s);
+      // This is critical, so rethrow
+      rethrow;
+    }
 
     // Initialize ThemeController
     logger.i('Initializing ThemeController...');
-    Get.put(ThemeController(), permanent: true);
-    logger.i('ThemeController Initialized Successfully');
+    try {
+      Get.put(ThemeController(), permanent: true);
+      logger.i('ThemeController Initialized Successfully');
+    } catch (e, s) {
+      logger.e('ThemeController initialization failed', e, s);
+      // This is important but not critical, continue
+    }
 
     // Initialize AuthService
     logger.i('Initializing AuthService...');
-    Get.put(AuthService(), permanent: true);
-    logger.i('AuthService Initialized Successfully');
+    try {
+      final authService = Get.put(AuthService(), permanent: true);
+      logger.i('AuthService Initialized Successfully');
+
+      // Try to restore user session
+      logger.i('Checking for persisted login...');
+      final user = await authService.restoreUserSession();
+      if (user != null) {
+        logger.i('Found persisted login for user: ${user.uid}');
+      } else {
+        logger.d('No persisted login found or session expired');
+      }
+    } catch (e, s) {
+      logger.e('AuthService initialization failed', e, s);
+      // This is important but not critical, continue
+    }
   } catch (e, s) {
     logger.e('Initialization Error during bootstrap', e, s);
-    // Optionally rethrow or handle critical failure
+    // Log the error but continue - the App widget will handle
+    // missing dependencies
   }
 
   runApp(await builder());
