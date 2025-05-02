@@ -34,6 +34,11 @@ class AppTheme {
   static const Color neonYellow = Color(0xFFFFD60A); // Neon yellow for accents
   static const Color lightGray = Color(0xFFF8F9FA);
 
+  /// Common colors for the app
+  static const Color primaryColor = brightElectricBlue;
+  static const Color primaryColorDark = electricBlue;
+  static const Color errorColor = neonPink;
+
   /// Surface colors for dark theme
   static const Color darkSurface1 = Color(0xFF121827); // Primary surface
   static const Color darkSurface2 = Color(0xFF1A2138); // Secondary surface

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
+import 'package:next_gen/core/utils/global_error_handler.dart';
 
 import 'package:next_gen/l10n/l10n.dart';
 
@@ -26,8 +28,20 @@ class _AppState extends State<App> {
     super.initState();
 
     // Log initialization
-    Get.find<LoggerService>()
-        .i('App widget initialized with unique navigator key');
+    final logger = Get.find<LoggerService>()
+      ..i('App widget initialized with unique navigator key');
+
+    // Initialize error handling
+    try {
+      // Ensure error services are registered
+      ErrorBinding().dependencies();
+
+      // Initialize global error handler
+      GlobalErrorHandler.init();
+      logger.i('Global error handler initialized');
+    } catch (e, s) {
+      logger.e('Failed to initialize error handling', e, s);
+    }
   }
 
   @override

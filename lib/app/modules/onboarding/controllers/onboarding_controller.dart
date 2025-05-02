@@ -14,9 +14,11 @@ class OnboardingController extends GetxController {
   GlobalKey<IntroductionScreenState>? _introKey;
 
   /// Register the IntroductionScreen key from the view
-  /// Using a method instead of a setter for clarity
+  // ignore: use_setters_to_change_properties
   void registerIntroKey(GlobalKey<IntroductionScreenState> key) {
     _introKey = key;
+    // Using a method instead of a setter because it's clearer in this context
+    // and we don't need a corresponding getter
   }
 
   final RxBool isLoading = false.obs;
@@ -49,6 +51,7 @@ class OnboardingController extends GetxController {
 
   // Using a method instead of a setter because this is called by
   // IntroductionScreen which expects a method with this signature
+  // ignore: use_setters_to_change_properties
   void onPageChanged(int index) {
     currentPage.value = index;
   }

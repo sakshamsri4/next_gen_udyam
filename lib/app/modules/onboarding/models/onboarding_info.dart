@@ -22,8 +22,8 @@ final List<OnboardingInfo> onboardingPages = [
   ),
   OnboardingInfo(
     title: 'Find Your Dream Job',
-    description:
-        'Browse thousands of job listings tailored to your skills and preferences',
+    description: 'Browse thousands of job listings tailored to your'
+        ' skills and preferences',
     animationPath: 'assets/animations/search.json',
     backgroundColor: const Color(0xFF16213E),
   ),
@@ -36,8 +36,8 @@ final List<OnboardingInfo> onboardingPages = [
   ),
   OnboardingInfo(
     title: 'Track Your Progress',
-    description:
-        'Monitor your applications and get real-time updates on your job search',
+    description: 'Monitor your applications and '
+        'get real-time updates on your job search',
     animationPath: 'assets/animations/track.json',
     backgroundColor: const Color(0xFF1A1A2E),
   ),

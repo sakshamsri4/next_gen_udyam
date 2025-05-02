@@ -8,6 +8,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
+import 'package:next_gen/core/services/connectivity_service.dart';
+import 'package:next_gen/core/services/error_service.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/storage/storage_service.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
@@ -93,6 +95,36 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
       logger.i('ThemeController Initialized Successfully');
     } catch (e, s) {
       logger.e('ThemeController initialization failed', e, s);
+      // This is important but not critical, continue
+    }
+
+    // Initialize ConnectivityService
+    logger.i('Initializing ConnectivityService...');
+    try {
+      final connectivityService = Get.put(
+        await ConnectivityService().init(),
+        permanent: true,
+      );
+      logger.i('ConnectivityService Initialized Successfully');
+
+      // Check initial connectivity
+      final status = connectivityService.status;
+      logger.i('Initial connectivity status: $status');
+    } catch (e, s) {
+      logger.e('ConnectivityService initialization failed', e, s);
+      // This is important but not critical, continue
+    }
+
+    // Initialize ErrorService
+    logger.i('Initializing ErrorService...');
+    try {
+      Get.put(
+        await ErrorService().init(),
+        permanent: true,
+      );
+      logger.i('ErrorService Initialized Successfully');
+    } catch (e, s) {
+      logger.e('ErrorService initialization failed', e, s);
       // This is important but not critical, continue
     }
 
