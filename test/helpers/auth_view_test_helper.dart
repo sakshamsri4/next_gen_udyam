@@ -108,17 +108,18 @@ class AuthMatchers {
   }) {
     return isA<dynamic>()
         .having(
-          (c) => isLoading == null || c.isLoading.value == isLoading,
+          (dynamic c) => isLoading == null || c.isLoading.value == isLoading,
           'isLoading',
           true,
         )
         .having(
-          (c) => isLoggedIn == null || c.isLoggedIn.value == isLoggedIn,
+          (dynamic c) => isLoggedIn == null || c.isLoggedIn.value == isLoggedIn,
           'isLoggedIn',
           true,
         )
         .having(
-          (c) => errorMessage == null || c.errorMessage.value == errorMessage,
+          (dynamic c) =>
+              errorMessage == null || c.errorMessage.value == errorMessage,
           'errorMessage',
           true,
         );
