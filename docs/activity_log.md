@@ -531,6 +531,44 @@
     - Properly handling loading states for all buttons prevents user errors
     - Standardizing UI patterns makes the codebase more maintainable
 
+## [2024-07-23]
+- Fixed Google Sign-In Error (ApiException: 10):
+  - **Issue Description**:
+    - Google Sign-In was failing with error: `PlatformException(sign_in_failed, com.google.android.gms.common.api.ApiException: 10: , null, null)`
+    - This error occurred when attempting to sign in with Google on Android
+    - The error code 10 typically indicates a configuration issue with Firebase and Google Sign-In
+
+  - **Root Cause Analysis**:
+    - The google-services.json file was missing proper OAuth client configuration
+    - The file only contained a web client type (client_type: 3) but no Android client type (client_type: 1)
+    - The SHA-1 certificate fingerprint was not properly registered in the Firebase console
+    - The error was not being handled gracefully, resulting in a generic error message
+
+  - **Working Solution**:
+    - Enhanced error handling in AuthService.signInWithGoogle():
+      - Added specific error detection for error code 10
+      - Improved error logging with detailed information about the likely cause
+      - Threw a more specific FirebaseAuthException with a user-friendly message
+    - Updated AuthController to handle the specific error:
+      - Added dedicated catch block for FirebaseAuthException
+      - Displayed a more informative error message to the user
+      - Added longer duration for the configuration error message
+    - Added proper imports for PlatformException handling
+    - Fixed code style issues to maintain code quality
+
+  - **Benefits**:
+    - Improved user experience with more informative error messages
+    - Enhanced error logging for easier debugging
+    - Better error handling with specific error types
+    - Maintained code quality with proper formatting and style
+
+  - **Lessons Learned**:
+    - Always register SHA-1 certificate fingerprints in Firebase console for Android apps
+    - Implement specific error handling for common authentication errors
+    - Provide user-friendly error messages that guide users on next steps
+    - Check google-services.json for proper OAuth client configuration
+    - Document configuration requirements for Google Sign-In in project documentation
+
 ## [2024-07-24]
 - Implemented Custom NeoPOP Loading Indicator:
   - **Issue Description**:
@@ -614,6 +652,90 @@
     - Test navigation flows thoroughly, especially back navigation
     - Consider how shared state variables might affect different parts of the app
 
+## [2024-07-26]
+- Fixed GetX Controller Registration and Navigation Issues:
+  - **Issue Description**:
+    - App was crashing with error: "AuthController not found. You need to call Get.put(AuthController())"
+    - GlobalKey duplication error: "A GlobalKey was used multiple times inside one widget's child list"
+    - These errors occurred during app startup and navigation between screens
+    - The issues prevented the app from properly initializing and navigating
+
+  - **Root Cause Analysis**:
+    - The AuthMiddleware was trying to access the AuthController before it was registered with GetX
+    - The middleware runs during route resolution, but the controller was only registered when the binding was executed
+    - Multiple GetMaterialApp instances were using the same default GlobalKey for navigation
+    - The controller registration timing was causing race conditions in the initialization process
+
+  - **Working Solution**:
+    - Updated AuthMiddleware to handle missing controller:
+      - Added try-catch block to safely find or register the AuthController
+      - Set explicit priority (2) to ensure proper middleware execution order
+      - Added comprehensive logging for better debugging
+    - Updated OnboardingMiddleware:
+      - Fixed logger initialization to use Get.find instead of direct instantiation
+      - Ensured proper priority (1) to run before AuthMiddleware
+    - Enhanced App widget to pre-register controllers:
+      - Added code to pre-register AuthController during app initialization
+      - Fixed GlobalKey duplication by explicitly using Get.key for navigation
+      - Added GetObserver for proper navigation history management
+      - Improved logging throughout the initialization process
+    - Updated route definitions with clear middleware priority comments
+
+  - **Benefits**:
+    - Fixed app crashes during startup and navigation
+    - Eliminated GlobalKey duplication errors
+    - Improved controller registration and lifecycle management
+    - Enhanced error handling and recovery
+    - Added better logging for debugging navigation issues
+
+  - **Lessons Learned**:
+    - Always handle missing dependencies gracefully with try-catch blocks
+    - Set explicit priorities for middlewares to control execution order
+    - Pre-register critical controllers early in the app lifecycle
+    - Use explicit navigation keys to avoid GlobalKey conflicts
+    - Add comprehensive logging for initialization and navigation processes
+
+- Enhanced Navigation and GlobalKey Management:
+  - **Issue Description**:
+    - Persistent GlobalKey duplication error: "A GlobalKey was used multiple times inside one widget's child list"
+    - The error occurred even after initial fixes, particularly during hot reload
+    - The issue was preventing proper navigation and causing app crashes
+    - The error was related to the Navigator key in GetMaterialApp
+
+  - **Root Cause Analysis**:
+    - The previous fix to use Get.key was not sufficient to prevent key duplication
+    - Hot reload was causing issues with key management and reuse
+    - The GetX framework was not properly handling key lifecycle during rebuilds
+    - Multiple widgets were trying to use the same default navigator key
+
+  - **Comprehensive Solution**:
+    - Converted App widget from StatelessWidget to StatefulWidget:
+      - Created a dedicated navigator key with a unique debug label
+      - Properly managed key lifecycle in initState and dispose methods
+      - Improved error handling and logging during initialization
+    - Enhanced AuthMiddleware with more robust error handling:
+      - Added fallback logger initialization if not found
+      - Implemented public routes list to skip auth checks for certain routes
+      - Added logic to prevent unnecessary redirects for already authenticated users
+    - Updated OnboardingMiddleware with similar robustness:
+      - Added fallback logger initialization
+      - Improved error handling throughout the middleware
+    - Removed unnecessary cleanup methods that were causing issues
+
+  - **Benefits**:
+    - Completely eliminated GlobalKey duplication errors
+    - Improved app stability during hot reload and restart
+    - Enhanced error recovery mechanisms
+    - Provided better debugging information through comprehensive logging
+    - Made the navigation system more robust against edge cases
+
+  - **Lessons Learned**:
+    - Use StatefulWidget when managing resources that need lifecycle control
+    - Create dedicated keys with unique debug labels for easier debugging
+    - Implement fallback initialization for critical services
+    - Test navigation thoroughly, especially with hot reload
+    - Add comprehensive error handling for all middleware components
+
 - Fixed Profile View Firebase User Property Issues:
   - **Issue Description**:
     - The ProfileView was using incorrect property names from the Firebase User class
@@ -679,3 +801,76 @@
     - Test navigation flows with both authenticated and unauthenticated states
     - Keep route names consistent across the application
     - Use IDE diagnostics to catch and fix syntax errors
+
+## [2024-07-27]
+- Fixed Google Sign-In Configuration Error (ApiException: 10):
+  - **Issue Description**:
+    - Google Sign-In was failing with error: `PlatformException(sign_in_failed, com.google.android.gms.common.api.ApiException: 10: , null, null)`
+    - Error message: `[firebase_auth/google-sign-in-configuration-error] Google Sign-In is not properly configured. Please contact support.`
+    - This error occurred when attempting to sign in with Google on Android
+    - The error code 10 typically indicates a configuration issue with Firebase and Google Sign-In
+
+  - **Root Cause Analysis**:
+    - The `google-services.json` file was missing proper OAuth client configuration
+    - The file only contained a web client type (client_type: 3) but no Android client type (client_type: 1)
+    - The SHA-1 certificate fingerprint was not properly registered in the Firebase configuration
+    - The error was being handled gracefully with a user-friendly message, but the underlying issue needed to be fixed
+
+  - **Working Solution**:
+    - Generated the SHA-1 certificate fingerprint for the development environment:
+      - Used `./gradlew signingReport` to get the SHA-1: `C8:15:26:2A:09:CB:73:3B:23:90:B7:5C:96:FD:5F:0D:5A:6F:C0:58`
+    - Updated the `google-services.json` file with the proper configuration:
+      - Added the Android client type (client_type: 1) with the SHA-1 fingerprint
+      - Ensured the package name matched the development flavor: `com.udyam.nextgen.next_gen.dev`
+      - Kept the existing web client type (client_type: 3) for web authentication
+    - Used an existing updated configuration file that was already prepared but not applied
+
+  - **Benefits**:
+    - Fixed Google Sign-In functionality for Android
+    - Eliminated the ApiException: 10 error
+    - Improved user experience by enabling social login
+    - Maintained proper error handling for other potential issues
+    - Ensured the configuration matches the development environment
+
+  - **Lessons Learned**:
+    - Always register SHA-1 certificate fingerprints in Firebase configuration for Android apps
+    - Check `google-services.json` for proper OAuth client configuration (client_type: 1 for Android)
+    - Different build flavors (development, staging, production) may need different configurations
+    - Error code 10 in Google Sign-In typically indicates a missing SHA-1 fingerprint
+    - Proper error handling with user-friendly messages is important for a good user experience
+
+- Fixed Sign Out Button Double-Tap Issue:
+  - **Issue Description**:
+    - Users needed to tap the sign out button twice to log out
+    - The first tap would not show any visual feedback
+    - The second tap would trigger the loading indicator and complete the sign out process
+    - This created a confusing user experience
+
+  - **Root Cause Analysis**:
+    - The issue was related to how the NeoPopButton from the neopop package handles tap events
+    - NeoPopButton has separate callbacks for `onTapDown` and `onTapUp`
+    - The loading state was being set in the AuthController's signOut method
+    - There was a timing issue between the button animation and the state update
+    - The UI wasn't updating immediately to show the loading indicator
+
+  - **Working Solution**:
+    - Modified the sign out button implementation in HomeView:
+      - Set the loading state immediately in the UI before calling signOut()
+      - Used Future.microtask to ensure UI updates before starting the sign out process
+      - Disabled the button when loading to prevent multiple taps
+    - Updated the AuthController's signOut method:
+      - Removed the duplicate loading state setting since it's now handled in the UI
+      - Added comments explaining the change to prevent future regressions
+
+  - **Benefits**:
+    - Fixed the double-tap issue for sign out
+    - Improved user experience with immediate visual feedback
+    - Prevented potential race conditions with state updates
+    - Made the sign out process more reliable and intuitive
+
+  - **Lessons Learned**:
+    - Set UI state immediately before starting async operations
+    - Use Future.microtask to ensure UI updates before heavy operations
+    - Disable buttons during loading states to prevent multiple taps
+    - Consider the timing of animations and state updates when using custom buttons
+    - Test user interactions thoroughly, especially for critical flows like authentication

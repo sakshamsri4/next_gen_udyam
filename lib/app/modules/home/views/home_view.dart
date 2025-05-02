@@ -114,15 +114,22 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 32),
               Obx(() {
-                // Use a separate function for the onTap callback
+                // Use a separate function for the onTap callback with debounce
                 void handleSignOut() {
+                  // Set loading state immediately to prevent double-tap issues
                   if (!authController.isSignOutLoading.value) {
-                    authController.signOut();
+                    // Set loading state immediately before the async operation
+                    authController.isSignOutLoading.value = true;
+                    // Use Future.microtask to ensure UI updates
+                    // before sign out process starts
+                    Future.microtask(() => authController.signOut());
                   }
                 }
 
                 return CustomNeoPopButton.flat(
                   onTap: handleSignOut,
+                  // Disable the button when loading to prevent multiple taps
+                  enabled: !authController.isSignOutLoading.value,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,

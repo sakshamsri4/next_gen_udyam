@@ -1,15 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
+import 'package:next_gen/app/modules/auth/services/auth_service.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
 class AuthController extends GetxController {
-  // Firebase instances
+  // Firebase instance
   late FirebaseAuth _auth;
-  late GoogleSignIn _googleSignIn;
 
   // User state
   final Rx<User?> user = Rx<User?>(null);
@@ -40,20 +39,15 @@ class AuthController extends GetxController {
   final isSignupButtonEnabled = false.obs;
   final isResetButtonEnabled = false.obs;
 
+  // Flag to track if we're restoring a session
+  final isRestoringSession = false.obs;
+
   @override
   void onInit() {
     super.onInit();
 
     // Initialize Firebase Auth
     _auth = FirebaseAuth.instance;
-    _googleSignIn = GoogleSignIn(
-      // Use the web client ID from the Firebase console
-      clientId: const String.fromEnvironment(
-        'GOOGLE_CLIENT_ID',
-        defaultValue: '91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65'
-            '.apps.googleusercontent.com',
-      ),
-    );
 
     // Reset all loading states
     isLoading.value = false;
@@ -66,7 +60,56 @@ class AuthController extends GetxController {
       user.value = firebaseUser;
     });
 
+    // Check for persisted login
+    _checkPersistedLogin();
+
     log.d('AuthController initialized with loading states reset');
+  }
+
+  // Check if user is persisted in Hive and restore session if needed
+  Future<void> _checkPersistedLogin() async {
+    try {
+      log.d('Checking for persisted login in Hive');
+
+      // Get the auth service
+      final authService = Get.find<AuthService>();
+
+      // If Firebase already has a user, no need to restore
+      if (_auth.currentUser != null) {
+        log.d(
+          'User already logged in via Firebase, no need to restore from Hive',
+        );
+        return;
+      }
+
+      // Set flag to indicate we're attempting to restore a session
+      isRestoringSession.value = true;
+
+      // Try to restore the Firebase session
+      final restoredUser = await authService.restoreUserSession();
+
+      if (restoredUser != null) {
+        log.i(
+          'Successfully restored Firebase session for user: '
+          '${restoredUser.uid}',
+        );
+
+        // Update the user value to trigger UI updates
+        user.value = restoredUser;
+
+        // Navigate to home if we're not already there
+        if (Get.currentRoute != Routes.home) {
+          log.i('Restoring session, navigating to home screen');
+          await Get.offAllNamed<dynamic>(Routes.home);
+        }
+      } else {
+        log.d('Could not restore Firebase session, user needs to login again');
+        isRestoringSession.value = false;
+      }
+    } catch (e, stackTrace) {
+      log.e('Error checking for persisted login', e, stackTrace);
+      isRestoringSession.value = false;
+    }
   }
 
   @override
@@ -214,11 +257,14 @@ class AuthController extends GetxController {
       log.i('Attempting login with email: ${emailController.text.trim()}');
       isLoading.value = true;
 
+      // Get the auth service to handle Hive persistence
+      final authService = Get.find<AuthService>();
+
       // Log the authentication attempt
-      log.d('Calling Firebase signInWithEmailAndPassword');
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text,
+      log.d('Calling AuthService signInWithEmailAndPassword');
+      final userCredential = await authService.signInWithEmailAndPassword(
+        emailController.text.trim(),
+        passwordController.text,
       );
 
       log.i('Login successful for user: ${userCredential.user?.uid}');
@@ -282,11 +328,14 @@ class AuthController extends GetxController {
       log.i('Attempting signup with email: ${emailController.text.trim()}');
       isLoading.value = true;
 
+      // Get the auth service to handle Hive persistence
+      final authService = Get.find<AuthService>();
+
       // Create user
-      log.d('Calling Firebase createUserWithEmailAndPassword');
-      final userCredential = await _auth.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text,
+      log.d('Calling AuthService registerWithEmailAndPassword');
+      final userCredential = await authService.registerWithEmailAndPassword(
+        emailController.text.trim(),
+        passwordController.text,
       );
 
       log
@@ -295,8 +344,10 @@ class AuthController extends GetxController {
         ..d('Updating display name for user')
         ..d('Reloading user profile');
 
-      await userCredential.user?.updateDisplayName(nameController.text.trim());
-      await userCredential.user?.reload();
+      // Update the display name
+      await authService.updateUserProfile(
+        displayName: nameController.text.trim(),
+      );
 
       // Clear form
       nameController.clear();
@@ -429,37 +480,48 @@ class AuthController extends GetxController {
       log.i('Attempting Google sign-in');
       isLoading.value = true;
 
-      // Trigger the Google Sign In process
-      log.d('Calling GoogleSignIn.signIn()');
-      final googleUser = await _googleSignIn.signIn();
+      // Get the auth service to handle Hive persistence
+      final authService = Get.find<AuthService>();
+
+      // Use the AuthService for Google sign-in
+      log.d('Calling AuthService signInWithGoogle()');
+      final userCredential = await authService.signInWithGoogle();
 
       // If user cancels the sign-in process
-      if (googleUser == null) {
+      if (userCredential == null) {
         log.d('Google sign-in cancelled by user');
         isLoading.value = false;
         return;
       }
-
-      log.d('Google sign-in successful, getting authentication details');
-      // Obtain the auth details from the Google Sign In
-      final googleAuth = await googleUser.authentication;
-
-      log.d('Creating Firebase credential with Google auth tokens');
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      log.d('Signing in to Firebase with Google credential');
-      // Sign in to Firebase with the Google credential
-      final userCredential = await _auth.signInWithCredential(credential);
 
       log
         ..i('Google sign-in successful for user: ${userCredential.user?.uid}')
         // Navigate to home
         ..d('Navigating to home screen');
       await Get.offAllNamed<dynamic>(Routes.home);
+    } on FirebaseAuthException catch (e, stackTrace) {
+      log.e('Firebase Auth Exception during Google sign-in', e, stackTrace);
+
+      // Handle specific error codes
+      if (e.code == 'google-sign-in-configuration-error') {
+        Get.snackbar(
+          'Configuration Error',
+          'Google Sign-In is not properly configured. Please contact support.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
+      } else {
+        Get.snackbar(
+          'Google Sign In Failed',
+          e.message ??
+              'An error occurred during Google sign in. Please try again.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
     } catch (e, stackTrace) {
       log.e('Error during Google sign-in', e, stackTrace);
       Get.snackbar(
@@ -492,13 +554,15 @@ class AuthController extends GetxController {
   Future<void> signOut() async {
     try {
       log.i('Attempting to sign out user');
-      isSignOutLoading.value = true;
+      // Note: isSignOutLoading.value is now set in the UI
+      // before this method is called
+      // to prevent double-tap issues, so we don't set it again here
 
-      log.d('Signing out from Firebase');
-      await _auth.signOut();
+      // Get the auth service to handle Hive data clearing
+      final authService = Get.find<AuthService>();
 
-      log.d('Signing out from Google');
-      await _googleSignIn.signOut();
+      // Use the AuthService to sign out which will also clear Hive data
+      await authService.signOut();
 
       // Reset all loading states before navigation
       resetAllLoadingStates();
