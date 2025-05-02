@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
@@ -156,41 +157,65 @@ class AuthService {
         return userCredential;
       } else {
         log.d('Using mobile-specific Google sign-in flow');
-        // For mobile platforms, use the GoogleSignIn package
-        // Trigger the authentication flow
-        final googleUser = await _googleSignIn.signIn();
+        try {
+          // For mobile platforms, use the GoogleSignIn package
+          // Trigger the authentication flow
+          final googleUser = await _googleSignIn.signIn();
 
-        if (googleUser == null) {
-          log.w('Google sign-in canceled by user');
-          return null; // User canceled the sign-in flow
-        }
+          if (googleUser == null) {
+            log.w('Google sign-in canceled by user');
+            return null; // User canceled the sign-in flow
+          }
 
-        log.d('Google sign-in successful, obtaining auth details');
-        // Obtain the auth details from the request
-        final googleAuth = await googleUser.authentication;
+          log.d('Google sign-in successful, obtaining auth details');
+          // Obtain the auth details from the request
+          final googleAuth = await googleUser.authentication;
 
-        // Create a new credential
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        // Sign in to Firebase with the Google credential
-        final userCredential = await _auth.signInWithCredential(credential);
-        log.i(
-          'User signed in with Google successfully:'
-          ' ${userCredential.user?.uid}',
-        );
-
-        // Save user to Hive
-        if (userCredential.user != null) {
-          await _saveUserToHive(
-            UserModel.fromFirebaseUser(userCredential.user!),
+          // Create a new credential
+          final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
           );
-          log.d('User data saved to local storage');
-        }
 
-        return userCredential;
+          // Sign in to Firebase with the Google credential
+          final userCredential = await _auth.signInWithCredential(credential);
+          log.i(
+            'User signed in with Google successfully:'
+            ' ${userCredential.user?.uid}',
+          );
+
+          // Save user to Hive
+          if (userCredential.user != null) {
+            await _saveUserToHive(
+              UserModel.fromFirebaseUser(userCredential.user!),
+            );
+            log.d('User data saved to local storage');
+          }
+
+          return userCredential;
+        } catch (e, stackTrace) {
+          // Handle specific Google Sign-In errors
+          if (e is PlatformException) {
+            final errorMessage = e.message ?? '';
+            if (e.code == 'sign_in_failed' && errorMessage.contains('10:')) {
+              log.e(
+                'Google Sign-In failed with error code 10. This usually '
+                'indicates a missing SHA-1 certificate fingerprint in '
+                'Firebase console or incorrect package name configuration.',
+                e,
+                stackTrace,
+              );
+
+              // Show a more user-friendly error message
+              throw FirebaseAuthException(
+                code: 'google-sign-in-configuration-error',
+                message: 'Google Sign-In is not properly configured. '
+                    'Please contact support.',
+              );
+            }
+          }
+          rethrow;
+        }
       }
     } catch (e, stackTrace) {
       log.e('Error signing in with Google', e, stackTrace);
@@ -369,6 +394,66 @@ class AuthService {
       } else {
         log.e('Error retrieving user from local storage', e, stackTrace);
       }
+      return null;
+    }
+  }
+
+  // Restore Firebase session from Hive data
+  Future<User?> restoreUserSession() async {
+    log.i('Attempting to restore user session from Hive');
+
+    try {
+      // If Firebase already has a user, no need to restore
+      if (_auth.currentUser != null) {
+        log.d('User already logged in via Firebase, no need to restore');
+        return _auth.currentUser;
+      }
+
+      // Try to get user from Hive
+      final persistedUser = await getUserFromHive();
+
+      if (persistedUser != null) {
+        log.i('Found persisted user in Hive: ${persistedUser.uid}');
+
+        try {
+          // Since we can't directly sign in without credentials,
+          // we'll try to use Firebase's persistence mechanism
+          // The token might still be valid in Firebase's internal storage
+
+          // Wait for Firebase to initialize and check auth state
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+
+          // Check if Firebase has automatically restored the session
+          if (_auth.currentUser != null) {
+            log.i(
+              'Firebase automatically restored session for user: '
+              '${_auth.currentUser!.uid}',
+            );
+            return _auth.currentUser;
+          }
+
+          // If we reach here, Firebase couldn't automatically restore
+          // the session. This means the token is expired or invalid
+          log.w(
+            'Firebase could not automatically restore session, '
+            'user needs to login again',
+          );
+
+          // Clear the persisted user since we couldn't restore the session
+          await _clearUserFromHive();
+          return null;
+        } catch (e, stackTrace) {
+          log.e('Error restoring Firebase session', e, stackTrace);
+          // Clear the persisted user since we couldn't restore the session
+          await _clearUserFromHive();
+          return null;
+        }
+      } else {
+        log.d('No persisted user found in Hive');
+        return null;
+      }
+    } catch (e, stackTrace) {
+      log.e('Error checking for persisted login', e, stackTrace);
       return null;
     }
   }

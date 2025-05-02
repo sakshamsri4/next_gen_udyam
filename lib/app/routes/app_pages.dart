@@ -1,11 +1,15 @@
 import 'package:get/get.dart';
 
+import 'package:next_gen/app/middleware/auth_middleware.dart';
+import 'package:next_gen/app/middleware/onboarding_middleware.dart';
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';
 import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
+import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
+import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
 
 part 'app_routes.dart';
 
@@ -19,29 +23,42 @@ class AppPages {
       name: _Paths.home,
       page: () => const HomeView(),
       binding: AuthBinding(),
+      middlewares: [OnboardingMiddleware()],
     ),
     GetPage<dynamic>(
       name: _Paths.auth,
       page: () => const AuthView(),
       binding: AuthBinding(),
+      middlewares: [OnboardingMiddleware()],
     ),
     GetPage<dynamic>(
       name: _Paths.login,
       page: () => const LoginView(),
       binding: AuthBinding(),
       transition: Transition.fadeIn,
+      // OnboardingMiddleware has priority 1, AuthMiddleware has priority 2
+      // This ensures onboarding check happens before auth check
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
     GetPage<dynamic>(
       name: _Paths.signup,
       page: () => const SignupView(),
       binding: AuthBinding(),
       transition: Transition.rightToLeft,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
     GetPage<dynamic>(
       name: _Paths.forgotPassword,
       page: () => const ForgotPasswordView(),
       binding: AuthBinding(),
       transition: Transition.rightToLeft,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.onboarding,
+      page: () => const OnboardingView(),
+      binding: OnboardingBinding(),
+      transition: Transition.fadeIn,
     ),
   ];
 }

@@ -23,7 +23,9 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   intl: ">=0.18.1 <0.20.0"
+  introduction_screen: ^3.1.0
   logger: ^2.0.2
+  lottie: ^2.3.0
   neopop: ^1.0.2
   responsive_builder: ^0.7.0
 
@@ -47,3 +49,4 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/animations/
