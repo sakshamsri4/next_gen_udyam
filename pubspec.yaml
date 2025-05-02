@@ -27,7 +27,7 @@ dependencies:
   intl: ">=0.18.1 <0.20.0"
   introduction_screen: ^3.1.0
   logger: ^2.0.2
-  lottie: ^2.3.0
+  lottie: ^3.3.1
   neopop: ^1.0.2
   responsive_builder: ^0.7.0
 
