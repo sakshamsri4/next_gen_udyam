@@ -3,6 +3,8 @@
   "language": "en",
   "words": [
     "Abdgd",
+    "AIzaSy",
+    "appinvite",
     "architecting",
     "appspot",
     "augment",
@@ -43,14 +45,18 @@
     "iskov",
     "larity",
     "lcov",
+    "listview",
     "liskov",
     "lsgknf",
     "LTWH",
     "lvlkg",
     "mgml",
+    "mobilesdk",
     "mocktail",
     "morphism",
     "mostrado",
+    "msix",
+    "MSIX",
     "mvvm",
     "neopop",
     "nextgen",
@@ -79,6 +85,7 @@
     "tquzxae",
     "udyam",
     "urability",
+    "wakelock",
     "zutx"
   ],
   "ignorePaths": [
@@ -100,6 +107,7 @@
     "*.lock",
     "*.g.dart",
     "*.freezed.dart",
-    "*.mocks.dart"
+    "*.mocks.dart",
+    "**/*.json"
   ]
 }

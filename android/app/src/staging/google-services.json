@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "91032840429",
+    "project_id": "next-gen-udyam",
+    "storage_bucket": "next-gen-udyam.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91032840429:android:a63734335340c355b884e4",
+        "android_client_info": {
+          "package_name": "com.udyam.nextgen.next_gen.stg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9r6IrsHl7gx9zxKsPNzVdC6xm54IIX3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

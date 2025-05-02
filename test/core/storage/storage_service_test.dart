@@ -109,7 +109,8 @@ void main() {
       await StorageService.init();
 
       // Assert - Use relaxed verification instead of verifyInOrder
-      verify(mockHive.registerAdapter(any)).called(greaterThanOrEqualTo(2));
+      verify(mockHive.registerAdapter<dynamic>(any))
+          .called(greaterThanOrEqualTo(2));
       verify(mockHive.openBox<ThemeSettings>(themeSettingsBoxName)).called(1);
       verify(mockHive.openBox<UserModel>('user_box')).called(1);
     });

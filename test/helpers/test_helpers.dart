@@ -24,7 +24,8 @@ class FirebaseAuthExceptionTester {
   /// Tests a function with various Firebase auth exception codes
   ///
   /// [testFunction] is the function that should throw the exception
-  /// [errorMessageGetter] is a function that returns the error message from your state
+  /// [errorMessageGetter] is a function that returns
+  /// the error message from your state
   /// [expectedMessages] is a map of exception codes to expected error messages
   static void testAuthExceptions({
     required void Function() testFunction,
@@ -99,13 +100,10 @@ class MockSnackbarController implements SnackbarController {
   @override
   Future<void> close({bool withAnimations = true}) async {}
 
-  @override
   void dismiss({bool withAnimations = true}) {}
 
-  @override
   bool get isDismissible => true;
 
-  @override
   bool get isShowing => false;
 
   @override
