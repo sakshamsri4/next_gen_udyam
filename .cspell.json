@@ -45,6 +45,7 @@
     "iskov",
     "larity",
     "lcov",
+    "listview",
     "liskov",
     "lsgknf",
     "LTWH",
@@ -54,6 +55,8 @@
     "mocktail",
     "morphism",
     "mostrado",
+    "msix",
+    "MSIX",
     "mvvm",
     "neopop",
     "nextgen",
@@ -82,6 +85,7 @@
     "tquzxae",
     "udyam",
     "urability",
+    "wakelock",
     "zutx"
   ],
   "ignorePaths": [
