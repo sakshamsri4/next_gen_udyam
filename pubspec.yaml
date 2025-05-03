@@ -14,7 +14,7 @@ dependencies:
   firebase_auth: any
   firebase_core: any
   firebase_storage: any
-  fl_chart: ^0.62.0
+  # No chart package dependency - using custom implementation
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.0

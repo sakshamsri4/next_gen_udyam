@@ -36,74 +36,76 @@ class DashboardController extends GetxController {
     _loadDashboardData();
   }
 
-  /// Load dashboard data including job statistics and recent activity
+  /// Load dashboard data including automobile sector job statistics
+  /// and recent activity
   Future<void> _loadDashboardData() async {
-    _logger.i('Loading dashboard data');
+    _logger.i('Loading automobile sector dashboard data');
     isLoading.value = true;
+    update(); // Notify GetBuilder to update UI
 
     try {
       // Simulate network delay
       await Future<void>.delayed(const Duration(seconds: 2));
 
-      // Load mock job statistics
+      // Load mock automobile sector job statistics
       jobStatistics.value = [
         JobStatistic(
-          title: 'Applications',
-          value: 24,
-          change: 8,
+          title: 'Available Positions',
+          value: 156,
+          change: 12,
           isPositive: true,
           color: const Color(0xFF4CAF50),
         ),
         JobStatistic(
-          title: 'Interviews',
-          value: 5,
-          change: 2,
+          title: 'Avg. Salary (K)',
+          value: 85,
+          change: 5,
           isPositive: true,
           color: const Color(0xFF2196F3),
         ),
         JobStatistic(
-          title: 'Offers',
-          value: 2,
-          change: 1,
+          title: 'Top Manufacturers',
+          value: 24,
+          change: 3,
           isPositive: true,
           color: const Color(0xFFFF9800),
         ),
         JobStatistic(
-          title: 'Rejections',
-          value: 12,
-          change: 3,
-          isPositive: false,
-          color: const Color(0xFFF44336),
+          title: 'Skills in Demand',
+          value: 18,
+          change: 4,
+          isPositive: true,
+          color: const Color(0xFF9C27B0),
         ),
       ];
 
-      // Load mock recent activity
+      // Load mock recent activity for automobile sector
       recentActivity.value = [
         ActivityItem(
           title: 'Application Submitted',
-          description: 'Senior Flutter Developer at Google',
+          description: 'Automotive Engineer at Tesla',
           time: DateTime.now().subtract(const Duration(hours: 2)),
           icon: Icons.send,
           color: const Color(0xFF4CAF50),
         ),
         ActivityItem(
           title: 'Interview Scheduled',
-          description: 'Technical Interview with Amazon',
+          description: 'Mechanical Design at Toyota',
           time: DateTime.now().subtract(const Duration(days: 1)),
           icon: Icons.calendar_today,
           color: const Color(0xFF2196F3),
         ),
         ActivityItem(
-          title: 'Application Rejected',
-          description: 'Junior Developer at Microsoft',
-          time: DateTime.now().subtract(const Duration(days: 3)),
-          icon: Icons.cancel,
-          color: const Color(0xFFF44336),
+          title: 'New Job Posted',
+          description: 'Electric Vehicle Specialist at Rivian',
+          time: DateTime.now().subtract(const Duration(days: 2)),
+          icon: Icons.work,
+          color: const Color(0xFF9C27B0),
         ),
         ActivityItem(
           title: 'Offer Received',
-          description: 'Mobile Developer at Facebook',
-          time: DateTime.now().subtract(const Duration(days: 5)),
+          description: 'Automotive Software Engineer at BMW',
+          time: DateTime.now().subtract(const Duration(days: 4)),
           icon: Icons.check_circle,
           color: const Color(0xFFFF9800),
         ),
@@ -114,6 +116,7 @@ class DashboardController extends GetxController {
       _logger.e('Error loading dashboard data', e, s);
     } finally {
       isLoading.value = false;
+      update(); // Notify GetBuilder to update UI
     }
   }
 
@@ -127,6 +130,7 @@ class DashboardController extends GetxController {
   Future<void> signOut() async {
     _logger.i('Signing out user');
     isSignOutLoading.value = true;
+    update(); // Notify GetBuilder to update UI
 
     try {
       await _authController.signOut();
@@ -135,6 +139,7 @@ class DashboardController extends GetxController {
       _logger.e('Error signing out', e, s);
     } finally {
       isSignOutLoading.value = false;
+      update(); // Notify GetBuilder to update UI
     }
   }
 }

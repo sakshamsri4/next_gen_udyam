@@ -77,5 +77,31 @@ class AppPages {
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
+    // Placeholder routes for bottom navigation
+    // These will be implemented later
+    GetPage<dynamic>(
+      name: _Paths.jobs,
+      page: () => const DashboardView(),
+      // Temporary - will be replaced with JobsView
+      binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.resume,
+      page: () => const DashboardView(),
+      // Temporary - will be replaced with ResumeView
+      binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.profile,
+      page: () => const DashboardView(),
+      // Temporary - will be replaced with ProfileView
+      binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
   ];
 }

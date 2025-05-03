@@ -97,10 +97,10 @@ class AuthController extends GetxController {
         // Update the user value to trigger UI updates
         user.value = restoredUser;
 
-        // Navigate to home if we're not already there
-        if (Get.currentRoute != Routes.home) {
-          log.i('Restoring session, navigating to home screen');
-          await Get.offAllNamed<dynamic>(Routes.home);
+        // Navigate to dashboard if we're not already there
+        if (Get.currentRoute != Routes.dashboard) {
+          log.i('Restoring session, navigating to dashboard screen');
+          await Get.offAllNamed<dynamic>(Routes.dashboard);
         }
       } else {
         log.d('Could not restore Firebase session, user needs to login again');
@@ -273,9 +273,9 @@ class AuthController extends GetxController {
       emailController.clear();
       passwordController.clear();
 
-      // Navigate to home
-      log.d('Navigating to home screen');
-      await Get.offAllNamed<dynamic>(Routes.home);
+      // Navigate to dashboard
+      log.d('Navigating to dashboard screen');
+      await Get.offAllNamed<dynamic>(Routes.dashboard);
     } on FirebaseAuthException catch (e) {
       log.e('Firebase Auth Exception during login', e, e.stackTrace);
       var errorMessage = 'An error occurred. Please try again.';
@@ -355,9 +355,9 @@ class AuthController extends GetxController {
       passwordController.clear();
       confirmPasswordController.clear();
 
-      // Navigate to home
-      log.d('Navigating to home screen');
-      await Get.offAllNamed<dynamic>(Routes.home);
+      // Navigate to dashboard
+      log.d('Navigating to dashboard screen');
+      await Get.offAllNamed<dynamic>(Routes.dashboard);
 
       Get.snackbar(
         'Success',
@@ -496,9 +496,9 @@ class AuthController extends GetxController {
 
       log
         ..i('Google sign-in successful for user: ${userCredential.user?.uid}')
-        // Navigate to home
-        ..d('Navigating to home screen');
-      await Get.offAllNamed<dynamic>(Routes.home);
+        // Navigate to dashboard
+        ..d('Navigating to dashboard screen');
+      await Get.offAllNamed<dynamic>(Routes.dashboard);
     } on FirebaseAuthException catch (e, stackTrace) {
       log.e('Firebase Auth Exception during Google sign-in', e, stackTrace);
 

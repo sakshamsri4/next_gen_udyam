@@ -201,14 +201,14 @@ dependencies:
 - Offline mode capabilities where applicable
 - Improved user experience during error conditions
 
-### 5. Dashboard Module (2-3 days)
+### 5. Dashboard Module with Bottom Navigation (3-4 days)
 
 **Tasks:**
-1. Create a responsive dashboard as the main landing page after login
-2. Implement job statistics and recent activity sections
-3. Add quick action buttons for common tasks
+1. Create a responsive dashboard as the main landing page after login, focused on automobile sector jobs
+2. Implement custom animated bottom navigation bar with NeoPOP styling
+3. Add automobile industry-specific job statistics and metrics
 4. Create responsive layout for different screen sizes
-5. Implement animations for transitions and data loading
+5. Implement animations for transitions, navigation, and data loading
 
 **Implementation Details:**
 ```bash
@@ -219,22 +219,28 @@ getx create module:dashboard
 **Dependencies:**
 ```yaml
 dependencies:
-  fl_chart: ^0.62.0
   shimmer: ^3.0.0
   cached_network_image: ^3.3.0
+  lottie: ^2.3.0
+  font_awesome_flutter: ^10.0.0
 ```
 
 **UI Components:**
-- Responsive dashboard with statistics cards
-- Recent activity timeline with NeoPOP styling
-- Quick action buttons for common tasks
-- Animated charts for job statistics
+- Animated bottom navigation bar with NeoPOP styling
+- Automobile sector-focused dashboard with relevant statistics:
+  - Available positions in automotive companies
+  - Average salary trends in automotive roles
+  - Top hiring automotive manufacturers
+  - Most in-demand automotive skills
+- Recent automotive job postings timeline with NeoPOP styling
+- Quick action buttons for automotive job seekers (Apply, Save Resume, Skill Assessment)
 - Shimmer loading effects for data loading
 
 **Deliverables:**
-- Main dashboard screen with job statistics
-- Recent activity timeline
-- Quick action buttons for common tasks
+- Main dashboard screen with automobile industry-specific job statistics
+- Custom animated bottom navigation bar for app-wide navigation
+- Recent automotive job activity timeline
+- Quick action buttons for common automotive job seeker tasks
 - Responsive UI that works well on mobile and web
 - Animated transitions and data loading
 

@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:neopop/neopop.dart';
 import 'package:next_gen/app/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
+import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -17,142 +18,161 @@ class DashboardView extends GetView<DashboardController> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          // Profile button
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Obx(() {
-              final user = controller.user.value;
-              return user != null
-                  ? GestureDetector(
-                      onTap: () {
-                        // Navigate to profile page
-                        Get.toNamed<dynamic>('/profile');
-                      },
-                      child: CircleAvatar(
-                        radius: 18,
-                        backgroundColor:
-                            theme.colorScheme.primary.withOpacity(0.2),
-                        backgroundImage: user.photoURL != null
-                            ? CachedNetworkImageProvider(user.photoURL!)
-                            : null,
-                        child: user.photoURL == null
-                            ? Text(
-                                user.displayName?.isNotEmpty == true
-                                    ? user.displayName![0].toUpperCase()
-                                    : user.email != null
-                                        ? user.email![0].toUpperCase()
-                                        : '?',
-                                style: TextStyle(
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                            : null,
-                      ),
-                    )
-                  : IconButton(
-                      icon: const Icon(Icons.account_circle),
-                      onPressed: () {
-                        // Navigate to login page
-                        Get.toNamed<dynamic>('/login');
-                      },
-                    );
-            }),
+    // Make sure NavigationController is initialized
+    Get.put(NavigationController(), permanent: true);
+
+    return GetBuilder<DashboardController>(
+      builder: (controller) {
+        return Scaffold(
+          bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+          appBar: AppBar(
+            title: const Text('Automotive Jobs Dashboard'),
+            centerTitle: true,
+            elevation: 0,
+            actions: [
+              // Profile button
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: _buildProfileButton(theme, controller),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: ResponsiveBuilder(
-        builder: (context, sizingInformation) {
-          // Determine if we're on a mobile device
-          final isMobile =
-              sizingInformation.deviceScreenType == DeviceScreenType.mobile;
+          body: ResponsiveBuilder(
+            builder: (context, sizingInformation) {
+              // Determine if we're on a mobile device
+              final isMobile =
+                  sizingInformation.deviceScreenType == DeviceScreenType.mobile;
 
-          return RefreshIndicator(
-            onRefresh: controller.refreshDashboard,
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return _buildLoadingState(isMobile);
-              }
+              return RefreshIndicator(
+                onRefresh: controller.refreshDashboard,
+                child: controller.isLoading.value
+                    ? _buildLoadingState(isMobile)
+                    : SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Welcome message
+                            _buildWelcomeSection(theme, isMobile, controller),
+                            SizedBox(height: isMobile ? 16.0 : 24.0),
 
-              return SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Welcome message
-                    _buildWelcomeSection(theme, isMobile),
-                    SizedBox(height: isMobile ? 16.0 : 24.0),
+                            // Quick action buttons
+                            _buildQuickActionButtons(theme, isMobile),
+                            SizedBox(height: isMobile ? 24.0 : 32.0),
 
-                    // Quick action buttons
-                    _buildQuickActionButtons(theme, isMobile),
-                    SizedBox(height: isMobile ? 24.0 : 32.0),
+                            // Statistics section
+                            _buildStatisticsSection(
+                              theme,
+                              isMobile,
+                              controller,
+                            ),
+                            SizedBox(height: isMobile ? 24.0 : 32.0),
 
-                    // Statistics section
-                    _buildStatisticsSection(theme, isMobile),
-                    SizedBox(height: isMobile ? 24.0 : 32.0),
+                            // Recent activity section
+                            _buildRecentActivitySection(
+                              theme,
+                              isMobile,
+                              controller,
+                            ),
+                            SizedBox(height: isMobile ? 16.0 : 24.0),
 
-                    // Recent activity section
-                    _buildRecentActivitySection(theme, isMobile),
-                    SizedBox(height: isMobile ? 16.0 : 24.0),
-
-                    // Sign out button
-                    _buildSignOutButton(theme, isMobile),
-                    SizedBox(height: isMobile ? 16.0 : 24.0),
-                  ],
-                ),
+                            // Sign out button
+                            _buildSignOutButton(theme, isMobile, controller),
+                            SizedBox(height: isMobile ? 16.0 : 24.0),
+                          ],
+                        ),
+                      ),
               );
-            }),
-          );
-        },
-      ),
+            },
+          ),
+        );
+      },
     );
   }
 
-  /// Build the welcome section with user greeting
-  Widget _buildWelcomeSection(ThemeData theme, bool isMobile) {
-    return Obx(() {
-      final user = controller.user.value;
-      final greeting = _getGreeting();
-      final name = user?.displayName?.split(' ').first ?? 'there';
+  /// Build the profile button in the app bar
+  Widget _buildProfileButton(ThemeData theme, DashboardController controller) {
+    final user = controller.user.value;
+    return user != null
+        ? GestureDetector(
+            onTap: () {
+              // Navigate to profile page
+              Get.toNamed<dynamic>('/profile');
+            },
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: theme.colorScheme.primary.withAlpha(50),
+              backgroundImage: user.photoURL != null
+                  ? CachedNetworkImageProvider(user.photoURL!)
+                  : null,
+              child: user.photoURL == null
+                  ? Text(
+                      (user.displayName ?? '').isNotEmpty
+                          ? user.displayName![0].toUpperCase()
+                          : user.email != null
+                              ? user.email![0].toUpperCase()
+                              : '?',
+                      style: TextStyle(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
+            ),
+          )
+        : IconButton(
+            icon: const Icon(Icons.account_circle),
+            onPressed: () {
+              // Navigate to login page
+              Get.toNamed<dynamic>('/login');
+            },
+          );
+  }
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            greeting,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
-            ),
+  /// Build the welcome section with user greeting
+  Widget _buildWelcomeSection(
+    ThemeData theme,
+    bool isMobile,
+    DashboardController controller,
+  ) {
+    final greeting = _getGreeting();
+    final user = controller.user.value;
+    final name = user?.displayName?.split(' ').first ?? 'there';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          greeting,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withAlpha(178),
           ),
-          const SizedBox(height: 4),
-          Text(
-            'Hello, $name!',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
-            ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Hello, $name!',
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
           ),
-          const SizedBox(height: 8),
-          Text(
-            "Here's your job search overview",
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
-            ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Here's your automotive career dashboard",
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.onSurface.withAlpha(178),
           ),
-        ],
-      );
-    });
+        ),
+      ],
+    );
   }
 
   /// Build quick action buttons for common tasks
-  Widget _buildQuickActionButtons(ThemeData theme, bool isMobile) {
+  Widget _buildQuickActionButtons(
+    ThemeData theme,
+    bool isMobile,
+  ) {
     final buttonWidth = isMobile ? 150.0 : 200.0;
     const buttonHeight = 60.0;
 
@@ -160,7 +180,7 @@ class DashboardView extends GetView<DashboardController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Quick Actions',
+          'Automotive Career Actions',
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -172,8 +192,8 @@ class DashboardView extends GetView<DashboardController> {
             children: [
               _buildQuickActionButton(
                 theme,
-                'Search Jobs',
-                FontAwesomeIcons.magnifyingGlass,
+                'Automotive Jobs',
+                FontAwesomeIcons.car,
                 Colors.blue,
                 buttonWidth,
                 buttonHeight,
@@ -182,7 +202,7 @@ class DashboardView extends GetView<DashboardController> {
               const SizedBox(width: 16),
               _buildQuickActionButton(
                 theme,
-                'New Application',
+                'Apply Now',
                 FontAwesomeIcons.fileCirclePlus,
                 Colors.green,
                 buttonWidth,
@@ -192,17 +212,17 @@ class DashboardView extends GetView<DashboardController> {
               const SizedBox(width: 16),
               _buildQuickActionButton(
                 theme,
-                'Upcoming Interviews',
-                FontAwesomeIcons.calendarCheck,
+                'Skill Assessment',
+                FontAwesomeIcons.gears,
                 Colors.orange,
                 buttonWidth,
                 buttonHeight,
-                () => Get.toNamed<dynamic>('/interviews'),
+                () => Get.toNamed<dynamic>('/skills/assessment'),
               ),
               const SizedBox(width: 16),
               _buildQuickActionButton(
                 theme,
-                'My Resume',
+                'Auto Resume',
                 FontAwesomeIcons.fileLines,
                 Colors.purple,
                 buttonWidth,
@@ -231,7 +251,7 @@ class DashboardView extends GetView<DashboardController> {
       onTapUp: onTap,
       onTapDown: () {},
       border: Border.all(
-        color: color.withOpacity(0.3),
+        color: color.withAlpha(76),
       ),
       depth: 5,
       child: SizedBox(
@@ -266,39 +286,41 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   /// Build the statistics section with job statistics cards
-  Widget _buildStatisticsSection(ThemeData theme, bool isMobile) {
+  Widget _buildStatisticsSection(
+    ThemeData theme,
+    bool isMobile,
+    DashboardController controller,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Job Statistics',
+          'Automotive Industry Metrics',
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
-        Obx(() {
-          final stats = controller.jobStatistics;
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              // Calculate the width of each card based on available width
-              final cardWidth = isMobile
-                  ? constraints.maxWidth
-                  : (constraints.maxWidth / 2) - 8;
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // Calculate the width of each card based on available width
+            final cardWidth = isMobile
+                ? constraints.maxWidth
+                : (constraints.maxWidth / 2) - 8;
 
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: stats.map((stat) {
-                  return SizedBox(
-                    width: cardWidth,
-                    child: _buildStatisticCard(theme, stat),
-                  );
-                }).toList(),
-              );
-            },
-          );
-        }),
+            final stats = controller.jobStatistics;
+            return Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: stats.map((stat) {
+                return SizedBox(
+                  width: cardWidth,
+                  child: _buildStatisticCard(theme, stat),
+                );
+              }).toList(),
+            );
+          },
+        ),
       ],
     );
   }
@@ -308,7 +330,7 @@ class DashboardView extends GetView<DashboardController> {
     return NeoPopCard(
       color: theme.cardColor,
       border: Border.all(
-        color: stat.color.withOpacity(0.3),
+        color: stat.color.withAlpha(76),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -321,7 +343,7 @@ class DashboardView extends GetView<DashboardController> {
                 Text(
                   stat.title,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withAlpha(178),
                   ),
                 ),
                 Container(
@@ -331,8 +353,8 @@ class DashboardView extends GetView<DashboardController> {
                   ),
                   decoration: BoxDecoration(
                     color: stat.isPositive
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.red.withOpacity(0.1),
+                        ? Colors.green.withAlpha(25)
+                        : Colors.red.withAlpha(25),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -369,27 +391,9 @@ class DashboardView extends GetView<DashboardController> {
             const SizedBox(height: 16),
             SizedBox(
               height: 40,
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(show: false),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: _generateRandomSpots(stat.value),
-                      isCurved: true,
-                      color: stat.color,
-                      barWidth: 2,
-                      isStrokeCapRound: true,
-                      dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: stat.color.withOpacity(0.1),
-                      ),
-                    ),
-                  ],
-                  lineTouchData: LineTouchData(enabled: false),
-                ),
+              child: SimpleLineChart(
+                color: stat.color,
+                value: stat.value,
               ),
             ),
           ],
@@ -399,36 +403,37 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   /// Build the recent activity section
-  Widget _buildRecentActivitySection(ThemeData theme, bool isMobile) {
+  Widget _buildRecentActivitySection(
+    ThemeData theme,
+    bool isMobile,
+    DashboardController controller,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Recent Activity',
+          'Recent Automotive Activity',
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
-        Obx(() {
-          final activities = controller.recentActivity;
-          return NeoPopCard(
-            color: theme.cardColor,
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: activities.length,
-              separatorBuilder: (context, index) => Divider(
-                color: theme.dividerColor.withOpacity(0.1),
-                height: 1,
-              ),
-              itemBuilder: (context, index) {
-                final activity = activities[index];
-                return _buildActivityItem(theme, activity);
-              },
+        NeoPopCard(
+          color: theme.cardColor,
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.recentActivity.length,
+            separatorBuilder: (context, index) => Divider(
+              color: theme.dividerColor.withAlpha(25),
+              height: 1,
             ),
-          );
-        }),
+            itemBuilder: (context, index) {
+              final activity = controller.recentActivity[index];
+              return _buildActivityItem(theme, activity);
+            },
+          ),
+        ),
       ],
     );
   }
@@ -439,7 +444,7 @@ class DashboardView extends GetView<DashboardController> {
 
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: activity.color.withOpacity(0.1),
+        backgroundColor: activity.color.withAlpha(25),
         child: Icon(
           activity.icon,
           color: activity.color,
@@ -464,7 +469,7 @@ class DashboardView extends GetView<DashboardController> {
           Text(
             timeAgo,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withAlpha(127),
             ),
           ),
         ],
@@ -477,55 +482,56 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   /// Build the sign out button
-  Widget _buildSignOutButton(ThemeData theme, bool isMobile) {
+  Widget _buildSignOutButton(
+    ThemeData theme,
+    bool isMobile,
+    DashboardController controller,
+  ) {
     return Center(
-      child: Obx(() {
-        final isLoading = controller.isSignOutLoading.value;
-        return NeoPopButton(
-          color: theme.colorScheme.error.withOpacity(0.8),
-          onTapUp: isLoading ? null : controller.signOut,
-          onTapDown: isLoading ? null : () {},
-          border: Border.all(
-            color: theme.colorScheme.error,
+      child: NeoPopButton(
+        color: theme.colorScheme.error.withAlpha(204),
+        onTapUp: controller.isSignOutLoading.value ? null : controller.signOut,
+        onTapDown: controller.isSignOutLoading.value ? null : () {},
+        border: Border.all(
+          color: theme.colorScheme.error,
+        ),
+        depth: 5,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 12,
           ),
-          depth: 5,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
-            child: isLoading
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        theme.colorScheme.onError,
+          child: controller.isSignOutLoading.value
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      theme.colorScheme.onError,
+                    ),
+                  ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.logout,
+                      color: theme.colorScheme.onError,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Sign Out',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.onError,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.logout,
-                        color: theme.colorScheme.onError,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Sign Out',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.colorScheme.onError,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        );
-      }),
+                  ],
+                ),
+        ),
+      ),
     );
   }
 
@@ -653,28 +659,115 @@ class DashboardView extends GetView<DashboardController> {
     if (difference.inDays > 7) {
       return DateFormat('MMM d, yyyy').format(dateTime);
     } else if (difference.inDays > 0) {
-      return '${difference.inDays} ${difference.inDays == 1 ? 'day' : 'days'} ago';
+      final days = difference.inDays;
+      return '$days ${days == 1 ? 'day' : 'days'} ago';
     } else if (difference.inHours > 0) {
-      return '${difference.inHours} ${difference.inHours == 1 ? 'hour' : 'hours'} ago';
+      final hours = difference.inHours;
+      return '$hours ${hours == 1 ? 'hour' : 'hours'} ago';
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} ${difference.inMinutes == 1 ? 'minute' : 'minutes'} ago';
+      final minutes = difference.inMinutes;
+      return '$minutes ${minutes == 1 ? 'minute' : 'minutes'} ago';
     } else {
       return 'Just now';
     }
   }
 
-  /// Generate random spots for the chart
-  List<FlSpot> _generateRandomSpots(int value) {
-    final random = DateTime.now().millisecondsSinceEpoch;
-    final spots = <FlSpot>[];
+  // No chart data generation needed - using custom chart implementation
+}
 
+/// Simple line chart widget
+class SimpleLineChart extends StatelessWidget {
+  const SimpleLineChart({
+    required this.color,
+    required this.value,
+    super.key,
+  });
+
+  final Color color;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _ChartPainter(
+        color: color,
+        value: value,
+      ),
+      size: const Size(double.infinity, 40),
+    );
+  }
+}
+
+/// Custom painter for the line chart
+class _ChartPainter extends CustomPainter {
+  _ChartPainter({
+    required this.color,
+    required this.value,
+  });
+
+  final Color color;
+  final int value;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final random = DateTime.now().millisecondsSinceEpoch;
+    final points = <Offset>[];
+
+    // Generate random points
     for (var i = 0; i < 7; i++) {
-      final y = (((random >> (i * 4)) & 0xF) / 15.0) * value * 1.5;
-      spots.add(FlSpot(i.toDouble(), y));
+      final x = size.width * i / 6;
+      final y = size.height -
+          (size.height * (((random >> (i * 4)) & 0xF) / 15.0) * 0.8);
+      points.add(Offset(x, y));
     }
 
-    return spots;
+    // Draw filled area
+    final path = Path()
+      ..moveTo(0, size.height)
+      ..lineTo(points.first.dx, points.first.dy);
+
+    for (var i = 1; i < points.length; i++) {
+      final p0 = points[i - 1];
+      final p1 = points[i];
+
+      // Use quadratic bezier for smooth curve
+      final controlX = (p0.dx + p1.dx) / 2;
+      path.quadraticBezierTo(controlX, p0.dy, p1.dx, p1.dy);
+    }
+
+    path
+      ..lineTo(size.width, size.height)
+      ..close();
+
+    // Fill the area
+    final fillPaint = Paint()
+      ..color = color.withAlpha(25) // Using withAlpha instead of withOpacity
+      ..style = PaintingStyle.fill;
+
+    canvas.drawPath(path, fillPaint);
+
+    // Draw the line
+    final linePath = Path()..moveTo(points.first.dx, points.first.dy);
+
+    for (var i = 1; i < points.length; i++) {
+      final p0 = points[i - 1];
+      final p1 = points[i];
+
+      // Use quadratic bezier for smooth curve
+      final controlX = (p0.dx + p1.dx) / 2;
+      linePath.quadraticBezierTo(controlX, p0.dy, p1.dx, p1.dy);
+    }
+
+    final linePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    canvas.drawPath(linePath, linePaint);
   }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// Custom NeoPOP card widget
@@ -699,7 +792,7 @@ class NeoPopCard extends StatelessWidget {
         border: border,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(25),
             offset: Offset(depth, depth),
             blurRadius: depth,
           ),
