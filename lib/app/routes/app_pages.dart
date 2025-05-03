@@ -79,13 +79,11 @@ class AppPages {
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
-    // Placeholder routes for bottom navigation
-    // These will be implemented later
+    // Jobs route using SearchView for job search functionality
     GetPage<dynamic>(
       name: _Paths.jobs,
-      page: () => const DashboardView(),
-      // Temporary - will be replaced with JobsView
-      binding: DashboardBinding(),
+      page: () => const SearchView(),
+      binding: SearchBinding(),
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),

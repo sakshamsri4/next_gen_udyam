@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
@@ -25,6 +26,8 @@ class SearchService extends GetxService {
         _analytics = analytics;
 
   final FirebaseFirestore _firestore;
+  // HiveManager is used indirectly through Hive.box calls
+  // ignore: unused_field
   final HiveManager _hiveManager;
   final LoggerService _logger;
   final AnalyticsService? _analytics;

@@ -35,8 +35,8 @@ class CustomAnimatedBottomNavBar extends GetView<NavigationController> {
             ),
             _buildNavItem(
               context,
-              icon: FontAwesomeIcons.car,
-              label: 'Jobs',
+              icon: FontAwesomeIcons.magnifyingGlass,
+              label: 'Search',
               index: 1,
             ),
             _buildNavItem(

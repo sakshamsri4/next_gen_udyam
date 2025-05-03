@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:neopop/neopop.dart';
 import 'package:next_gen/app/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
 import 'package:responsive_builder/responsive_builder.dart';
@@ -192,12 +193,12 @@ class DashboardView extends GetView<DashboardController> {
             children: [
               _buildQuickActionButton(
                 theme,
-                'Automotive Jobs',
-                FontAwesomeIcons.car,
+                'Search Jobs',
+                FontAwesomeIcons.magnifyingGlass,
                 Colors.blue,
                 buttonWidth,
                 buttonHeight,
-                () => Get.toNamed<dynamic>('/jobs/search'),
+                () => Get.toNamed<dynamic>(Routes.jobs),
               ),
               const SizedBox(width: 16),
               _buildQuickActionButton(
