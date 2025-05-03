@@ -104,7 +104,6 @@ class SearchService extends GetxService {
             descending: filter.sortOrder == SortOrder.descending,
           );
         case SortOption.relevance:
-        default:
           // For relevance, we'll just use the default order
           break;
       }
