@@ -197,6 +197,8 @@ class NeoPopCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cardColor = color ?? theme.cardColor;
+    // parentColor is used for future implementation of nested cards
+    // ignore: unused_local_variable
     final backgroundColor = parentColor ?? theme.scaffoldBackgroundColor;
 
     return Container(

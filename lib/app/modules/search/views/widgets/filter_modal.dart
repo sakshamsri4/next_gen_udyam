@@ -44,7 +44,9 @@ class _FilterModalState extends State<FilterModal> {
     'Temporary',
   ];
 
-  // Experience options
+  // These options are defined for future implementation
+  // of additional filter options
+  // ignore: unused_field
   final List<String> _experienceOptions = [
     '0-1 years',
     '1-3 years',
@@ -53,7 +55,7 @@ class _FilterModalState extends State<FilterModal> {
     '10+ years',
   ];
 
-  // Education options
+  // ignore: unused_field
   final List<String> _educationOptions = [
     'High School',
     "Associate's",
@@ -62,7 +64,7 @@ class _FilterModalState extends State<FilterModal> {
     'Doctorate',
   ];
 
-  // Industry options
+  // ignore: unused_field
   final List<String> _industryOptions = [
     'Automotive',
     'Manufacturing',

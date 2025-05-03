@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
@@ -47,7 +46,8 @@ class SearchService extends GetxService {
       if (filter.query.isNotEmpty) {
         await saveSearchHistory(filter.query);
 
-        // Log search event
+        // Log search event - no need to await analytics
+        // ignore: unawaited_futures
         _analytics?.logSearch(searchTerm: filter.query);
       }
 

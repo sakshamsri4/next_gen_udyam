@@ -38,10 +38,9 @@ dependencies:
   path_provider: ^2.1.1
   responsive_builder: ^0.7.0
   shimmer: ^3.0.0
-  # Using cloud_firestore for search instead of Algolia due to dependency conflicts
-  debounce_throttle: ^2.0.0
-
+  # Dependencies for search module
   cloud_firestore: any
+  debounce_throttle: ^2.0.0
 dev_dependencies:
   bloc_test: ^10.0.0
   build_runner: ^2.4.8
