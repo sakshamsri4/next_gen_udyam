@@ -803,6 +803,119 @@
     - Use IDE diagnostics to catch and fix syntax errors
 
 ## [2024-07-27]
+- Fixed GetIt Service Locator Error:
+  - **Issue Description**:
+    - App was crashing with error: "Bad state: GetIt: Object/factory with type AuthService is not registered inside GetIt"
+    - Error occurred in AuthBinding when trying to access AuthService from the service locator
+    - The error was preventing the login screen from loading
+    - Stack trace showed the error happening during the AuthBinding.dependencies method
+
+  - **Root Cause Analysis**:
+    - The AuthService was not properly registered in the GetIt service locator
+    - The service locator initialization might have failed or been incomplete
+    - The AuthBinding was trying to access the AuthService from the service locator before it was registered
+    - There was no fallback mechanism when service locator initialization failed
+
+  - **Working Solution**:
+    - Updated AuthBinding class to handle missing AuthService:
+      - Added try-catch block to safely handle the case when AuthService is not found in the service locator
+      - Added code to create a new instance of AuthService if it's not found in the service locator
+      - Added code to register the new instance with the service locator for future use
+      - Added proper logging for all steps
+    - Enhanced bootstrap.dart to ensure critical services are registered:
+      - Added fallback initialization for critical services (LoggerService and AuthService)
+      - Added code to check if services are registered before trying to register them again
+      - Added proper error handling for service initialization failures
+    - Improved error recovery to prevent app crashes
+
+  - **Benefits**:
+    - Fixed app crash during AuthBinding initialization
+    - Improved service locator initialization with proper fallback mechanisms
+    - Enhanced error handling and recovery throughout the dependency injection process
+    - Made the code more robust against service locator initialization failures
+    - Ensured critical services are always available
+
+  - **Lessons Learned**:
+    - Always provide fallback mechanisms for dependency injection
+    - Add proper error handling for service locator initialization
+    - Use try-catch blocks when accessing services from the service locator
+    - Check if services are registered before trying to register them again
+    - Ensure critical services are initialized early in the bootstrap process
+- Fixed AuthService Dependency Injection Error:
+  - **Issue Description**:
+    - App was crashing with error: "AuthService not found. You need to call Get.put(AuthService())"
+    - Error occurred in AuthController._checkPersistedLogin when trying to access AuthService
+    - The error was preventing proper initialization and navigation in the app
+    - Stack trace showed the error happening during app startup in the App widget build method
+
+  - **Root Cause Analysis**:
+    - AuthController was trying to access AuthService before it was registered with GetX
+    - The AuthBinding class was registering AuthController but not AuthService
+    - The dependency order was incorrect - AuthService needs to be registered before AuthController
+    - The _checkPersistedLogin method didn't have proper error handling for missing dependencies
+
+  - **Working Solution**:
+    - Updated AuthBinding class to register AuthService before AuthController:
+      - Added code to check if AuthService is already registered
+      - Used serviceLocator to get the AuthService instance
+      - Added proper logging for dependency registration
+    - Added robust error handling in AuthController methods:
+      - Updated _checkPersistedLogin to safely handle missing AuthService
+      - Added try-catch blocks in login, signup, signInWithGoogle, and signOut methods
+      - Added user-friendly error messages when AuthService is not available
+      - Ensured loading states are properly reset when errors occur
+    - Improved error recovery to prevent app crashes
+
+  - **Benefits**:
+    - Fixed app crash during initialization
+    - Improved dependency management with proper registration order
+    - Enhanced error handling and recovery throughout the auth flow
+    - Added user-friendly error messages for better user experience
+    - Made the code more robust against dependency injection issues
+
+  - **Lessons Learned**:
+    - Always ensure dependencies are registered in the correct order
+    - Add proper error handling for dependency injection failures
+    - Use try-catch blocks when accessing dependencies that might not be available
+    - Provide user-friendly error messages for better user experience
+    - Test the app with different initialization scenarios
+- Fixed StorageService Widget Test Errors:
+  - **Issue Description**:
+    - The `storage_service_widget_test.dart` file had errors related to missing static getters in the `StorageService` class
+    - Error messages: "The getter 'getThemeSettingsImpl' isn't defined for the type 'StorageService'" and "The getter 'saveThemeSettingsImpl' isn't defined for the type 'StorageService'"
+    - These errors prevented the tests from running successfully
+
+  - **Root Cause Analysis**:
+    - The test was trying to access static getters (`getThemeSettingsImpl` and `saveThemeSettingsImpl`) that were used in other test files but not defined in the actual `StorageService` class
+    - The test was designed to verify that these implementation methods exist, but they were missing from the class
+    - The `HiveManager` class also had issues with imports and type references
+
+  - **Working Solution**:
+    - Added the missing static getters to the `StorageService` class:
+      - Added `static ThemeSettings Function() getThemeSettingsImpl`
+      - Added `static Future<void> Function(ThemeSettings) saveThemeSettingsImpl`
+      - Added `static Future<void> Function() initImpl`
+      - Initialized these with default implementations that delegate to instance methods
+    - Added static methods for direct access:
+      - Added `static ThemeSettings getThemeSettingsStatic()`
+      - Added `static Future<void> saveThemeSettingsStatic(ThemeSettings settings)`
+    - Updated the test file to use the correct static getters
+    - Fixed imports and type references in the `HiveManager` class
+    - Added proper type parameter to `Hive.box<dynamic>(boxName)` in the `closeBox` method
+
+  - **Benefits**:
+    - Fixed all errors in the `storage_service_widget_test.dart` file
+    - Ensured tests run successfully
+    - Improved code organization with proper static getters for testing
+    - Enhanced type safety with explicit type parameters
+    - Made the code more maintainable with clear separation between instance and static methods
+
+  - **Lessons Learned**:
+    - Always provide static implementations for methods that need to be mocked in tests
+    - Use explicit type parameters to avoid type inference issues
+    - Keep test implementations consistent with the actual code
+    - Document the purpose of static getters used for testing
+    - Ensure proper imports for all types used in the code
 - Implemented Error Handling & Connectivity Module:
   - **Implementation Details**:
     - Created a comprehensive error handling and connectivity monitoring system:

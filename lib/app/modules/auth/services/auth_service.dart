@@ -2,9 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hive/hive.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
+import 'package:next_gen/core/di/service_locator.dart';
+// Analytics service commented out for now, will be implemented later
+// import 'package:next_gen/core/services/analytics_service.dart';
 import 'package:next_gen/core/services/logger_service.dart';
+import 'package:next_gen/core/storage/storage_service.dart';
 
 class AuthService {
   // Factory constructor
@@ -28,6 +31,12 @@ class AuthService {
 
   // Private constructor
   AuthService._internal() {
+    // Initialize dependencies
+    _logger = serviceLocator<LoggerService>();
+    _storageService = serviceLocator<StorageService>();
+    // Analytics service commented out for now, will be implemented later
+    // _analyticsService = serviceLocator<AnalyticsService>();
+
     // Initialize GoogleSignIn with appropriate configuration
     if (kIsWeb) {
       // For web, we'll disable Google Sign-In for now
@@ -47,6 +56,8 @@ class AuthService {
         ],
       );
     }
+
+    _logger.i('AuthService initialized');
   }
 
   // Singleton pattern
@@ -55,7 +66,10 @@ class AuthService {
   // Changed from final to late so it can be mocked in tests
   late FirebaseAuth _auth = FirebaseAuth.instance;
   late GoogleSignIn _googleSignIn;
-  final String _userBoxName = 'user_box';
+  late final LoggerService _logger;
+  late final StorageService _storageService;
+  // Analytics service commented out for now, will be implemented later
+  // late final AnalyticsService _analyticsService;
 
   // Get current user
   User? get currentUser => _auth.currentUser;
@@ -74,28 +88,31 @@ class AuthService {
     String email,
     String password,
   ) async {
-    log.i('Attempting to register user with email: $email');
+    _logger.i('Attempting to register user with email: $email');
     try {
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.logSignUp(method: 'email');
+
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      log.i('User registered successfully: ${credential.user?.uid}');
+      _logger.i('User registered successfully: ${credential.user?.uid}');
 
       // Send email verification
       await credential.user?.sendEmailVerification();
-      log.i('Verification email sent to: $email');
+      _logger.i('Verification email sent to: $email');
 
-      // Save user to Hive
+      // Save user to storage
       if (credential.user != null) {
         await _saveUserToHive(UserModel.fromFirebaseUser(credential.user!));
-        log.d('User data saved to local storage');
+        _logger.d('User data saved to local storage');
       }
 
       return credential;
     } catch (e, stackTrace) {
-      log.e('Registration failed for email: $email', e, stackTrace);
+      _logger.e('Registration failed for email: $email', e, stackTrace);
       rethrow;
     }
   }
@@ -105,34 +122,40 @@ class AuthService {
     String email,
     String password,
   ) async {
-    log.i('Attempting to sign in user with email: $email');
+    _logger.i('Attempting to sign in user with email: $email');
     try {
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.logLogin(method: 'email');
+
       final credential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      log.i('User signed in successfully: ${credential.user?.uid}');
+      _logger.i('User signed in successfully: ${credential.user?.uid}');
 
-      // Save user to Hive
+      // Save user to storage
       if (credential.user != null) {
         await _saveUserToHive(UserModel.fromFirebaseUser(credential.user!));
-        log.d('User data saved to local storage');
+        _logger.d('User data saved to local storage');
       }
 
       return credential;
     } catch (e, stackTrace) {
-      log.e('Sign in failed for email: $email', e, stackTrace);
+      _logger.e('Sign in failed for email: $email', e, stackTrace);
       rethrow;
     }
   }
 
   // Sign in with Google
   Future<UserCredential?> signInWithGoogle() async {
-    log.i('Attempting to sign in with Google');
+    _logger.i('Attempting to sign in with Google');
     try {
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.logLogin(method: 'google');
+
       if (kIsWeb) {
-        log.d('Using web-specific Google sign-in flow');
+        _logger.d('Using web-specific Google sign-in flow');
         // For web, use Firebase's built-in Google auth provider
         // This avoids the need for a client ID in the web app
         final googleProvider = GoogleAuthProvider()
@@ -141,33 +164,33 @@ class AuthService {
 
         // Sign in with popup
         final userCredential = await _auth.signInWithPopup(googleProvider);
-        log.i(
+        _logger.i(
           'User signed in with Google successfully:'
           ' ${userCredential.user?.uid}',
         );
 
-        // Save user to Hive
+        // Save user to storage
         if (userCredential.user != null) {
           await _saveUserToHive(
             UserModel.fromFirebaseUser(userCredential.user!),
           );
-          log.d('User data saved to local storage');
+          _logger.d('User data saved to local storage');
         }
 
         return userCredential;
       } else {
-        log.d('Using mobile-specific Google sign-in flow');
+        _logger.d('Using mobile-specific Google sign-in flow');
         try {
           // For mobile platforms, use the GoogleSignIn package
           // Trigger the authentication flow
           final googleUser = await _googleSignIn.signIn();
 
           if (googleUser == null) {
-            log.w('Google sign-in canceled by user');
+            _logger.w('Google sign-in canceled by user');
             return null; // User canceled the sign-in flow
           }
 
-          log.d('Google sign-in successful, obtaining auth details');
+          _logger.d('Google sign-in successful, obtaining auth details');
           // Obtain the auth details from the request
           final googleAuth = await googleUser.authentication;
 
@@ -179,17 +202,17 @@ class AuthService {
 
           // Sign in to Firebase with the Google credential
           final userCredential = await _auth.signInWithCredential(credential);
-          log.i(
+          _logger.i(
             'User signed in with Google successfully:'
             ' ${userCredential.user?.uid}',
           );
 
-          // Save user to Hive
+          // Save user to storage
           if (userCredential.user != null) {
             await _saveUserToHive(
               UserModel.fromFirebaseUser(userCredential.user!),
             );
-            log.d('User data saved to local storage');
+            _logger.d('User data saved to local storage');
           }
 
           return userCredential;
@@ -198,7 +221,7 @@ class AuthService {
           if (e is PlatformException) {
             final errorMessage = e.message ?? '';
             if (e.code == 'sign_in_failed' && errorMessage.contains('10:')) {
-              log.e(
+              _logger.e(
                 'Google Sign-In failed with error code 10. This usually '
                 'indicates a missing SHA-1 certificate fingerprint in '
                 'Firebase console or incorrect package name configuration.',
@@ -218,50 +241,69 @@ class AuthService {
         }
       }
     } catch (e, stackTrace) {
-      log.e('Error signing in with Google', e, stackTrace);
+      _logger.e('Error signing in with Google', e, stackTrace);
       rethrow;
     }
   }
 
   // Sign out
   Future<void> signOut() async {
-    log.i('Attempting to sign out user');
+    _logger.i('Attempting to sign out user');
     try {
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.logEvent(name: 'logout');
+
       await _googleSignIn.signOut();
       await _auth.signOut();
       await _clearUserFromHive();
-      log.i('User signed out successfully');
+      _logger.i('User signed out successfully');
     } catch (e, stackTrace) {
-      log.e('Error signing out user', e, stackTrace);
+      _logger.e('Error signing out user', e, stackTrace);
       rethrow;
     }
   }
 
   // Reset password
   Future<void> resetPassword(String email) async {
-    log.i('Attempting to send password reset email to: $email');
+    _logger.i('Attempting to send password reset email to: $email');
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      log.i('Password reset email sent successfully to: $email');
+      _logger.i('Password reset email sent successfully to: $email');
+
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.logEvent(
+      //   name: 'password_reset_email',
+      //   parameters: {'email': email},
+      // );
     } catch (e, stackTrace) {
-      log.e('Failed to send password reset email to: $email', e, stackTrace);
+      _logger.e(
+        'Failed to send password reset email to: $email',
+        e,
+        stackTrace,
+      );
       rethrow;
     }
   }
 
   // Send email verification to current user
   Future<void> sendEmailVerification() async {
-    log.i('Attempting to send email verification');
+    _logger.i('Attempting to send email verification');
     try {
       final user = _auth.currentUser;
       if (user != null) {
         await user.sendEmailVerification();
-        log.i('Verification email sent successfully to: ${user.email}');
+        _logger.i('Verification email sent successfully to: ${user.email}');
+
+        // Analytics service commented out for now, will be implemented later
+        // await _analyticsService.logEvent(
+        //   name: 'email_verification_sent',
+        //   parameters: {'email': user.email},
+        // );
       } else {
         throw Exception('No user logged in');
       }
     } catch (e, stackTrace) {
-      log.e('Failed to send verification email', e, stackTrace);
+      _logger.e('Failed to send verification email', e, stackTrace);
       rethrow;
     }
   }
@@ -271,42 +313,52 @@ class AuthService {
     String? displayName,
     String? photoURL,
   }) async {
-    log.i('Attempting to update user profile');
+    _logger.i('Attempting to update user profile');
     try {
       final user = _auth.currentUser;
       if (user != null) {
+        // Track profile update event
+        final updatedFields = <String, dynamic>{};
+
         if (displayName != null) {
           await user.updateDisplayName(displayName);
-          log.d('Display name updated to: $displayName');
+          _logger.d('Display name updated to: $displayName');
+          updatedFields['display_name'] = true;
         }
 
         if (photoURL != null) {
           await user.updatePhotoURL(photoURL);
-          log.d('Photo URL updated to: $photoURL');
+          _logger.d('Photo URL updated to: $photoURL');
+          updatedFields['photo_url'] = true;
         }
 
         // Reload user to get updated profile
         await user.reload();
 
-        // Update user in Hive
+        // Update user in storage
         if (_auth.currentUser != null) {
           await _saveUserToHive(UserModel.fromFirebaseUser(_auth.currentUser!));
-          log.d('Updated user data saved to local storage');
+          _logger.d('Updated user data saved to local storage');
         }
 
-        log.i('User profile updated successfully');
+        // Analytics service commented out for now, will be implemented later
+        // await _analyticsService.logProfileUpdate(
+        //   updatedFields: updatedFields,
+        // );
+
+        _logger.i('User profile updated successfully');
       } else {
         throw Exception('No user logged in');
       }
     } catch (e, stackTrace) {
-      log.e('Failed to update user profile', e, stackTrace);
+      _logger.e('Failed to update user profile', e, stackTrace);
       rethrow;
     }
   }
 
   // Get current Firebase user as UserModel
   Future<UserModel?> getUserFromFirebase() async {
-    log.d('Getting current user from Firebase');
+    _logger.d('Getting current user from Firebase');
     final user = _auth.currentUser;
     if (user != null) {
       return UserModel.fromFirebaseUser(user);
@@ -317,6 +369,15 @@ class AuthService {
   // Get user-friendly error message from FirebaseAuthException
   String getErrorMessage(dynamic error) {
     if (error is FirebaseAuthException) {
+      // Analytics service commented out for now, will be implemented later
+      // _analyticsService.logEvent(
+      //   name: 'auth_error',
+      //   parameters: {
+      //     'error_code': error.code,
+      //     'error_message': error.message ?? 'No message',
+      //   },
+      // );
+
       switch (error.code) {
         case 'user-not-found':
           return 'The email address was not found. Please check and try again.';
@@ -335,6 +396,9 @@ class AuthService {
           return 'Too many attempts. Please try again later.';
         case 'operation-not-allowed':
           return 'This operation is not allowed. Please contact support.';
+        case 'google-sign-in-configuration-error':
+          return 'Google Sign-In is not properly configured. '
+              'Please contact support.';
         default:
           return 'Unknown error occurred: ${error.message}';
       }
@@ -342,78 +406,61 @@ class AuthService {
     return 'An unexpected error occurred. Please try again later.';
   }
 
-  // Save user to Hive
+  // Save user to storage
   Future<void> _saveUserToHive(UserModel user) async {
-    log.d('Saving user to local storage: ${user.uid}');
+    _logger.d('Saving user to local storage: ${user.uid}');
     try {
-      // Check if Hive is initialized
-      if (!Hive.isBoxOpen(_userBoxName)) {
-        log.d('Opening Hive box for user storage');
-      }
+      await _storageService.saveUser(user);
+      _logger.d('User saved to local storage successfully');
 
-      final box = await Hive.openBox<UserModel>(_userBoxName);
-      await box.put('current_user', user);
-      log.d('User saved to local storage successfully');
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.setUserId(user.uid);
+      // await _analyticsService.setUserProperty(
+      //   name: 'email_verified',
+      //   value: user.emailVerified.toString(),
+      // );
     } catch (e, stackTrace) {
-      if (e.toString().contains('initialize Hive')) {
-        log.w(
-          'Hive not initialized yet, skipping save to local storage',
-          e,
-          stackTrace,
-        );
-      } else {
-        log.e('Error saving user to local storage', e, stackTrace);
-      }
+      _logger.e('Error saving user to local storage', e, stackTrace);
     }
   }
 
-  // Get user from Hive
+  // Get user from storage
   Future<UserModel?> getUserFromHive() async {
-    log.d('Retrieving user from local storage');
+    _logger.d('Retrieving user from local storage');
     try {
-      // Check if Hive is initialized
-      if (!Hive.isBoxOpen(_userBoxName)) {
-        log.d('Opening Hive box for user retrieval');
-      }
-
-      final box = await Hive.openBox<UserModel>(_userBoxName);
-      final user = box.get('current_user');
+      final user = _storageService.getUser();
       if (user != null) {
-        log.d('User retrieved from local storage: ${user.uid}');
+        _logger.d('User retrieved from local storage: ${user.uid}');
       } else {
-        log.d('No user found in local storage');
+        _logger.d('No user found in local storage');
       }
       return user;
     } catch (e, stackTrace) {
-      if (e.toString().contains('initialize Hive')) {
-        log.w(
-          'Hive not initialized yet, skipping retrieval from local storage',
-          e,
-          stackTrace,
-        );
-      } else {
-        log.e('Error retrieving user from local storage', e, stackTrace);
-      }
+      _logger.e('Error retrieving user from local storage', e, stackTrace);
       return null;
     }
   }
 
-  // Restore Firebase session from Hive data
+  // Restore Firebase session from storage
   Future<User?> restoreUserSession() async {
-    log.i('Attempting to restore user session from Hive');
+    _logger.i('Attempting to restore user session from storage');
 
     try {
       // If Firebase already has a user, no need to restore
       if (_auth.currentUser != null) {
-        log.d('User already logged in via Firebase, no need to restore');
+        _logger.d('User already logged in via Firebase, no need to restore');
+
+        // Analytics service commented out for now, will be implemented later
+        // await _analyticsService.setUserId(_auth.currentUser!.uid);
+
         return _auth.currentUser;
       }
 
-      // Try to get user from Hive
+      // Try to get user from storage
       final persistedUser = await getUserFromHive();
 
       if (persistedUser != null) {
-        log.i('Found persisted user in Hive: ${persistedUser.uid}');
+        _logger.i('Found persisted user in storage: ${persistedUser.uid}');
 
         try {
           // Since we can't directly sign in without credentials,
@@ -425,16 +472,22 @@ class AuthService {
 
           // Check if Firebase has automatically restored the session
           if (_auth.currentUser != null) {
-            log.i(
+            _logger.i(
               'Firebase automatically restored session for user: '
               '${_auth.currentUser!.uid}',
             );
+
+            // Analytics service commented out for now, will be implemented later
+            // await _analyticsService.setUserId(
+            //   _auth.currentUser!.uid,
+            // );
+
             return _auth.currentUser;
           }
 
           // If we reach here, Firebase couldn't automatically restore
           // the session. This means the token is expired or invalid
-          log.w(
+          _logger.w(
             'Firebase could not automatically restore session, '
             'user needs to login again',
           );
@@ -443,43 +496,32 @@ class AuthService {
           await _clearUserFromHive();
           return null;
         } catch (e, stackTrace) {
-          log.e('Error restoring Firebase session', e, stackTrace);
+          _logger.e('Error restoring Firebase session', e, stackTrace);
           // Clear the persisted user since we couldn't restore the session
           await _clearUserFromHive();
           return null;
         }
       } else {
-        log.d('No persisted user found in Hive');
+        _logger.d('No persisted user found in storage');
         return null;
       }
     } catch (e, stackTrace) {
-      log.e('Error checking for persisted login', e, stackTrace);
+      _logger.e('Error checking for persisted login', e, stackTrace);
       return null;
     }
   }
 
-  // Clear user from Hive
+  // Clear user from storage
   Future<void> _clearUserFromHive() async {
-    log.d('Clearing user from local storage');
+    _logger.d('Clearing user from local storage');
     try {
-      // Check if Hive is initialized
-      if (!Hive.isBoxOpen(_userBoxName)) {
-        log.d('Opening Hive box for user deletion');
-      }
+      await _storageService.deleteUser();
+      _logger.d('User cleared from local storage successfully');
 
-      final box = await Hive.openBox<UserModel>(_userBoxName);
-      await box.delete('current_user');
-      log.d('User cleared from local storage successfully');
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.setUserId(null);
     } catch (e, stackTrace) {
-      if (e.toString().contains('initialize Hive')) {
-        log.w(
-          'Hive not initialized yet, skipping clear from local storage',
-          e,
-          stackTrace,
-        );
-      } else {
-        log.e('Error clearing user from local storage', e, stackTrace);
-      }
+      _logger.e('Error clearing user from local storage', e, stackTrace);
     }
   }
 }

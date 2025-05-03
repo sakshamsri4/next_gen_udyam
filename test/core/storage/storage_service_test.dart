@@ -180,7 +180,7 @@ void main() {
       };
 
       // Act
-      final settings = StorageService.getThemeSettings();
+      final settings = StorageService.getThemeSettingsImpl();
 
       // Assert
       expect(settings.isDarkMode, isTrue);
@@ -196,7 +196,7 @@ void main() {
           .thenReturn(ThemeSettings()); // Explicitly set default return
 
       // Act
-      final settings = StorageService.getThemeSettings();
+      final settings = StorageService.getThemeSettingsImpl();
 
       // Assert
       expect(settings.isDarkMode, true); // Check default value
@@ -212,7 +212,7 @@ void main() {
           .thenReturn(null);
 
       // Act
-      final settings = StorageService.getThemeSettings();
+      final settings = StorageService.getThemeSettingsImpl();
 
       // Assert
       expect(settings.isDarkMode, true);
@@ -225,7 +225,7 @@ void main() {
       final settingsToSave = ThemeSettings();
 
       // Act
-      await StorageService.saveThemeSettings(settingsToSave);
+      await StorageService.saveThemeSettingsImpl(settingsToSave);
 
       // Assert
       verify(mockHive.box<ThemeSettings>(themeSettingsBoxName));
