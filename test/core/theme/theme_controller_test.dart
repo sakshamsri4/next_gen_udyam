@@ -1,55 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/storage/storage_service.dart';
 import 'package:next_gen/core/storage/theme_settings.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
 
+// Create a mock StorageService for testing
+class MockStorageService extends Fake implements StorageService {
+  final ThemeSettings _themeSettings = ThemeSettings();
+
+  @override
+  ThemeSettings getThemeSettings() {
+    return _themeSettings;
+  }
+
+  @override
+  Future<void> saveThemeSettings(ThemeSettings settings) async {
+    _themeSettings.isDarkMode = settings.isDarkMode;
+    _themeSettings.useMaterial3 = settings.useMaterial3;
+    _themeSettings.useHighContrast = settings.useHighContrast;
+  }
+}
+
+// Create a mock LoggerService for testing
+class MockLoggerService extends Fake implements LoggerService {
+  @override
+  void i(String message, [dynamic error, StackTrace? stackTrace]) {}
+
+  @override
+  void d(String message, [dynamic error, StackTrace? stackTrace]) {}
+
+  @override
+  void e(String message, [dynamic error, StackTrace? stackTrace]) {}
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late ThemeController controller;
-  final mockThemeSettings = ThemeSettings();
-
-  // Store original implementations
-  final originalInitImpl = StorageService.initImpl;
-  final originalGetThemeSettingsImpl = StorageService.getThemeSettingsImpl;
-  final originalSaveThemeSettingsImpl = StorageService.saveThemeSettingsImpl;
+  late MockStorageService mockStorageService;
+  late MockLoggerService mockLoggerService;
 
   setUp(() {
-    // Replace implementations with test versions
-    StorageService.initImpl = () async {
-      // No-op for testing
-    };
-
-    StorageService.getThemeSettingsImpl = () {
-      return mockThemeSettings;
-    };
-
-    StorageService.saveThemeSettingsImpl = (settings) async {
-      mockThemeSettings.isDarkMode = settings.isDarkMode;
-    };
+    // Create mocks
+    mockStorageService = MockStorageService();
+    mockLoggerService = MockLoggerService();
 
     // Reset mock state
-    mockThemeSettings.isDarkMode = true;
+    mockStorageService.getThemeSettings().isDarkMode = true;
 
     // Initialize GetX
     Get.reset();
 
-    // Create controller
-    controller = ThemeController();
+    // Create controller with mocks
+    controller =
+        ThemeController.forTesting(mockStorageService, mockLoggerService);
     Get.put(controller);
   });
 
-  tearDown(() {
-    // Restore original implementations
-    StorageService.initImpl = originalInitImpl;
-    StorageService.getThemeSettingsImpl = originalGetThemeSettingsImpl;
-    StorageService.saveThemeSettingsImpl = originalSaveThemeSettingsImpl;
-
-    Get.reset();
-  });
+  tearDown(Get.reset);
 
   group('ThemeController', () {
     testWidgets('initial theme is dark', (WidgetTester tester) async {
