@@ -9,7 +9,7 @@ environment:
 dependencies:
   awesome_snackbar_content: ^0.1.5
   bloc: ^9.0.0
-  connectivity_plus: ^4.0.0
+  connectivity_plus: ^6.1.4
   firebase_auth: any
   firebase_core: any
   firebase_storage: any
