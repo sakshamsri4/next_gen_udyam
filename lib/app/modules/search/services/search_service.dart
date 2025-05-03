@@ -54,7 +54,8 @@ class SearchService extends GetxService {
       // Apply filters
       if (filter.query.isNotEmpty) {
         // For simplicity, we're just checking if the title contains the query
-        // In a real app, you might want to use a more sophisticated search solution
+        // In a real app, you might want to use
+        // a more sophisticated search solution
         query = query
             .where('title', isGreaterThanOrEqualTo: filter.query)
             .where('title', isLessThanOrEqualTo: '${filter.query}\\uf8ff');
