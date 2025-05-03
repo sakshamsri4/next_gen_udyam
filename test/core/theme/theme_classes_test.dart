@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/core/theme/neopop_theme.dart';
-import 'package:next_gen/core/theme/theme_controller.dart';
 
 void main() {
   group('Theme Classes', () {
@@ -25,14 +24,6 @@ void main() {
       expect(NeoPopTheme.successButtonStyle, isNotNull);
       expect(NeoPopTheme.flatButtonStyle, isNotNull);
       expect(NeoPopTheme.cardStyle, isNotNull);
-    });
-
-    test('ThemeController can be instantiated', () {
-      // This test indirectly tests the constructor
-      final controller = ThemeController();
-      expect(controller, isNotNull);
-      expect(controller.isDarkMode, isTrue);
-      expect(controller.theme, equals(AppTheme.darkTheme));
     });
   });
 }

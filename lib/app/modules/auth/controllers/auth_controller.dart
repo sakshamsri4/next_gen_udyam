@@ -71,15 +71,23 @@ class AuthController extends GetxController {
     try {
       log.d('Checking for persisted login in Hive');
 
-      // Get the auth service
-      final authService = Get.find<AuthService>();
-
       // If Firebase already has a user, no need to restore
       if (_auth.currentUser != null) {
         log.d(
           'User already logged in via Firebase, no need to restore from Hive',
         );
         return;
+      }
+
+      // Try to get the auth service
+      AuthService? authService;
+      try {
+        authService = Get.find<AuthService>();
+        log.d('AuthService found, proceeding with session restoration');
+      } catch (e) {
+        // AuthService not registered yet
+        log.w('AuthService not found, skipping session restoration: $e');
+        return; // Exit early, we can't restore without AuthService
       }
 
       // Set flag to indicate we're attempting to restore a session
@@ -258,7 +266,22 @@ class AuthController extends GetxController {
       isLoading.value = true;
 
       // Get the auth service to handle Hive persistence
-      final authService = Get.find<AuthService>();
+      AuthService? authService;
+      try {
+        authService = Get.find<AuthService>();
+      } catch (e) {
+        log.e('AuthService not found, cannot proceed with login', e);
+        Get.snackbar(
+          'Login Failed',
+          'Internal error: Authentication service not available. '
+              'Please try again later.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        isLoading.value = false;
+        return;
+      }
 
       // Log the authentication attempt
       log.d('Calling AuthService signInWithEmailAndPassword');
@@ -329,7 +352,22 @@ class AuthController extends GetxController {
       isLoading.value = true;
 
       // Get the auth service to handle Hive persistence
-      final authService = Get.find<AuthService>();
+      AuthService? authService;
+      try {
+        authService = Get.find<AuthService>();
+      } catch (e) {
+        log.e('AuthService not found, cannot proceed with signup', e);
+        Get.snackbar(
+          'Signup Failed',
+          'Internal error: Authentication service not available. '
+              'Please try again later.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        isLoading.value = false;
+        return;
+      }
 
       // Create user
       log.d('Calling AuthService registerWithEmailAndPassword');
@@ -481,7 +519,22 @@ class AuthController extends GetxController {
       isLoading.value = true;
 
       // Get the auth service to handle Hive persistence
-      final authService = Get.find<AuthService>();
+      AuthService? authService;
+      try {
+        authService = Get.find<AuthService>();
+      } catch (e) {
+        log.e('AuthService not found, cannot proceed with Google sign-in', e);
+        Get.snackbar(
+          'Google Sign In Failed',
+          'Internal error: Authentication service not available. '
+              'Please try again later.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        isLoading.value = false;
+        return;
+      }
 
       // Use the AuthService for Google sign-in
       log.d('Calling AuthService signInWithGoogle()');
@@ -559,7 +612,22 @@ class AuthController extends GetxController {
       // to prevent double-tap issues, so we don't set it again here
 
       // Get the auth service to handle Hive data clearing
-      final authService = Get.find<AuthService>();
+      AuthService? authService;
+      try {
+        authService = Get.find<AuthService>();
+      } catch (e) {
+        log.e('AuthService not found, cannot proceed with sign out', e);
+        Get.snackbar(
+          'Sign Out Failed',
+          'Internal error: Authentication service not available. '
+              'Please try again later.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        resetAllLoadingStates();
+        return;
+      }
 
       // Use the AuthService to sign out which will also clear Hive data
       await authService.signOut();

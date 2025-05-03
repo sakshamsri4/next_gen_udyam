@@ -803,6 +803,128 @@
     - Use IDE diagnostics to catch and fix syntax errors
 
 ## [2024-07-27]
+- Fixed GetIt Service Locator Error:
+  - **Issue Description**:
+    - App was crashing with error: "Bad state: GetIt: Object/factory with type AuthService is not registered inside GetIt"
+    - Error occurred in AuthBinding when trying to access AuthService from the service locator
+    - The error was preventing the login screen from loading
+    - Stack trace showed the error happening during the AuthBinding.dependencies method
+
+## [2024-07-28]
+- Fixed Theme Controller Test Imports:
+  - **Issue Description**:
+    - The `test/core/theme/theme_controller_test.dart` file had multiple import and class reference errors
+    - Error included double semicolon in import statement and missing imports for required classes
+    - The test file was failing to compile due to these errors
+    - Multiple undefined classes and methods were reported by the analyzer
+
+  - **Root Cause Analysis**:
+    - The import statement had a double semicolon: `import 'package:flutter_test/flutter_test.dart';;`
+    - Missing imports for required classes: `Fake`, `StorageService`, `ThemeSettings`, `LoggerService`, `ThemeController`, `Get`, `Container`, `GetMaterialApp`, and `AppTheme`
+    - The test file was using these classes without proper imports
+    - The `Fake` class was imported from `mocktail` but was also available in `flutter_test`
+
+  - **Working Solution**:
+    - Fixed the double semicolon in the import statement
+    - Added all missing imports:
+      - `import 'package:flutter/material.dart';` for `Container`
+      - `import 'package:get/get.dart';` for `Get` and `GetMaterialApp`
+      - `import 'package:next_gen/core/services/logger_service.dart';` for `LoggerService`
+      - `import 'package:next_gen/core/storage/storage_service.dart';` for `StorageService`
+      - `import 'package:next_gen/core/storage/theme_settings.dart';` for `ThemeSettings`
+      - `import 'package:next_gen/core/theme/app_theme.dart';` for `AppTheme`
+      - `import 'package:next_gen/core/theme/theme_controller.dart';` for `ThemeController`
+    - Removed unnecessary `mocktail` import since `Fake` is available in `flutter_test`
+    - Verified all tests pass after the fixes
+
+  - **Benefits**:
+    - Fixed all compilation errors in the theme controller test file
+    - Ensured all tests run successfully
+    - Improved code quality with proper imports
+    - Eliminated unnecessary dependencies
+    - Made the test file more maintainable
+
+  - **Lessons Learned**:
+    - Always check import statements for syntax errors like double semicolons
+    - Ensure all required classes are properly imported
+    - Use the IDE's diagnostics to identify and fix import issues
+    - Remove unnecessary imports to keep the code clean
+    - Run tests after making changes to verify they pass
+- Fixed AuthService Dependency Injection Error:
+  - **Issue Description**:
+    - App was crashing with error: "AuthService not found. You need to call Get.put(AuthService())"
+    - Error occurred in AuthController._checkPersistedLogin when trying to access AuthService
+    - The error was preventing proper initialization and navigation in the app
+    - Stack trace showed the error happening during app startup in the App widget build method
+
+  - **Root Cause Analysis**:
+    - AuthController was trying to access AuthService before it was registered with GetX
+    - The AuthBinding class was registering AuthController but not AuthService
+    - The dependency order was incorrect - AuthService needs to be registered before AuthController
+    - The _checkPersistedLogin method didn't have proper error handling for missing dependencies
+
+  - **Working Solution**:
+    - Updated AuthBinding class to register AuthService before AuthController:
+      - Added code to check if AuthService is already registered
+      - Used serviceLocator to get the AuthService instance
+      - Added proper logging for dependency registration
+    - Added robust error handling in AuthController methods:
+      - Updated _checkPersistedLogin to safely handle missing AuthService
+      - Added try-catch blocks in login, signup, signInWithGoogle, and signOut methods
+      - Added user-friendly error messages when AuthService is not available
+      - Ensured loading states are properly reset when errors occur
+    - Improved error recovery to prevent app crashes
+
+  - **Benefits**:
+    - Fixed app crash during initialization
+    - Improved dependency management with proper registration order
+    - Enhanced error handling and recovery throughout the auth flow
+    - Added user-friendly error messages for better user experience
+    - Made the code more robust against dependency injection issues
+
+  - **Lessons Learned**:
+    - Always ensure dependencies are registered in the correct order
+    - Add proper error handling for dependency injection failures
+    - Use try-catch blocks when accessing dependencies that might not be available
+    - Provide user-friendly error messages for better user experience
+    - Test the app with different initialization scenarios
+- Fixed StorageService Widget Test Errors:
+  - **Issue Description**:
+    - The `storage_service_widget_test.dart` file had errors related to missing static getters in the `StorageService` class
+    - Error messages: "The getter 'getThemeSettingsImpl' isn't defined for the type 'StorageService'" and "The getter 'saveThemeSettingsImpl' isn't defined for the type 'StorageService'"
+    - These errors prevented the tests from running successfully
+
+  - **Root Cause Analysis**:
+    - The test was trying to access static getters (`getThemeSettingsImpl` and `saveThemeSettingsImpl`) that were used in other test files but not defined in the actual `StorageService` class
+    - The test was designed to verify that these implementation methods exist, but they were missing from the class
+    - The `HiveManager` class also had issues with imports and type references
+
+  - **Working Solution**:
+    - Added the missing static getters to the `StorageService` class:
+      - Added `static ThemeSettings Function() getThemeSettingsImpl`
+      - Added `static Future<void> Function(ThemeSettings) saveThemeSettingsImpl`
+      - Added `static Future<void> Function() initImpl`
+      - Initialized these with default implementations that delegate to instance methods
+    - Added static methods for direct access:
+      - Added `static ThemeSettings getThemeSettingsStatic()`
+      - Added `static Future<void> saveThemeSettingsStatic(ThemeSettings settings)`
+    - Updated the test file to use the correct static getters
+    - Fixed imports and type references in the `HiveManager` class
+    - Added proper type parameter to `Hive.box<dynamic>(boxName)` in the `closeBox` method
+
+  - **Benefits**:
+    - Fixed all errors in the `storage_service_widget_test.dart` file
+    - Ensured tests run successfully
+    - Improved code organization with proper static getters for testing
+    - Enhanced type safety with explicit type parameters
+    - Made the code more maintainable with clear separation between instance and static methods
+
+  - **Lessons Learned**:
+    - Always provide static implementations for methods that need to be mocked in tests
+    - Use explicit type parameters to avoid type inference issues
+    - Keep test implementations consistent with the actual code
+    - Document the purpose of static getters used for testing
+    - Ensure proper imports for all types used in the code
 - Implemented Error Handling & Connectivity Module:
   - **Implementation Details**:
     - Created a comprehensive error handling and connectivity monitoring system:
