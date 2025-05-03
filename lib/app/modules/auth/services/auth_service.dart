@@ -477,7 +477,7 @@ class AuthService {
               '${_auth.currentUser!.uid}',
             );
 
-            // Analytics service commented out for now, will be implemented later
+            // Analytics service commented out for now
             // await _analyticsService.setUserId(_auth.currentUser!.uid);
 
             return _auth.currentUser;

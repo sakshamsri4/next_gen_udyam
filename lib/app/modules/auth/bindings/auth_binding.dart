@@ -10,9 +10,8 @@ class AuthBinding extends Bindings {
     // Get or register logger service
     final logger = Get.isRegistered<LoggerService>()
         ? Get.find<LoggerService>()
-        : Get.put(serviceLocator<LoggerService>(), permanent: true);
-
-    logger.d('AuthBinding: Registering dependencies');
+        : Get.put(serviceLocator<LoggerService>(), permanent: true)
+      ..d('AuthBinding: Registering dependencies');
 
     // Register AuthService if not already registered
     if (!Get.isRegistered<AuthService>()) {
