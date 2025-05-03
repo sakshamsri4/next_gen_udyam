@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
-/// This script monkey patches the fl_chart package to fix the issue with MediaQuery.boldTextOverride
+/// This script monkey patches the fl_chart package to fix the issue with
+/// MediaQuery.boldTextOverride
 void monkeyPatchFlChart() {
   // Path to the utils.dart file in the fl_chart package
   const flChartUtilsPath =
@@ -9,7 +11,7 @@ void monkeyPatchFlChart() {
   // Read the file
   final file = File(flChartUtilsPath);
   if (!file.existsSync()) {
-    print('Could not find fl_chart utils.dart file at $flChartUtilsPath');
+    debugPrint('Could not find fl_chart utils.dart file at $flChartUtilsPath');
     return;
   }
 
@@ -22,19 +24,25 @@ void monkeyPatchFlChart() {
     final newContent = content
         .replaceAll(
           'if (MediaQuery.boldTextOverride(context)) {',
-          '// Removed MediaQuery.boldTextOverride check as it is not available in newer Flutter versions\n  // if (MediaQuery.boldTextOverride(context)) {',
+          // Removed MediaQuery.boldTextOverride check as it is not available
+          // in newer Flutter versions
+          '// if (MediaQuery.boldTextOverride(context)) {',
         )
         .replaceAll(
-          'effectiveTextStyle = effectiveTextStyle!.merge(const TextStyle(fontWeight: FontWeight.bold));',
-          '// effectiveTextStyle = effectiveTextStyle!.merge(const TextStyle(fontWeight: FontWeight.bold));',
+          'effectiveTextStyle = effectiveTextStyle!.merge(const TextStyle('
+              ' fontWeight: FontWeight.bold));',
+          // Disabled bold text style merge
+          '// effectiveTextStyle = effectiveTextStyle!.merge(const TextStyle('
+              ' fontWeight: FontWeight.bold));',
         );
 
     // Write the new content
     file.writeAsStringSync(newContent);
-    print('Successfully patched fl_chart package');
+    debugPrint('Successfully patched fl_chart package');
   } else {
-    print(
-      'The fl_chart package does not contain the problematic code or has already been patched',
+    debugPrint(
+      'The fl_chart package does not contain the problematic code '
+      'or has already been patched',
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
-/// This script directly patches the fl_chart package to fix the issue with MediaQuery.boldTextOverride
+/// This script directly patches the fl_chart package to fix the issue with
+/// MediaQuery.boldTextOverride
 void patchFlChart() {
   try {
     // Path to the utils.dart file in the fl_chart package
@@ -10,8 +12,9 @@ void patchFlChart() {
     // Read the file
     final file = File(flChartUtilsPath);
     if (!file.existsSync()) {
-      // ignore: avoid_print
-      print('Could not find fl_chart utils.dart file at $flChartUtilsPath');
+      debugPrint(
+        'Could not find fl_chart utils.dart file at $flChartUtilsPath',
+      );
       return;
     }
 
@@ -40,10 +43,8 @@ TextStyle getThemeAwareTextStyle(BuildContext context, TextStyle? providedStyle)
     // Write the fixed content back to the file
     file.writeAsStringSync(fixedContent);
 
-    // ignore: avoid_print
-    print('Successfully patched fl_chart package');
+    debugPrint('Successfully patched fl_chart package');
   } catch (e) {
-    // ignore: avoid_print
-    print('Error patching fl_chart package: $e');
+    debugPrint('Error patching fl_chart package: $e');
   }
 }
