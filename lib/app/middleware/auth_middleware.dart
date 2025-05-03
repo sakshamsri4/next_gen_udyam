@@ -44,17 +44,17 @@ class AuthMiddleware extends GetMiddleware {
       );
     }
 
-    // If the user is logged in, redirect to home
+    // If the user is logged in, redirect to dashboard
     // Otherwise, continue to the auth page
     if (authController.user.value != null) {
-      // Don't redirect if already on home or a protected route
-      if (route == Routes.home) {
-        _logger.d('Already on home route, no redirect needed');
+      // Don't redirect if already on dashboard or a protected route
+      if (route == Routes.dashboard) {
+        _logger.d('Already on dashboard route, no redirect needed');
         return null;
       }
 
-      _logger.i('User is logged in, redirecting to home');
-      return const RouteSettings(name: Routes.home);
+      _logger.i('User is logged in, redirecting to dashboard');
+      return const RouteSettings(name: Routes.dashboard);
     }
 
     _logger.d('User is not logged in, continuing to requested route');

@@ -7,6 +7,8 @@ import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
+import 'package:next_gen/app/modules/dashboard/bindings/dashboard_binding.dart';
+import 'package:next_gen/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
 import 'package:next_gen/app/modules/error/views/error_view.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
@@ -67,6 +69,39 @@ class AppPages {
       page: () => const ErrorView(),
       binding: ErrorBinding(),
       transition: Transition.fadeIn,
+    ),
+    GetPage<dynamic>(
+      name: _Paths.dashboard,
+      page: () => const DashboardView(),
+      binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    // Placeholder routes for bottom navigation
+    // These will be implemented later
+    GetPage<dynamic>(
+      name: _Paths.jobs,
+      page: () => const DashboardView(),
+      // Temporary - will be replaced with JobsView
+      binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.resume,
+      page: () => const DashboardView(),
+      // Temporary - will be replaced with ResumeView
+      binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.profile,
+      page: () => const DashboardView(),
+      // Temporary - will be replaced with ProfileView
+      binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
   ];
 }
