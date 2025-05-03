@@ -14,6 +14,13 @@ class ThemeController extends GetxController {
     _storageService = serviceLocator<StorageService>();
     _logger.i('ThemeController initialized');
   }
+
+  /// Test constructor for dependency injection
+  /// This should only be used in tests
+  @visibleForTesting
+  ThemeController.forTesting(this._storageService, this._logger) {
+    _logger.i('ThemeController initialized for testing');
+  }
   static ThemeController get to => Get.find();
 
   /// Logger instance

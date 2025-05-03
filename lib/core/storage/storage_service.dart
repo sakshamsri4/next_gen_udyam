@@ -11,6 +11,7 @@ class StorageService {
   /// Constructor
   StorageService() {
     _logger = serviceLocator<LoggerService>();
+    _hiveManager = serviceLocator<HiveManager>();
     _logger.i('StorageService initialized');
   }
 
@@ -31,10 +32,17 @@ class StorageService {
   };
 
   /// Logger instance
-  late final LoggerService _logger;
+  late LoggerService _logger;
 
-  /// Get the Hive manager
-  HiveManager get _hiveManager => serviceLocator<HiveManager>();
+  /// Hive manager instance
+  late HiveManager _hiveManager;
+
+  /// Test backdoor for dependency injection
+  /// This should only be used in tests
+  void testSetDependencies(HiveManager hiveManager, LoggerService logger) {
+    _hiveManager = hiveManager;
+    _logger = logger;
+  }
 
   /// Initialize Hive and register adapters
   /// This is now handled by HiveManager

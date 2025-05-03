@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
 
+part 'theme_settings.g.dart';
+
 /// Hive type ID for ThemeSettings
 const themeSettingsTypeId = 1;
 
@@ -47,45 +49,4 @@ class ThemeSettings extends HiveObject {
         'useMaterial3: $useMaterial3, '
         'useHighContrast: $useHighContrast)';
   }
-}
-
-/// Adapter for ThemeSettings to be used with Hive
-class ThemeSettingsAdapter extends TypeAdapter<ThemeSettings> {
-  @override
-  final int typeId = themeSettingsTypeId;
-
-  @override
-  ThemeSettings read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return ThemeSettings(
-      isDarkMode: fields[0] as bool? ?? true,
-      useMaterial3: fields[1] as bool? ?? true,
-      useHighContrast: fields[2] as bool? ?? false,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, ThemeSettings obj) {
-    writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.isDarkMode)
-      ..writeByte(1)
-      ..write(obj.useMaterial3)
-      ..writeByte(2)
-      ..write(obj.useHighContrast);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ThemeSettingsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
 }
