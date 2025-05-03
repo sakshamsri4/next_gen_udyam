@@ -14,6 +14,8 @@ import 'package:next_gen/app/modules/error/views/error_view.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
 import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
+import 'package:next_gen/app/modules/search/bindings/search_binding.dart';
+import 'package:next_gen/app/modules/search/views/search_view.dart';
 
 part 'app_routes.dart';
 
@@ -100,6 +102,13 @@ class AppPages {
       page: () => const DashboardView(),
       // Temporary - will be replaced with ProfileView
       binding: DashboardBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.search,
+      page: () => const SearchView(),
+      binding: SearchBinding(),
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
