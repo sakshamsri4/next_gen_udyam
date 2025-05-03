@@ -16,48 +16,54 @@ final serviceLocator = GetIt.instance;
 Future<void> initializeServices() async {
   // Register logger service first (needed by other services)
   serviceLocator.registerSingleton<LoggerService>(LoggerService());
-  final logger = serviceLocator<LoggerService>();
-  logger.i('Service Locator: Logger service registered');
+  final logger = serviceLocator<LoggerService>()
+    ..i('Service Locator: Logger service registered')
 
-  // Register storage services
-  logger.i('Service Locator: Registering storage services...');
-  serviceLocator.registerSingleton<HiveManager>(HiveManager());
-  serviceLocator.registerSingleton<StorageService>(StorageService());
+    // Register storage services
+    ..i('Service Locator: Registering storage services...');
+
+  serviceLocator
+    ..registerSingleton<HiveManager>(HiveManager())
+    ..registerSingleton<StorageService>(StorageService());
 
   // Initialize Hive
   logger.i('Service Locator: Initializing Hive...');
   await serviceLocator<HiveManager>().initialize();
-  logger.i('Service Locator: Hive initialized');
+  logger
+    ..i('Service Locator: Hive initialized')
 
-  // Register connectivity service
-  logger.i('Service Locator: Registering connectivity service...');
+    // Register connectivity service
+    ..i('Service Locator: Registering connectivity service...');
   final connectivityService = await ConnectivityService().init();
   serviceLocator.registerSingleton<ConnectivityService>(connectivityService);
-  logger.i('Service Locator: Connectivity service registered');
+  logger
+    ..i('Service Locator: Connectivity service registered')
 
-  // Register error service
-  logger.i('Service Locator: Registering error service...');
+    // Register error service
+    ..i('Service Locator: Registering error service...');
   final errorService = await ErrorService().init();
   serviceLocator.registerSingleton<ErrorService>(errorService);
-  logger.i('Service Locator: Error service registered');
+  logger
+    ..i('Service Locator: Error service registered')
 
-  // Register theme controller
-  logger.i('Service Locator: Registering theme controller...');
+    // Register theme controller
+    ..i('Service Locator: Registering theme controller...');
   serviceLocator.registerSingleton<ThemeController>(ThemeController());
-  logger.i('Service Locator: Theme controller registered');
+  logger
+    ..i('Service Locator: Theme controller registered')
 
-  // Register auth service
-  logger.i('Service Locator: Registering auth service...');
+    // Register auth service
+    ..i('Service Locator: Registering auth service...');
   serviceLocator.registerSingleton<AuthService>(AuthService());
-  logger.i('Service Locator: Auth service registered');
+  logger
+    ..i('Service Locator: Auth service registered')
 
-  // Analytics service commented out for now, will be implemented later
-  /*
-  logger.i('Service Locator: Registering analytics service...');
-  final analyticsService = await AnalyticsService().init();
-  serviceLocator.registerSingleton<AnalyticsService>(analyticsService);
-  logger.i('Service Locator: Analytics service registered');
-  */
-
-  logger.i('Service Locator: All services registered successfully');
+    // Analytics service commented out for now, will be implemented later
+    /*
+    ..i('Service Locator: Registering analytics service...');
+    final analyticsService = await AnalyticsService().init();
+    serviceLocator.registerSingleton<AnalyticsService>(analyticsService);
+    logger.i('Service Locator: Analytics service registered');
+    */
+    ..i('Service Locator: All services registered successfully');
 }
