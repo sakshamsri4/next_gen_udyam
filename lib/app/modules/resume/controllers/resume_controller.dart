@@ -22,7 +22,7 @@ class ResumeController extends GetxController {
       isLoading.value = true;
       _logger.i('Uploading resume...');
 
-      // TODO(dev): Implement resume upload functionality
+      // TODO(sakshamsri4): Implement resume upload functionality. https://github.com/sakshamsri4/next_gen_udyam/issues/22
       await Future<void>.delayed(
         const Duration(seconds: 2),
       ); // Simulate network delay
@@ -50,7 +50,7 @@ class ResumeController extends GetxController {
       isLoading.value = true;
       _logger.i('Fetching resumes...');
 
-      // TODO(dev): Implement resume list functionality
+      // TODO(sakshamsri4): Implement resume list functionality. https://github.com/sakshamsri4/next_gen_udyam/issues/23
       await Future<void>.delayed(
         const Duration(seconds: 2),
       ); // Simulate network delay

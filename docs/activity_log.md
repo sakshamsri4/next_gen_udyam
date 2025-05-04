@@ -907,7 +907,7 @@
     - The error was preventing proper initialization and navigation in the app
     - Stack trace showed the error happening during app startup in the App widget build method
 
-## [2024-07-29] - Navigation and Resume Module
+## [2024-07-29] - Navigation Module
 - Fixed Bottom Navigation Tab Views:
   - **Issue Description**:
     - Bottom navigation bar was not properly displaying the correct views when tabs were selected
