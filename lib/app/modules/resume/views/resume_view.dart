@@ -47,9 +47,8 @@ class _ResumeViewState extends State<ResumeView> {
       bottomNavigationBar: const CustomAnimatedBottomNavBar(),
       body: ResponsiveBuilder(
         builder: (context, sizingInformation) {
-          // Determine if we're on a mobile device
-          final isMobile =
-              sizingInformation.deviceScreenType == DeviceScreenType.mobile;
+          // Responsive layout will be implemented in future updates
+          // sizingInformation can be used for responsive design
 
           return Center(
             child: SingleChildScrollView(
@@ -77,7 +76,8 @@ class _ResumeViewState extends State<ResumeView> {
 
                   // Description
                   Text(
-                    'Upload and manage your resume to apply for automotive jobs.',
+                    'Upload and manage your resume to apply for '
+                    'automotive jobs.',
                     style: theme.textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),

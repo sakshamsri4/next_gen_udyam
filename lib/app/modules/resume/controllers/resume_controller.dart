@@ -22,9 +22,10 @@ class ResumeController extends GetxController {
       isLoading.value = true;
       _logger.i('Uploading resume...');
 
-      // TODO: Implement resume upload functionality
-      await Future.delayed(
-          const Duration(seconds: 2)); // Simulate network delay
+      // TODO(dev): Implement resume upload functionality
+      await Future<void>.delayed(
+        const Duration(seconds: 2),
+      ); // Simulate network delay
 
       Get.snackbar(
         'Coming Soon',
@@ -49,9 +50,10 @@ class ResumeController extends GetxController {
       isLoading.value = true;
       _logger.i('Fetching resumes...');
 
-      // TODO: Implement resume list functionality
-      await Future.delayed(
-          const Duration(seconds: 2)); // Simulate network delay
+      // TODO(dev): Implement resume list functionality
+      await Future<void>.delayed(
+        const Duration(seconds: 2),
+      ); // Simulate network delay
 
       Get.snackbar(
         'Coming Soon',

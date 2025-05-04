@@ -65,12 +65,14 @@ class AuthMiddleware extends GetMiddleware {
 
       // If not on a protected route, redirect to dashboard
       _logger.i(
-        'User is logged in but not on a protected route, redirecting to dashboard',
+        'User is logged in but not on a protected route, '
+        'redirecting to dashboard',
       );
       return const RouteSettings(name: Routes.dashboard);
     }
 
-    // If user is not logged in and trying to access a protected route, redirect to login
+    // If user is not logged in and trying
+    // to access a protected route, redirect to login
     final protectedRoutes = [
       Routes.dashboard,
       Routes.jobs,
