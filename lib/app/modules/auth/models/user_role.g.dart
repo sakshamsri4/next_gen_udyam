@@ -29,13 +29,10 @@ class UserRoleAdapter extends TypeAdapter<UserRole> {
     switch (obj) {
       case UserRole.admin:
         writer.writeByte(0);
-        break;
       case UserRole.employer:
         writer.writeByte(1);
-        break;
       case UserRole.employee:
         writer.writeByte(2);
-        break;
     }
   }
 

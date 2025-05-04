@@ -100,19 +100,14 @@ class SortOptionAdapter extends TypeAdapter<SortOption> {
     switch (obj) {
       case SortOption.relevance:
         writer.writeByte(0);
-        break;
       case SortOption.date:
         writer.writeByte(1);
-        break;
       case SortOption.salary:
         writer.writeByte(2);
-        break;
       case SortOption.company:
         writer.writeByte(3);
-        break;
       case SortOption.location:
         writer.writeByte(4);
-        break;
     }
   }
 
@@ -148,10 +143,8 @@ class SortOrderAdapter extends TypeAdapter<SortOrder> {
     switch (obj) {
       case SortOrder.ascending:
         writer.writeByte(0);
-        break;
       case SortOrder.descending:
         writer.writeByte(1);
-        break;
     }
   }
 
