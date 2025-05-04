@@ -68,12 +68,24 @@ class SearchService extends GetxService {
         query = query.where('location', isEqualTo: filter.location);
       }
 
-      if (filter.minSalary > 0) {
-        query = query.where('salary', isGreaterThanOrEqualTo: filter.minSalary);
-      }
+      // Check if we need to do client-side salary filtering
+      final clientSideSalaryFilter = filter.query.isNotEmpty &&
+          (filter.minSalary > 0 || filter.maxSalary < 1000000);
 
-      if (filter.maxSalary < 1000000) {
-        query = query.where('salary', isLessThanOrEqualTo: filter.maxSalary);
+      // Only apply server-side salary filters if we're not doing text search
+      if (!clientSideSalaryFilter) {
+        if (filter.minSalary > 0) {
+          query = query.where(
+            'salary',
+            isGreaterThanOrEqualTo: filter.minSalary,
+          );
+        }
+        if (filter.maxSalary < 1000000) {
+          query = query.where(
+            'salary',
+            isLessThanOrEqualTo: filter.maxSalary,
+          );
+        }
       }
 
       if (filter.jobTypes.isNotEmpty) {
@@ -127,7 +139,18 @@ class SearchService extends GetxService {
       final snapshot = await query.get();
 
       // Convert to JobModel list
-      final jobs = snapshot.docs.map(JobModel.fromFirestore).toList();
+      var jobs = snapshot.docs.map(JobModel.fromFirestore).toList();
+
+      // Apply client-side salary filtering if needed
+      if (clientSideSalaryFilter) {
+        _logger.d('Applying client-side salary filtering');
+        if (filter.minSalary > 0) {
+          jobs = jobs.where((job) => job.salary >= filter.minSalary).toList();
+        }
+        if (filter.maxSalary < 1000000) {
+          jobs = jobs.where((job) => job.salary <= filter.maxSalary).toList();
+        }
+      }
 
       _logger.i('Found ${jobs.length} jobs');
       return jobs;
