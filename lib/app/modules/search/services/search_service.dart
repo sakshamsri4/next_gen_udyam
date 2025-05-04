@@ -88,8 +88,20 @@ class SearchService extends GetxService {
         }
       }
 
+      // Handle job types filtering
       if (filter.jobTypes.isNotEmpty) {
-        query = query.where('jobType', whereIn: filter.jobTypes);
+        // Firestore has a limit of 10 items in a whereIn query
+        if (filter.jobTypes.length <= 10) {
+          query = query.where('jobType', whereIn: filter.jobTypes);
+        } else {
+          // If we have more than 10 job types,
+          // we need to do client-side filtering
+          _logger.d(
+            'Too many job types for Firestore query '
+            '(${filter.jobTypes.length}), will filter client-side',
+          );
+          // We'll apply this filter client-side after getting the results
+        }
       }
 
       if (filter.isRemote) {
@@ -133,6 +145,7 @@ class SearchService extends GetxService {
           'Sorting will be applied client-side due to Firestore query '
           'limitations',
         );
+        // We'll apply this sort client-side after getting the results
       }
 
       // Execute the query
@@ -140,6 +153,8 @@ class SearchService extends GetxService {
 
       // Convert to JobModel list
       var jobs = snapshot.docs.map(JobModel.fromFirestore).toList();
+
+      // Apply client-side filtering if needed
 
       // Apply client-side salary filtering if needed
       if (clientSideSalaryFilter) {
@@ -149,6 +164,46 @@ class SearchService extends GetxService {
         }
         if (filter.maxSalary < 1000000) {
           jobs = jobs.where((job) => job.salary <= filter.maxSalary).toList();
+        }
+      }
+
+      // Apply client-side job type filtering if needed (more than 10 types)
+      if (filter.jobTypes.length > 10) {
+        _logger.d('Applying client-side job type filtering');
+        jobs =
+            jobs.where((job) => filter.jobTypes.contains(job.jobType)).toList();
+      }
+
+      // Apply client-side sorting if we have a text search and need sorting
+      if (filter.query.isNotEmpty && filter.sortBy != SortOption.relevance) {
+        _logger.d('Applying client-side sorting by ${filter.sortBy}');
+
+        final isDescending = filter.sortOrder == SortOrder.descending;
+
+        switch (filter.sortBy) {
+          case SortOption.date:
+            jobs.sort((a, b) {
+              final comparison = a.postedDate.compareTo(b.postedDate);
+              return isDescending ? -comparison : comparison;
+            });
+          case SortOption.salary:
+            jobs.sort((a, b) {
+              final comparison = a.salary.compareTo(b.salary);
+              return isDescending ? -comparison : comparison;
+            });
+          case SortOption.company:
+            jobs.sort((a, b) {
+              final comparison = a.company.compareTo(b.company);
+              return isDescending ? -comparison : comparison;
+            });
+          case SortOption.location:
+            jobs.sort((a, b) {
+              final comparison = a.location.compareTo(b.location);
+              return isDescending ? -comparison : comparison;
+            });
+          case SortOption.relevance:
+            // No sorting needed for relevance
+            break;
         }
       }
 
