@@ -3,91 +3,111 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:neopop/neopop.dart';
+import 'package:neopop/neopop.dart' hide NeoPopCard;
 import 'package:next_gen/app/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:next_gen/app/modules/dashboard/widgets/dashboard_widgets.dart';
+import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:shimmer/shimmer.dart';
 
 /// Dashboard view with job statistics and recent activity
-class DashboardView extends GetView<DashboardController> {
+class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
+
+  @override
+  State<DashboardView> createState() => _DashboardViewState();
+}
+
+class _DashboardViewState extends State<DashboardView> {
+  late final DashboardController controller;
+  late final NavigationController navigationController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the controllers
+    controller = Get.find<DashboardController>();
+
+    // Get or register NavigationController
+    if (Get.isRegistered<NavigationController>()) {
+      navigationController = Get.find<NavigationController>();
+    } else {
+      navigationController = Get.put(NavigationController(), permanent: true);
+    }
+
+    // Set the selected index to the Dashboard tab (index 0)
+    navigationController.selectedIndex.value = 0;
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Make sure NavigationController is initialized
-    Get.put(NavigationController(), permanent: true);
-
-    return GetBuilder<DashboardController>(
-      builder: (controller) {
-        return Scaffold(
-          bottomNavigationBar: const CustomAnimatedBottomNavBar(),
-          appBar: AppBar(
-            title: const Text('Automotive Jobs Dashboard'),
-            centerTitle: true,
-            elevation: 0,
-            actions: [
-              // Profile button
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: _buildProfileButton(theme, controller),
-              ),
-            ],
+    return Scaffold(
+      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+      appBar: AppBar(
+        title: const Text('Automotive Jobs Dashboard'),
+        centerTitle: true,
+        elevation: 0,
+        actions: [
+          // Profile button
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: _buildProfileButton(theme, controller),
           ),
-          body: ResponsiveBuilder(
-            builder: (context, sizingInformation) {
-              // Determine if we're on a mobile device
-              final isMobile =
-                  sizingInformation.deviceScreenType == DeviceScreenType.mobile;
+        ],
+      ),
+      body: ResponsiveBuilder(
+        builder: (context, sizingInformation) {
+          // Determine if we're on a mobile device
+          final isMobile =
+              sizingInformation.deviceScreenType == DeviceScreenType.mobile;
 
-              return RefreshIndicator(
-                onRefresh: controller.refreshDashboard,
-                child: controller.isLoading.value
-                    ? _buildLoadingState(isMobile)
-                    : SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Welcome message
-                            _buildWelcomeSection(theme, isMobile, controller),
-                            SizedBox(height: isMobile ? 16.0 : 24.0),
+          return RefreshIndicator(
+            onRefresh: controller.refreshDashboard,
+            child: controller.isLoading.value
+                ? _buildLoadingState(isMobile)
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Welcome message
+                        _buildWelcomeSection(theme, isMobile, controller),
+                        SizedBox(height: isMobile ? 16.0 : 24.0),
 
-                            // Quick action buttons
-                            _buildQuickActionButtons(theme, isMobile),
-                            SizedBox(height: isMobile ? 24.0 : 32.0),
+                        // Quick action buttons
+                        _buildQuickActionButtons(theme, isMobile),
+                        SizedBox(height: isMobile ? 24.0 : 32.0),
 
-                            // Statistics section
-                            _buildStatisticsSection(
-                              theme,
-                              isMobile,
-                              controller,
-                            ),
-                            SizedBox(height: isMobile ? 24.0 : 32.0),
-
-                            // Recent activity section
-                            _buildRecentActivitySection(
-                              theme,
-                              isMobile,
-                              controller,
-                            ),
-                            SizedBox(height: isMobile ? 16.0 : 24.0),
-
-                            // Sign out button
-                            _buildSignOutButton(theme, isMobile, controller),
-                            SizedBox(height: isMobile ? 16.0 : 24.0),
-                          ],
+                        // Statistics section
+                        _buildStatisticsSection(
+                          theme,
+                          isMobile,
+                          controller,
                         ),
-                      ),
-              );
-            },
-          ),
-        );
-      },
+                        SizedBox(height: isMobile ? 24.0 : 32.0),
+
+                        // Recent activity section
+                        _buildRecentActivitySection(
+                          theme,
+                          isMobile,
+                          controller,
+                        ),
+                        SizedBox(height: isMobile ? 16.0 : 24.0),
+
+                        // Sign out button
+                        _buildSignOutButton(theme, isMobile, controller),
+                        SizedBox(height: isMobile ? 16.0 : 24.0),
+                      ],
+                    ),
+                  ),
+          );
+        },
+      ),
     );
   }
 
@@ -192,12 +212,12 @@ class DashboardView extends GetView<DashboardController> {
             children: [
               _buildQuickActionButton(
                 theme,
-                'Automotive Jobs',
-                FontAwesomeIcons.car,
+                'Search Jobs',
+                FontAwesomeIcons.magnifyingGlass,
                 Colors.blue,
                 buttonWidth,
                 buttonHeight,
-                () => Get.toNamed<dynamic>('/jobs/search'),
+                () => Get.toNamed<dynamic>(Routes.jobs),
               ),
               const SizedBox(width: 16),
               _buildQuickActionButton(
@@ -673,132 +693,4 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   // No chart data generation needed - using custom chart implementation
-}
-
-/// Simple line chart widget
-class SimpleLineChart extends StatelessWidget {
-  const SimpleLineChart({
-    required this.color,
-    required this.value,
-    super.key,
-  });
-
-  final Color color;
-  final int value;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _ChartPainter(
-        color: color,
-        value: value,
-      ),
-      size: const Size(double.infinity, 40),
-    );
-  }
-}
-
-/// Custom painter for the line chart
-class _ChartPainter extends CustomPainter {
-  _ChartPainter({
-    required this.color,
-    required this.value,
-  });
-
-  final Color color;
-  final int value;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final random = DateTime.now().millisecondsSinceEpoch;
-    final points = <Offset>[];
-
-    // Generate random points
-    for (var i = 0; i < 7; i++) {
-      final x = size.width * i / 6;
-      final y = size.height -
-          (size.height * (((random >> (i * 4)) & 0xF) / 15.0) * 0.8);
-      points.add(Offset(x, y));
-    }
-
-    // Draw filled area
-    final path = Path()
-      ..moveTo(0, size.height)
-      ..lineTo(points.first.dx, points.first.dy);
-
-    for (var i = 1; i < points.length; i++) {
-      final p0 = points[i - 1];
-      final p1 = points[i];
-
-      // Use quadratic bezier for smooth curve
-      final controlX = (p0.dx + p1.dx) / 2;
-      path.quadraticBezierTo(controlX, p0.dy, p1.dx, p1.dy);
-    }
-
-    path
-      ..lineTo(size.width, size.height)
-      ..close();
-
-    // Fill the area
-    final fillPaint = Paint()
-      ..color = color.withAlpha(25) // Using withAlpha instead of withOpacity
-      ..style = PaintingStyle.fill;
-
-    canvas.drawPath(path, fillPaint);
-
-    // Draw the line
-    final linePath = Path()..moveTo(points.first.dx, points.first.dy);
-
-    for (var i = 1; i < points.length; i++) {
-      final p0 = points[i - 1];
-      final p1 = points[i];
-
-      // Use quadratic bezier for smooth curve
-      final controlX = (p0.dx + p1.dx) / 2;
-      linePath.quadraticBezierTo(controlX, p0.dy, p1.dx, p1.dy);
-    }
-
-    final linePaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    canvas.drawPath(linePath, linePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// Custom NeoPOP card widget
-class NeoPopCard extends StatelessWidget {
-  const NeoPopCard({
-    required this.child,
-    required this.color,
-    super.key,
-    this.border,
-    this.depth = 5,
-  });
-  final Widget child;
-  final Color color;
-  final Border? border;
-  final double depth;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        border: border,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(25),
-            offset: Offset(depth, depth),
-            blurRadius: depth,
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
 }

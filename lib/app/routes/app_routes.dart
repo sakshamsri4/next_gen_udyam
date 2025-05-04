@@ -14,6 +14,7 @@ abstract class Routes {
   static const jobs = _Paths.jobs;
   static const resume = _Paths.resume;
   static const profile = _Paths.profile;
+  static const search = _Paths.search;
 }
 
 abstract class _Paths {
@@ -29,4 +30,5 @@ abstract class _Paths {
   static const jobs = '/jobs';
   static const resume = '/resume';
   static const profile = '/profile';
+  static const search = '/search';
 }

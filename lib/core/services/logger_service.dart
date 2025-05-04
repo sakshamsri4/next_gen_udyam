@@ -26,12 +26,12 @@ class LoggerService {
   Future<void> _initLogger() async {
     // Create a custom log filter
     final logFilter = _CustomLogFilter(
-      level: kDebugMode ? Level.verbose : Level.info,
+      level: kDebugMode ? Level.trace : Level.info,
     );
 
     // Create a pretty printer for console output
     final prettyPrinter = PrettyPrinter(
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     );
 
     // Create outputs
@@ -137,15 +137,22 @@ class LoggerService {
     }
   }
 
-  /// Log a trace message (formerly verbose)
+  /// Log a trace message
   void t(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.v(message);
+    if (error != null) {
+      final errorMsg = stackTrace != null
+          ? '$message\nError: $error\n$stackTrace'
+          : '$message\nError: $error';
+      _logger.t(errorMsg);
+    } else {
+      _logger.t(message);
+    }
   }
 
   /// Log a verbose message (deprecated, use t() instead)
   @Deprecated('Use t() instead')
   void v(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.v(message);
+    t(message, error, stackTrace);
   }
 
   /// Log a debug message
@@ -197,15 +204,21 @@ class LoggerService {
   }
 
   /// Log a fatal error message
-  void wtf(String message, [dynamic error, StackTrace? stackTrace]) {
+  void f(String message, [dynamic error, StackTrace? stackTrace]) {
     if (error != null) {
       final errorMsg = stackTrace != null
           ? '$message\nError: $error\n$stackTrace'
           : '$message\nError: $error';
-      _logger.wtf(errorMsg);
+      _logger.f(errorMsg);
     } else {
-      _logger.wtf(message);
+      _logger.f(message);
     }
+  }
+
+  /// Log a fatal error message (deprecated, use f() instead)
+  @Deprecated('Use f() instead')
+  void wtf(String message, [dynamic error, StackTrace? stackTrace]) {
+    f(message, error, stackTrace);
   }
 
   /// Log an object as JSON

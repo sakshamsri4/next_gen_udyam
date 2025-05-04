@@ -55,6 +55,7 @@ class DashboardController extends GetxController {
           change: 12,
           isPositive: true,
           color: const Color(0xFF4CAF50),
+          icon: Icons.work,
         ),
         JobStatistic(
           title: 'Avg. Salary (K)',
@@ -62,6 +63,8 @@ class DashboardController extends GetxController {
           change: 5,
           isPositive: true,
           color: const Color(0xFF2196F3),
+          icon: Icons.attach_money,
+          unit: 'USD',
         ),
         JobStatistic(
           title: 'Top Manufacturers',
@@ -69,6 +72,8 @@ class DashboardController extends GetxController {
           change: 3,
           isPositive: true,
           color: const Color(0xFFFF9800),
+          icon: Icons.business,
+          unit: 'companies',
         ),
         JobStatistic(
           title: 'Skills in Demand',
@@ -76,6 +81,8 @@ class DashboardController extends GetxController {
           change: 4,
           isPositive: true,
           color: const Color(0xFF9C27B0),
+          icon: Icons.trending_up,
+          unit: 'skills',
         ),
       ];
 
@@ -152,12 +159,16 @@ class JobStatistic {
     required this.change,
     required this.isPositive,
     required this.color,
+    required this.icon,
+    this.unit = 'jobs',
   });
   final String title;
   final int value;
   final int change;
   final bool isPositive;
   final Color color;
+  final IconData icon;
+  final String unit;
 }
 
 /// Model class for recent activity items

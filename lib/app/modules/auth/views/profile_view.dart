@@ -2,10 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neopop/neopop.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
+import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
-class ProfileView extends GetView<AuthController> {
+class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
+
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  late final AuthController controller;
+  late final NavigationController navigationController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the controllers
+    controller = Get.find<AuthController>();
+
+    // Get or register NavigationController
+    if (Get.isRegistered<NavigationController>()) {
+      navigationController = Get.find<NavigationController>();
+    } else {
+      navigationController = Get.put(NavigationController(), permanent: true);
+    }
+
+    // Set the selected index to the Profile tab (index 3)
+    navigationController.selectedIndex.value = 3;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +49,7 @@ class ProfileView extends GetView<AuthController> {
           ),
         ],
       ),
+      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

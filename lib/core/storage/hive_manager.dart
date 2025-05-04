@@ -2,12 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/modules/onboarding/models/onboarding_status.dart';
+import 'package:next_gen/app/modules/search/models/hive_adapters.dart';
+import 'package:next_gen/app/modules/search/models/search_history.dart';
 import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/storage/theme_settings.dart';
 
 /// Constants for box names
 const String userBoxName = 'user_box';
+const String searchHistoryBoxName = 'search_history_box';
 
 /// Type IDs for Hive adapters
 const int userModelTypeId = 0; // Already defined in the project
@@ -71,6 +74,10 @@ class HiveManager {
         Hive.registerAdapter(OnboardingStatusAdapter());
       }
 
+      // Register search module adapters
+      _logger.d('Registering search module adapters');
+      registerSearchHiveAdapters();
+
       _logger.d('All adapters registered successfully');
     } catch (e, stackTrace) {
       _logger.e('Error registering Hive adapters', e, stackTrace);
@@ -99,6 +106,12 @@ class HiveManager {
       if (!Hive.isBoxOpen(onboardingStatusBoxName)) {
         _logger.d('Opening OnboardingStatus box');
         await Hive.openBox<OnboardingStatus>(onboardingStatusBoxName);
+      }
+
+      // Open SearchHistory box
+      if (!Hive.isBoxOpen(searchHistoryBoxName)) {
+        _logger.d('Opening SearchHistory box');
+        await Hive.openBox<SearchHistory>(searchHistoryBoxName);
       }
 
       _logger.d('All boxes opened successfully');

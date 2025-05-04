@@ -24,7 +24,7 @@ class ConnectivityService extends GetxService {
 
   /// Internet connection checker instance
   final InternetConnectionChecker _connectionChecker =
-      InternetConnectionChecker();
+      InternetConnectionChecker.createInstance();
 
   /// Stream controller for connectivity status
   final _connectivityStreamController =
@@ -45,7 +45,7 @@ class ConnectivityService extends GetxService {
   bool get isConnected => _status.value == ConnectivityStatus.online;
 
   /// Subscription to connectivity changes
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   /// Initialize the service
   Future<ConnectivityService> init() async {
@@ -64,8 +64,8 @@ class ConnectivityService extends GetxService {
   /// Check current connectivity status
   Future<void> _checkConnectivity() async {
     try {
-      final connectivityResult = await _connectivity.checkConnectivity();
-      await _updateConnectionStatus(connectivityResult);
+      final connectivityResults = await _connectivity.checkConnectivity();
+      await _updateConnectionStatus(connectivityResults);
     } catch (e, s) {
       _logger.e('Error checking connectivity', e, s);
       _updateStatus(ConnectivityStatus.unknown);
@@ -73,10 +73,11 @@ class ConnectivityService extends GetxService {
   }
 
   /// Update connection status based on connectivity result
-  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
-    _logger.d('Connectivity changed: $result');
+  Future<void> _updateConnectionStatus(List<ConnectivityResult> results) async {
+    _logger.d('Connectivity changed: $results');
 
-    if (result == ConnectivityResult.none) {
+    if (results.isEmpty ||
+        results.contains(ConnectivityResult.none) && results.length == 1) {
       _updateStatus(ConnectivityStatus.offline);
       return;
     }
