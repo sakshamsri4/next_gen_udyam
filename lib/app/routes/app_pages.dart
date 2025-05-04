@@ -7,6 +7,7 @@ import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/profile_view.dart';
+import 'package:next_gen/app/modules/auth/views/role_selection_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
 import 'package:next_gen/app/modules/dashboard/bindings/dashboard_binding.dart';
 import 'package:next_gen/app/modules/dashboard/views/dashboard_view.dart';
@@ -109,6 +110,13 @@ class AppPages {
       name: _Paths.search,
       page: () => const SearchView(),
       bindings: [SearchBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.roleSelection,
+      page: () => const RoleSelectionView(),
+      binding: AuthBinding(),
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),

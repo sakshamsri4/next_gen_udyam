@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:hive/hive.dart';
+import 'package:next_gen/app/modules/auth/models/user_role.dart';
 
 part 'user_model.g.dart';
 
@@ -13,11 +14,15 @@ class UserModel {
     this.photoUrl,
     this.emailVerified = false,
     this.phoneNumber,
+    this.role = UserRole.employee,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
   // Factory constructors
-  factory UserModel.fromFirebaseUser(firebase.User user) {
+  factory UserModel.fromFirebaseUser(
+    firebase.User user, {
+    UserRole role = UserRole.employee,
+  }) {
     return UserModel(
       uid: user.uid,
       email: user.email ?? '',
@@ -25,6 +30,7 @@ class UserModel {
       photoUrl: user.photoURL,
       emailVerified: user.emailVerified,
       phoneNumber: user.phoneNumber,
+      role: role,
     );
   }
 
@@ -37,6 +43,9 @@ class UserModel {
       emailVerified: map['emailVerified'] as bool,
       phoneNumber: map['phoneNumber'] as String?,
       createdAt: DateTime.parse(map['createdAt'] as String),
+      role: map['role'] != null
+          ? UserRole.values[map['role'] as int]
+          : UserRole.employee,
     );
   }
 
@@ -62,6 +71,9 @@ class UserModel {
   @HiveField(6)
   final DateTime createdAt;
 
+  @HiveField(7)
+  final UserRole role;
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -71,6 +83,7 @@ class UserModel {
       'emailVerified': emailVerified,
       'phoneNumber': phoneNumber,
       'createdAt': createdAt.toIso8601String(),
+      'role': role.index,
     };
   }
 
@@ -82,6 +95,7 @@ class UserModel {
     bool? emailVerified,
     String? phoneNumber,
     DateTime? createdAt,
+    UserRole? role,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -91,6 +105,7 @@ class UserModel {
       emailVerified: emailVerified ?? this.emailVerified,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       createdAt: createdAt ?? this.createdAt,
+      role: role ?? this.role,
     );
   }
 }

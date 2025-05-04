@@ -23,6 +23,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       photoUrl: fields[3] as String?,
       emailVerified: fields[4] as bool,
       phoneNumber: fields[5] as String?,
+      role: fields[7] as UserRole,
       createdAt: fields[6] as DateTime?,
     );
   }
@@ -30,7 +31,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.uid)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(5)
       ..write(obj.phoneNumber)
       ..writeByte(6)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.role);
   }
 
   @override
