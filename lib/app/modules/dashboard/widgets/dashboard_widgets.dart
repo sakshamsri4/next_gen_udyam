@@ -35,7 +35,8 @@ class _ChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final random = DateTime.now().millisecondsSinceEpoch;
+    // Use the provided value parameter instead of timestamp
+    final random = value;
     final points = <Offset>[];
 
     // Generate random points
@@ -92,7 +93,8 @@ class _ChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _ChartPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.value != value;
 }
 
 /// Custom NeoPOP card widget
