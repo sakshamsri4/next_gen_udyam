@@ -13,7 +13,7 @@ class SearchFilter {
     this.query = '',
     this.location = '',
     this.minSalary = 0,
-    this.maxSalary = 1000000,
+    this.maxSalary = 200000, // Changed from 1000000 to match RangeSlider max
     this.jobTypes = const [],
     this.experience = const [],
     this.education = const [],
@@ -30,7 +30,7 @@ class SearchFilter {
       query: json['query'] as String? ?? '',
       location: json['location'] as String? ?? '',
       minSalary: json['minSalary'] as int? ?? 0,
-      maxSalary: json['maxSalary'] as int? ?? 1000000,
+      maxSalary: json['maxSalary'] as int? ?? 200000, // Changed from 1000000
       jobTypes: List<String>.from(json['jobTypes'] as List? ?? []),
       experience: List<String>.from(json['experience'] as List? ?? []),
       education: List<String>.from(json['education'] as List? ?? []),
@@ -162,7 +162,7 @@ class SearchFilter {
     return query.isEmpty &&
         location.isEmpty &&
         minSalary == 0 &&
-        maxSalary == 1000000 &&
+        maxSalary == 200000 && // Changed from 1000000 to match default
         jobTypes.isEmpty &&
         experience.isEmpty &&
         education.isEmpty &&

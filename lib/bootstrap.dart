@@ -14,6 +14,7 @@ import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/services/connectivity_service.dart';
 import 'package:next_gen/core/services/error_service.dart';
 import 'package:next_gen/core/services/logger_service.dart';
+import 'package:next_gen/core/storage/hive_manager.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
 import 'package:next_gen/firebase_options.dart';
 
@@ -137,6 +138,12 @@ void _registerServicesWithGetX(dynamic loggerDynamic) {
     // Register AuthService
     if (!Get.isRegistered<AuthService>()) {
       Get.put(serviceLocator<AuthService>(), permanent: true);
+    }
+
+    // Register HiveManager
+    if (!Get.isRegistered<HiveManager>()) {
+      logger.i('Registering HiveManager with GetX');
+      Get.put(serviceLocator<HiveManager>(), permanent: true);
     }
 
     // Analytics service commented out for now, will be implemented later

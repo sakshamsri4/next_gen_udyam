@@ -76,7 +76,12 @@ class _FilterModalState extends State<FilterModal> {
   @override
   void initState() {
     super.initState();
-    _filter = widget.initialFilter;
+    // Ensure maxSalary is not greater than the slider's max value
+    final initialFilter = widget.initialFilter;
+    _filter = initialFilter.copyWith(
+      maxSalary:
+          initialFilter.maxSalary > 200000 ? 200000 : initialFilter.maxSalary,
+    );
     _locationController.text = _filter.location;
   }
 
@@ -154,8 +159,8 @@ class _FilterModalState extends State<FilterModal> {
           const SizedBox(height: 8),
           RangeSlider(
             values: RangeValues(
-              _filter.minSalary.toDouble(),
-              _filter.maxSalary.toDouble(),
+              _filter.minSalary.toDouble().clamp(0, 200000),
+              _filter.maxSalary.toDouble().clamp(0, 200000),
             ),
             max: 200000,
             divisions: 20,

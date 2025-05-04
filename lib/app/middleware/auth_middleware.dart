@@ -44,17 +44,44 @@ class AuthMiddleware extends GetMiddleware {
       );
     }
 
-    // If the user is logged in, redirect to dashboard
-    // Otherwise, continue to the auth page
+    // If the user is logged in, allow access to protected routes
+    // Otherwise, redirect to login
     if (authController.user.value != null) {
-      // Don't redirect if already on dashboard or a protected route
-      if (route == Routes.dashboard) {
-        _logger.d('Already on dashboard route, no redirect needed');
+      // List of protected routes that should be accessible when logged in
+      final protectedRoutes = [
+        Routes.dashboard,
+        Routes.jobs,
+        Routes.resume,
+        Routes.profile,
+        Routes.search,
+      ];
+
+      // If the route is a protected route, allow access
+      if (protectedRoutes.contains(route)) {
+        _logger
+            .d('User is logged in, allowing access to protected route: $route');
         return null;
       }
 
-      _logger.i('User is logged in, redirecting to dashboard');
+      // If not on a protected route, redirect to dashboard
+      _logger.i(
+        'User is logged in but not on a protected route, redirecting to dashboard',
+      );
       return const RouteSettings(name: Routes.dashboard);
+    }
+
+    // If user is not logged in and trying to access a protected route, redirect to login
+    final protectedRoutes = [
+      Routes.dashboard,
+      Routes.jobs,
+      Routes.resume,
+      Routes.profile,
+      Routes.search,
+    ];
+
+    if (protectedRoutes.contains(route)) {
+      _logger.i('User is not logged in, redirecting to login');
+      return const RouteSettings(name: Routes.login);
     }
 
     _logger.d('User is not logged in, continuing to requested route');

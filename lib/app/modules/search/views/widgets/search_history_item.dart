@@ -25,13 +25,12 @@ class SearchHistoryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     return ListTile(
-      leading: Icon(
+      leading: const Icon(
         FontAwesomeIcons.clockRotateLeft,
         size: 16,
-        color: isDarkMode ? AppTheme.slateGray : AppTheme.slateGray,
+        color: AppTheme.slateGray,
       ),
       title: Text(
         item.query,
@@ -41,7 +40,7 @@ class SearchHistoryItem extends StatelessWidget {
         icon: const Icon(FontAwesomeIcons.xmark),
         onPressed: onDelete,
         iconSize: 16,
-        color: isDarkMode ? AppTheme.slateGray : AppTheme.slateGray,
+        color: AppTheme.slateGray,
       ),
       onTap: onTap,
     );

@@ -60,8 +60,8 @@ class SearchService extends GetxService {
         // In a real app, you might want to use
         // a more sophisticated search solution
         query = query
-            .where('title', isGreaterThanOrEqualTo: filter.query)
-            .where('title', isLessThanOrEqualTo: '${filter.query}\\uf8ff');
+            .orderBy('title')
+            .startAt([filter.query]).endAt(['${filter.query}\\uf8ff']);
       }
 
       if (filter.location.isNotEmpty) {
@@ -85,30 +85,42 @@ class SearchService extends GetxService {
       }
 
       // Apply sorting
-      switch (filter.sortBy) {
-        case SortOption.date:
-          query = query.orderBy(
-            'postedDate',
-            descending: filter.sortOrder == SortOrder.descending,
-          );
-        case SortOption.salary:
-          query = query.orderBy(
-            'salary',
-            descending: filter.sortOrder == SortOrder.descending,
-          );
-        case SortOption.company:
-          query = query.orderBy(
-            'company',
-            descending: filter.sortOrder == SortOrder.descending,
-          );
-        case SortOption.location:
-          query = query.orderBy(
-            'location',
-            descending: filter.sortOrder == SortOrder.descending,
-          );
-        case SortOption.relevance:
-          // For relevance, we'll just use the default order
-          break;
+      // Only apply sorting if we're not already filtering by title
+      // because Firestore requires composite indexes for multiple orderBy
+      // clauses
+      if (filter.query.isEmpty) {
+        switch (filter.sortBy) {
+          case SortOption.date:
+            query = query.orderBy(
+              'postedDate',
+              descending: filter.sortOrder == SortOrder.descending,
+            );
+          case SortOption.salary:
+            query = query.orderBy(
+              'salary',
+              descending: filter.sortOrder == SortOrder.descending,
+            );
+          case SortOption.company:
+            query = query.orderBy(
+              'company',
+              descending: filter.sortOrder == SortOrder.descending,
+            );
+          case SortOption.location:
+            query = query.orderBy(
+              'location',
+              descending: filter.sortOrder == SortOrder.descending,
+            );
+          case SortOption.relevance:
+            // For relevance, we'll just use the default order
+            break;
+        }
+      } else if (filter.sortBy != SortOption.relevance) {
+        // If we're filtering by title and need sorting, we'll sort the results
+        // client-side
+        _logger.d(
+          'Sorting will be applied client-side due to Firestore query '
+          'limitations',
+        );
       }
 
       // Execute the query

@@ -3,6 +3,10 @@ import 'package:next_gen/app/modules/search/models/job_model.dart';
 import 'package:next_gen/app/modules/search/models/search_filter.dart';
 import 'package:next_gen/app/modules/search/models/search_history.dart';
 
+/// Type IDs for Hive adapters
+const int sortOptionTypeId = 5;
+const int sortOrderTypeId = 6;
+
 /// Register all Hive adapters for the search module
 void registerSearchHiveAdapters() {
   // Register JobModel adapter
@@ -21,12 +25,12 @@ void registerSearchHiveAdapters() {
   }
 
   // Register SortOption adapter
-  if (!Hive.isAdapterRegistered(5)) {
+  if (!Hive.isAdapterRegistered(sortOptionTypeId)) {
     Hive.registerAdapter(SortOptionAdapter());
   }
 
   // Register SortOrder adapter
-  if (!Hive.isAdapterRegistered(6)) {
+  if (!Hive.isAdapterRegistered(sortOrderTypeId)) {
     Hive.registerAdapter(SortOrderAdapter());
   }
 }

@@ -7,6 +7,7 @@ import 'package:next_gen/app/modules/search/models/job_model.dart';
 import 'package:next_gen/app/modules/search/views/widgets/filter_modal.dart';
 import 'package:next_gen/app/modules/search/views/widgets/job_card.dart';
 import 'package:next_gen/app/modules/search/views/widgets/search_history_item.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
@@ -14,9 +15,34 @@ import 'package:responsive_builder/responsive_builder.dart';
 import 'package:shimmer/shimmer.dart';
 
 /// View for the Search module
-class SearchView extends GetView<app_search.SearchController> {
+class SearchView extends StatefulWidget {
   /// Constructor
   const SearchView({super.key});
+
+  @override
+  State<SearchView> createState() => _SearchViewState();
+}
+
+class _SearchViewState extends State<SearchView> {
+  late final app_search.SearchController controller;
+  late final NavigationController navigationController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the controllers
+    controller = Get.find<app_search.SearchController>();
+
+    // Get or register NavigationController
+    if (Get.isRegistered<NavigationController>()) {
+      navigationController = Get.find<NavigationController>();
+    } else {
+      navigationController = Get.put(NavigationController(), permanent: true);
+    }
+
+    // Set the selected index to the Search tab (index 1)
+    navigationController.selectedIndex.value = 1;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -174,14 +200,16 @@ class SearchView extends GetView<app_search.SearchController> {
       child: ListView.builder(
         itemCount: 5,
         itemBuilder: (context, index) {
+          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
           return Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
+            highlightColor:
+                isDarkMode ? Colors.grey.shade600 : Colors.grey.shade100,
             child: Container(
               margin: const EdgeInsets.only(bottom: 16),
               height: isMobile ? 120 : 150,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDarkMode ? Colors.grey.shade800 : Colors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),

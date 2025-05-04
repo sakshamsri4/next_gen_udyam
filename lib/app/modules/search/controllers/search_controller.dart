@@ -97,9 +97,18 @@ class SearchController extends GetxController {
     }
   }
 
+  // Track the most recent search request
+  int _lastSearchToken = 0;
+
   /// Perform search
   Future<void> _performSearch({String? query}) async {
-    _logger.i('Performing search with query: ${query ?? filter.value.query}');
+    // Generate a unique token for this search request
+    final currentToken = DateTime.now().microsecondsSinceEpoch;
+    final localToken = currentToken;
+    _lastSearchToken = currentToken;
+
+    _logger.i('Performing search with query: ${query ?? filter.value.query} '
+        '(token: $localToken)');
     isLoading.value = true;
     update(); // Notify GetBuilder to update UI
 
@@ -111,12 +120,23 @@ class SearchController extends GetxController {
 
       // Perform search
       final results = await _searchService.searchJobs(filter.value);
-      searchResults.value = results;
+
+      // Only update results if this is still the most recent search
+      if (_lastSearchToken == localToken) {
+        searchResults.value = results;
+        _logger.d('Search results updated (token: $localToken)');
+      } else {
+        _logger.d('Search results discarded - newer search exists '
+            '(token: $localToken, latest: $_lastSearchToken)');
+      }
     } catch (e, s) {
       _logger.e('Error performing search', e, s);
     } finally {
-      isLoading.value = false;
-      update(); // Notify GetBuilder to update UI
+      // Only update loading state if this is still the most recent search
+      if (_lastSearchToken == localToken) {
+        isLoading.value = false;
+        update(); // Notify GetBuilder to update UI
+      }
     }
   }
 
