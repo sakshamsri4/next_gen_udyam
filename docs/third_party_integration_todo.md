@@ -8,25 +8,28 @@ This document outlines the step-by-step process for extracting UI components and
 For each module, we'll follow this process:
 1. **Extract**: Copy only the necessary UI components and assets from the third-party app
 2. **Adapt**: Modify the UI components to work with our Firebase/Supabase backend
-3. **Implement**: Create our own controllers and services that connect to Firebase/Supabase
-4. **Test**: Verify the functionality works with our backend
-5. **Clean Up**: Remove any unused third-party code or dependencies
+3. **Apply CRED Design**: Transform the UI components to follow CRED design principles from `docs/cred_design_guide.md`
+4. **Implement**: Create our own controllers and services that connect to Firebase/Supabase
+5. **Test**: Verify the functionality works with our backend
+6. **Clean Up**: Remove any unused third-party code or dependencies
 
 ## Modules to Integrate
 
 ### 1. UI Components and Assets
 
-- [ ] Extract and adapt core UI components:
-  - [ ] Copy custom button styles and widgets
-  - [ ] Extract text field designs and input widgets
-  - [ ] Copy card designs and layouts
-  - [ ] Extract avatar and image components
-  - [ ] Copy loading animations and shimmer effects
-  - [ ] Extract color schemes and typography
-  - [ ] Copy icons and vector assets
-- [ ] Create our own component library with these extracted designs
-- [ ] Connect components to our theme system
-- [ ] Test components with different screen sizes
+- [ ] Extract and adapt core UI components with CRED design principles:
+  - [ ] Copy custom button styles and widgets and apply CRED button design (elevated, pill-shaped)
+  - [ ] Extract text field designs and input widgets and apply CRED typography guidelines
+  - [ ] Copy card designs and layouts and apply CRED card design (physical appearance, elevation)
+  - [ ] Extract avatar and image components and apply CRED styling
+  - [ ] Copy loading animations and shimmer effects and adapt to CRED motion principles
+  - [ ] Replace color schemes with CRED color system from the design guide
+  - [ ] Apply CRED typography guidelines to all text elements
+  - [ ] Copy icons and vector assets and adapt to CRED icon style
+- [ ] Create our own component library with these CRED-styled components
+- [ ] Connect components to our theme system based on CRED design guide
+- [ ] Implement animations following CRED motion guidelines
+- [ ] Test components with different screen sizes while maintaining CRED design language
 
 ### 2. Profile Screens
 
@@ -139,8 +142,11 @@ We'll implement the modules in this order:
 ## Completion Criteria
 A module is considered successfully integrated when:
 1. The UI components are extracted and adapted to our app
-2. It uses our Firebase backend for all data operations
-3. It uses Supabase for file storage where needed
-4. All functionality works as expected
-5. It's properly tested with different scenarios
-6. No third-party code or files remain in the final implementation
+2. CRED design principles from `docs/cred_design_guide.md` are applied to all UI elements
+3. It uses our Firebase backend for all data operations
+4. It uses Supabase for file storage where needed
+5. All functionality works as expected
+6. It's properly tested with different scenarios
+7. Responsive design is maintained across all screen sizes
+8. Animations and interactions follow CRED motion guidelines
+9. No third-party code or files remain in the final implementation

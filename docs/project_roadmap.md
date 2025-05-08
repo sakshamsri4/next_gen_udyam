@@ -7,12 +7,13 @@ This roadmap outlines the step-by-step implementation plan for the Next Gen Job 
 We've integrated a third-party job portal app (JobsFlutterApp) to accelerate development. The updated approach focuses on:
 - **Functionality First**: Implement core functionality from the third-party app before enhancing UI
 - **Dual User Roles**: Support both employee and employer functionality from day one
-- **Incremental UI Enhancement**: Start with functional screens, then gradually apply NeoPOP styling
-- **API Integration**: Use the existing API integration from the third-party app initially
+- **CRED Design From Start**: Apply CRED design principles from the beginning using our `docs/cred_design_guide.md`
+- **Firebase Backend**: Use our Firebase backend instead of the third-party API
 
 ## Development Approach
 - **Rapid Development**: Focus on building features quickly with minimal testing overhead
-- **CRED Design System**: Implement NeoPOP UI components following CRED design principles
+- **CRED Design System**: Implement UI components following CRED design principles as documented in `docs/cred_design_guide.md`
+- **Consistent Design Language**: Apply CRED design principles consistently across all screens from the beginning
 - **Responsive UI**: Ensure excellent user experience across Android, iOS, and web platforms
 - **GetX CLI**: Use for scaffolding modules and managing state
 - **Modular Architecture**: Organize code in feature modules with clear separation of concerns
@@ -627,11 +628,15 @@ dependencies:
 
 ## Design Guidelines
 
-### NeoPOP Implementation
-- Use elevated buttons with proper depth
-- Apply consistent color palette
-- Implement physical feedback on interactions
-- Follow CRED design principles for typography and spacing
+### CRED Design Implementation
+- **Follow the CRED Design Guide**: Refer to `docs/cred_design_guide.md` for comprehensive design principles
+- **Core Design Philosophy**: Implement "Beauty as the Central Goal" with balance of form and function
+- **NeoPOP Design System**: Apply the current CRED design system with bold, colorful, and physical elements
+- **Typography**: Use the specified font system with clear hierarchy and weight contrast
+- **Color System**: Apply the defined color palette with high contrast and purposeful usage
+- **Component Design**: Implement buttons, cards, navigation, and forms according to CRED specifications
+- **Motion and Animation**: Follow animation principles for purpose-driven, natural, and subtle movements
+- **Illustrations and Icons**: Use the defined style for bold, colorful, and consistent visual elements
 
 ### Responsive UI Guidelines
 - Use responsive_builder for adaptive layouts
@@ -639,6 +644,7 @@ dependencies:
 - Use flexible widgets that adapt to available space
 - Ensure touch targets are appropriate for each platform
 - Optimize navigation for different devices (drawer for mobile, sidebar for desktop)
+- Maintain CRED design principles across all screen sizes
 
 ## Revised Implementation Plan (2024-07-28)
 
@@ -673,11 +679,12 @@ dependencies:
 
 ### Phase 2: UI Enhancement & Additional Features (2-3 weeks)
 
-5. **NeoPOP UI Integration (3-4 days)**
-   - Apply NeoPOP styling to existing screens
-   - Implement custom buttons and cards with NeoPOP design
-   - Create consistent theme across the app
-   - Ensure responsive design for all screen sizes
+5. **CRED Design Implementation (3-4 days)**
+   - Apply CRED design principles from `docs/cred_design_guide.md` to all screens
+   - Implement custom buttons and cards following CRED design specifications
+   - Create consistent theme across the app based on the CRED color system
+   - Ensure responsive design for all screen sizes while maintaining CRED design language
+   - Implement animations and micro-interactions according to CRED motion guidelines
 
 6. **Resume Upload Module (2-3 days)**
    - Implement resume upload functionality
