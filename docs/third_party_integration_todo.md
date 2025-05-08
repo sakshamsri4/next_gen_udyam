@@ -1,141 +1,146 @@
 # Third-Party Integration Todo List
 
 ## Overview
-This document outlines the step-by-step process for integrating UI components and functionality from the third-party JobsFlutterApp into our existing Next Gen Job Portal application. We'll maintain our Firebase backend while leveraging the UI components and user flows from the third-party app.
+This document outlines the step-by-step process for extracting UI components and assets from the third-party JobsFlutterApp and integrating them into our existing Next Gen Job Portal application. We'll use our Firebase backend for data and Supabase for storage, while leveraging only the UI components and assets from the third-party app.
 
 ## Integration Process
 
 For each module, we'll follow this process:
-1. **Analysis**: Examine the third-party implementation
-2. **Adaptation**: Create adapter controllers to work with our Firebase backend
-3. **UI Integration**: Integrate the UI components
-4. **Testing**: Test the functionality with our backend
+1. **Extract**: Copy only the necessary UI components and assets from the third-party app
+2. **Adapt**: Modify the UI components to work with our Firebase/Supabase backend
+3. **Implement**: Create our own controllers and services that connect to Firebase/Supabase
+4. **Test**: Verify the functionality works with our backend
+5. **Clean Up**: Remove any unused third-party code or dependencies
 
 ## Modules to Integrate
 
-### 1. Profile Module
+### 1. UI Components and Assets
 
-#### Customer Profile
-- [ ] Analyze third-party CustomerProfileView and controller
-- [ ] Create CustomerProfileController adapter for Firebase
-- [ ] Implement customer profile data model
-- [ ] Integrate customer profile view UI components
-- [ ] Add profile editing functionality
-- [ ] Implement profile image upload with Firebase Storage
-- [ ] Add skills, education, and experience sections
+- [ ] Extract and adapt core UI components:
+  - [ ] Copy custom button styles and widgets
+  - [ ] Extract text field designs and input widgets
+  - [ ] Copy card designs and layouts
+  - [ ] Extract avatar and image components
+  - [ ] Copy loading animations and shimmer effects
+  - [ ] Extract color schemes and typography
+  - [ ] Copy icons and vector assets
+- [ ] Create our own component library with these extracted designs
+- [ ] Connect components to our theme system
+- [ ] Test components with different screen sizes
+
+### 2. Profile Screens
+
+#### Customer Profile Screen
+- [ ] Extract customer profile screen UI only
+- [ ] Copy profile layout, cards, and form elements
+- [ ] Create our own ProfileController connected to Firebase
+- [ ] Implement profile image upload with Supabase storage
+- [ ] Connect UI to our data models and controllers
 - [ ] Test with Firebase backend
 
-#### Company Profile
-- [ ] Analyze third-party CompanyProfileView and controller
-- [ ] Create CompanyProfileController adapter for Firebase
-- [ ] Implement company profile data model
-- [ ] Integrate company profile view UI components
-- [ ] Add profile editing functionality
-- [ ] Implement company logo upload with Firebase Storage
-- [ ] Add company jobs listing section
+#### Company Profile Screen
+- [ ] Extract company profile screen UI only
+- [ ] Copy company profile layout and design elements
+- [ ] Create our own CompanyProfileController connected to Firebase
+- [ ] Implement company logo upload with Supabase storage
+- [ ] Connect UI to our data models and controllers
 - [ ] Test with Firebase backend
 
-### 2. Job Details Module
+### 3. Job Details Screen
 
-#### Job Details View
-- [ ] Analyze third-party JobDetailsView and controller
-- [ ] Create JobDetailsController adapter for Firebase
-- [ ] Implement job details data model
-- [ ] Integrate job details view UI components
-- [ ] Add company information section
-- [ ] Implement similar jobs section
+- [ ] Extract job details screen UI only
+- [ ] Copy layout, cards, and visual elements
+- [ ] Create our own JobDetailsController connected to Firebase
+- [ ] Implement job application form UI
+- [ ] Connect UI to our data models and controllers
 - [ ] Test with Firebase backend
 
-#### Job Application Flow
-- [ ] Analyze third-party job application process
-- [ ] Create application submission adapter for Firebase
-- [ ] Implement application data model
-- [ ] Integrate application form UI
-- [ ] Add application confirmation
+### 4. Saved Jobs Screen
+
+- [ ] Extract saved jobs screen UI only
+- [ ] Copy list view, cards, and empty state designs
+- [ ] Create our own SavedJobsController connected to Firebase
+- [ ] Implement save/unsave functionality with Firebase
+- [ ] Connect UI to our data models and controllers
 - [ ] Test with Firebase backend
 
-### 3. Saved Jobs Module
-- [ ] Analyze third-party SavedView and controller
-- [ ] Create SavedController adapter for Firebase
-- [ ] Implement saved jobs data model
-- [ ] Integrate saved jobs view UI components
-- [ ] Add toggle save/unsave functionality
-- [ ] Implement empty state for no saved jobs
+### 5. Search Screen
+
+- [ ] Extract search screen UI elements only
+- [ ] Copy search bar, filters, and results layout
+- [ ] Create our own SearchController connected to Firebase
+- [ ] Implement Firestore-based search functionality
+- [ ] Connect UI to our data models and controllers
 - [ ] Test with Firebase backend
 
-### 4. Search Module Enhancements
-- [ ] Analyze third-party SearchView and controller
-- [ ] Enhance existing search functionality with third-party features
-- [ ] Implement company search with Firebase
-- [ ] Add advanced filtering options
-- [ ] Improve search results UI
+### 6. Home Screen Elements
+
+- [ ] Extract home screen UI components only
+- [ ] Copy featured jobs carousel design
+- [ ] Extract recent jobs list layout
+- [ ] Copy category chips and filters design
+- [ ] Create our own HomeController connected to Firebase
+- [ ] Connect UI to our data models and controllers
 - [ ] Test with Firebase backend
 
-### 5. Home Module Enhancements
-- [ ] Analyze third-party HomeView and controller
-- [ ] Enhance existing home screen with featured jobs section
-- [ ] Add recent jobs section
-- [ ] Implement job categories/chips for quick filtering
-- [ ] Test with Firebase backend
+### 7. Navigation Elements
 
-### 6. UI Components Integration
-- [ ] Integrate custom job card component
-- [ ] Integrate custom avatar component
-- [ ] Integrate custom text field component
-- [ ] Integrate custom button component
-- [ ] Integrate shimmer loading effects
-- [ ] Create a UI component library for reuse
-- [ ] Test components with different data scenarios
-
-### 7. Navigation Improvements
-- [ ] Analyze third-party navigation structure
-- [ ] Integrate bottom navigation bar (if needed)
-- [ ] Implement drawer menu with additional options
-- [ ] Update routes to support new screens
-- [ ] Test navigation flow
+- [ ] Extract bottom navigation bar design
+- [ ] Copy drawer menu layout and animations
+- [ ] Extract tab navigation components
+- [ ] Create our own navigation system connected to our routes
+- [ ] Test navigation flow with our screens
 
 ## Implementation Priority
 
 We'll implement the modules in this order:
 
-1. **Profile Module** - Provides essential user information display
-2. **Job Details Module** - Core functionality for viewing and applying to jobs
-3. **Saved Jobs Module** - Important user engagement feature
-4. **Search Module Enhancements** - Improves job discovery
-5. **Home Module Enhancements** - Better first-time user experience
-6. **UI Components Integration** - Consistent UI across the app
-7. **Navigation Improvements** - Better app navigation
+1. **UI Components and Assets** - Create a foundation for all screens
+2. **Home Screen Elements** - Establish the main entry point
+3. **Job Details Screen** - Core functionality for viewing jobs
+4. **Search Screen** - Essential for job discovery
+5. **Profile Screens** - User and company information
+6. **Saved Jobs Screen** - User engagement feature
+7. **Navigation Elements** - Tie everything together
 
 ## Technical Requirements
 
-### Firebase Integration
-- Ensure all data operations use our Firebase backend
-- Implement proper security rules for Firestore collections
-- Set up Firebase Storage for profile images and company logos
-- Use Firebase Authentication for user identification
+### Firebase and Supabase Integration
+- Use Firebase for all data operations (Firestore, Authentication)
+- Use Supabase for file storage (profile images, company logos)
+- Implement proper security rules for both services
+- Create clear separation between UI and backend logic
+
+### Extraction Process
+- Copy only the necessary UI components and assets
+- Do not copy any business logic or API calls
+- Remove all references to the third-party backend
+- Adapt components to work with our data models
 
 ### Code Organization
-- Keep third-party integration code in a separate directory structure
-- Create adapter controllers to bridge UI and Firebase
+- Create a clean component library with extracted UI elements
+- Organize screens in our existing module structure
+- Use our own controllers and services for business logic
 - Maintain consistent naming conventions
-- Document all integration points
+- Do not keep any original third-party files
 
 ### Testing
-- Test each module with real Firebase data
-- Verify all CRUD operations work correctly
+- Test each UI component with our Firebase/Supabase backend
+- Verify all functionality works correctly
 - Test edge cases (empty data, loading states, errors)
 - Ensure responsive design works on different screen sizes
 
 ## Documentation
-- Document the integration process for each module
-- Create usage examples for integrated components
+- Document which UI components were extracted from the third-party app
+- Create usage examples for our component library
 - Update the project roadmap to reflect integration progress
 - Maintain activity log with integration milestones
 
 ## Completion Criteria
 A module is considered successfully integrated when:
-1. It uses our Firebase backend for all data operations
-2. The UI components are properly styled and responsive
-3. All functionality works as expected
-4. It's properly tested with different scenarios
-5. It's documented in the project documentation
+1. The UI components are extracted and adapted to our app
+2. It uses our Firebase backend for all data operations
+3. It uses Supabase for file storage where needed
+4. All functionality works as expected
+5. It's properly tested with different scenarios
+6. No third-party code or files remain in the final implementation
