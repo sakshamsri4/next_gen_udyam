@@ -549,6 +549,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_screenutil:
+    dependency: "direct main"
+    description:
+      name: flutter_screenutil
+      sha256: "8239210dd68bee6b0577aa4a090890342d04a136ce1c81f98ee513fc0ce891de"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.9.3"
   flutter_svg:
     dependency: transitive
     description:
@@ -612,6 +620,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
+  google_fonts:
+    dependency: "direct main"
+    description:
+      name: google_fonts
+      sha256: b1ac0fe2832c9cc95e5e88b57d627c5e68c223b9657f4b96e1487aa9098c7b82
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.1"
   google_identity_services_web:
     dependency: transitive
     description:
@@ -668,6 +684,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  heroicons:
+    dependency: "direct main"
+    description:
+      name: heroicons
+      sha256: "4da0ce23d7c25b35390cb6cf485e33b959e811541e9d9cb33a1fceb3d6705f0c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.11.0"
   hive:
     dependency: "direct main"
     description:
@@ -745,6 +769,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.19.0"
+  intl_phone_field:
+    dependency: "direct main"
+    description:
+      name: intl_phone_field
+      sha256: "73819d3dfcb68d2c85663606f6842597c3ddf6688ac777f051b17814fe767bbf"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
   introduction_screen:
     dependency: "direct main"
     description:
