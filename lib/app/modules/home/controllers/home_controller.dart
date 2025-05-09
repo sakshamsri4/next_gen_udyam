@@ -202,7 +202,8 @@ class HomeController extends GetxController {
       }
 
       final userId = _authController.user.value?.uid ?? '';
-      if (userId.isEmpty) return isSaved;
+      // This check is redundant since isLoggedIn should ensure userId exists
+      // but keeping it as a defensive measure
 
       final result = await _jobService.toggleSaveJob(
         userId: userId,
@@ -211,13 +212,14 @@ class HomeController extends GetxController {
       );
 
       // Update local saved jobs list
-      if (result) {
+      if (result && !isSaved) {
         _savedJobIds.add(jobId);
-      } else {
+      } else if (result && isSaved) {
         _savedJobIds.remove(jobId);
       }
 
-      return result;
+      // Return the new saved state based on the operation success
+      return result ? !isSaved : isSaved;
     } catch (e) {
       _logger.e('Error toggling job saved state', e);
       Get.snackbar(
