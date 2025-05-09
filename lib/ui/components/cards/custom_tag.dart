@@ -17,14 +17,14 @@ class CustomTag extends StatelessWidget {
   /// [titleColor] is the color of the text
   /// [backgroundColor] is the background color of the tag
   const CustomTag({
-    Key? key,
     required this.icon,
     required this.title,
-    this.isFeatured = false,
     required this.titleColor,
     required this.backgroundColor,
-  }) : super(key: key);
-  
+    super.key,
+    this.isFeatured = false,
+  });
+
   final HeroIcons icon;
   final String title;
   final bool isFeatured;
@@ -41,7 +41,6 @@ class CustomTag extends StatelessWidget {
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           HeroIcon(
@@ -57,7 +56,7 @@ class CustomTag extends StatelessWidget {
               fontWeight: FontWeight.w500,
               color: titleColor,
             ),
-          )
+          ),
         ],
       ),
     );

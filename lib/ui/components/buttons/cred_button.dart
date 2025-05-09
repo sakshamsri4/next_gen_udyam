@@ -23,7 +23,7 @@ class CredButton extends StatelessWidget {
   /// (defaults to true)
   /// [icon] is an optional icon to display before the text
   /// [isLoading] controls the loading state of the button
-  CredButton({
+  const CredButton({
     required this.title,
     required this.onTap,
     this.backgroundColor,
@@ -137,7 +137,7 @@ class CredButton extends StatelessWidget {
   }) {
     final theme = Get.theme;
     final text = textColor ?? theme.colorScheme.primary;
-    
+
     return CredButton(
       title: title,
       onTap: onTap,
@@ -243,7 +243,8 @@ class CredButton extends StatelessWidget {
                           ),
                         )
                       : Row(
-                          mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+                          mainAxisSize:
+                              isFullWidth ? MainAxisSize.max : MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (icon != null) ...[

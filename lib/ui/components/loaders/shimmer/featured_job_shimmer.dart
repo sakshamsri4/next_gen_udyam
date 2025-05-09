@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'shimmer_widget.dart';
+import 'package:next_gen/ui/components/loaders/shimmer/shimmer_widget.dart';
 
 /// A shimmer effect for featured job cards
 ///
@@ -9,7 +9,7 @@ import 'shimmer_widget.dart';
 /// while they are loading
 class FeaturedJobShimmer extends StatelessWidget {
   /// Creates a featured job shimmer
-  const FeaturedJobShimmer({Key? key}) : super(key: key);
+  const FeaturedJobShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {

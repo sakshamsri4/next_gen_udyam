@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
@@ -21,18 +20,18 @@ class CustomLottie extends StatelessWidget {
   /// [titleStyle] is the style for the title text
   /// [descriptionStyle] is the style for the description text
   const CustomLottie({
-    Key? key,
     required this.title,
-    this.onTryAgain,
     required this.asset,
+    super.key,
+    this.onTryAgain,
     this.repeat = false,
     this.description,
     this.assetHeight,
     this.padding,
     this.titleStyle,
     this.descriptionStyle,
-  }) : super(key: key);
-  
+  });
+
   final String title;
   final String? description;
   final String asset;
@@ -46,7 +45,7 @@ class CustomLottie extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Center(
       child: Padding(
         padding: padding ?? const EdgeInsets.only(bottom: kToolbarHeight),
@@ -85,7 +84,7 @@ class CustomLottie extends StatelessWidget {
               TextButton(
                 onPressed: onTryAgain,
                 child: Text(
-                  "Try again",
+                  'Try again',
                   style: GoogleFonts.poppins(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w700,

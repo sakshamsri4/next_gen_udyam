@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'shimmer_widget.dart';
+import 'package:next_gen/ui/components/loaders/shimmer/shimmer_widget.dart';
 
 /// A shimmer effect for job details screen
 ///
@@ -9,7 +9,7 @@ import 'shimmer_widget.dart';
 /// while it is loading
 class JobDetailsShimmer extends StatelessWidget {
   /// Creates a job details shimmer
-  const JobDetailsShimmer({Key? key}) : super(key: key);
+  const JobDetailsShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +24,21 @@ class JobDetailsShimmer extends StatelessWidget {
             radius: 0,
           ),
           SizedBox(height: 20.h),
-          
+
           // Job description shimmer
           ShimmerWidget(
             width: double.infinity,
             height: 300.h,
             margin: EdgeInsets.symmetric(horizontal: 16.w),
           ),
-          
+
           // About the employer shimmer
           ShimmerWidget(
             width: double.infinity,
             height: 100.h,
             margin: EdgeInsets.all(16.w),
           ),
-          
+
           // Similar jobs title shimmer
           ShimmerWidget(
             width: 200.w,
@@ -46,7 +46,7 @@ class JobDetailsShimmer extends StatelessWidget {
             margin: EdgeInsets.symmetric(horizontal: 16.w),
           ),
           SizedBox(height: 16.h),
-          
+
           // Similar jobs shimmer
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),

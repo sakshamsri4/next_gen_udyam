@@ -12,6 +12,7 @@ import 'package:next_gen/app/modules/dashboard/bindings/dashboard_binding.dart';
 import 'package:next_gen/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
 import 'package:next_gen/app/modules/error/views/error_view.dart';
+import 'package:next_gen/app/modules/home/bindings/home_binding.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
 import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
@@ -33,7 +34,7 @@ class AppPages {
     GetPage<dynamic>(
       name: _Paths.home,
       page: () => const HomeView(),
-      binding: AuthBinding(),
+      bindings: [HomeBinding(), AuthBinding()],
       middlewares: [OnboardingMiddleware()],
     ),
     GetPage<dynamic>(

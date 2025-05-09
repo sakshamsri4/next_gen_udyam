@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heroicons/heroicons.dart';
 
@@ -19,7 +17,8 @@ class CustomInfoCard extends StatelessWidget {
   /// [title] is the title to display in the header
   /// [action] is an optional icon for an action button
   /// [onActionTap] is called when the action button is tapped
-  /// [backgroundColor] is the background color of the card (defaults to theme surface color)
+  /// [backgroundColor] is the background color of the card
+  /// (defaults to theme surface color)
   /// [elevation] is the elevation of the card (defaults to 8)
   /// [borderRadius] is the border radius of the card (defaults to 16)
   const CustomInfoCard({

@@ -10,6 +10,7 @@ dependencies:
   awesome_snackbar_content: ^0.1.5
   bloc: ^9.0.0
   cached_network_image: ^3.3.0
+  carousel_slider: ^5.0.0
   cloud_firestore: ^5.6.7 # For search module
   connectivity_plus: ^6.1.4
   debounce_throttle: ^2.0.0 # For search module
@@ -44,6 +45,7 @@ dependencies:
   path_provider: ^2.1.1
   responsive_builder: ^0.7.0
   shimmer: ^3.0.0
+  smooth_page_indicator: ^1.2.1
 dev_dependencies:
   bloc_test: ^10.0.0
   build_runner: ^2.4.8

@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
-
+import 'package:next_gen/ui/components/avatars/custom_avatar.dart';
+import 'package:next_gen/ui/components/buttons/button_with_text.dart';
 import 'package:next_gen/ui/components/buttons/custom_button.dart';
 import 'package:next_gen/ui/components/buttons/custom_save_button.dart';
-import 'package:next_gen/ui/components/buttons/button_with_text.dart';
-import 'package:next_gen/ui/components/fields/custom_text_field.dart';
-import 'package:next_gen/ui/components/fields/search_bar.dart';
-import 'package:next_gen/ui/components/cards/custom_job_card.dart';
 import 'package:next_gen/ui/components/cards/custom_info_card.dart';
+import 'package:next_gen/ui/components/cards/custom_job_card.dart';
 import 'package:next_gen/ui/components/cards/custom_tag.dart';
-import 'package:next_gen/ui/components/avatars/custom_avatar.dart';
+import 'package:next_gen/ui/components/fields/custom_text_field.dart';
 import 'package:next_gen/ui/components/loaders/custom_lottie.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/featured_job_shimmer.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/recent_jobs_shimmer.dart';
-import 'package:next_gen/ui/components/loaders/shimmer/job_details_shimmer.dart';
 
 /// Example usage of the UI components
 ///
