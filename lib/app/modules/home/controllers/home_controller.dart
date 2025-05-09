@@ -89,6 +89,12 @@ class HomeController extends GetxController {
     _loadHomeData();
   }
 
+  @override
+  void onClose() {
+    homeScrollController.dispose();
+    super.onClose();
+  }
+
   /// Load all home screen data
   Future<void> _loadHomeData() async {
     await Future.wait([
