@@ -38,7 +38,7 @@ class ComponentExamples extends StatelessWidget {
             CustomButton(
               title: 'Primary Button',
               onTap: () async {
-                await Future.delayed(const Duration(seconds: 1));
+                await Future<void>.delayed(const Duration(seconds: 1));
               },
             ),
             SizedBox(height: 16.h),
@@ -47,14 +47,14 @@ class ComponentExamples extends StatelessWidget {
                 CustomSaveButton(
                   isLiked: true,
                   onTap: (isLiked) async {
-                    await Future.delayed(const Duration(seconds: 1));
+                    await Future<void>.delayed(const Duration(seconds: 1));
                     return !isLiked;
                   },
                 ),
                 SizedBox(width: 16.w),
                 CustomSaveButton(
                   onTap: (isLiked) async {
-                    await Future.delayed(const Duration(seconds: 1));
+                    await Future<void>.delayed(const Duration(seconds: 1));
                     return !isLiked;
                   },
                 ),
@@ -66,7 +66,7 @@ class ComponentExamples extends StatelessWidget {
               firstTextSpan: 'Already have an account? ',
               secondTextSpan: 'Login',
               onTap: () async {
-                await Future.delayed(const Duration(seconds: 1));
+                await Future<void>.delayed(const Duration(seconds: 1));
               },
               onTextTap: () {},
             ),
@@ -110,7 +110,7 @@ class ComponentExamples extends StatelessWidget {
               description:
                   'We are looking for a senior Flutter developer to join our team.',
               onActionTap: (isLiked) async {
-                await Future.delayed(const Duration(seconds: 1));
+                await Future<void>.delayed(const Duration(seconds: 1));
                 return !isLiked;
               },
             ),
