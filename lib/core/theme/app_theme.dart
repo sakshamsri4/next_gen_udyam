@@ -44,6 +44,15 @@ class AppTheme {
   static const Color darkSurface2 = Color(0xFF1A2138); // Secondary surface
   static const Color darkSurface3 = Color(0xFF232A40); // Tertiary surface
 
+  /// Background and surface colors for light and dark themes
+  static const Color darkBackground = deepNavy;
+  static const Color lightBackground = lightGray;
+  static const Color darkSurface = darkSurface1;
+  static const Color lightSurface = pureWhite;
+
+  /// Additional color variants
+  static const Color brightNeonGreen = Color(0xFF39FF14); // Brighter neon green
+
   /// Light theme
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
