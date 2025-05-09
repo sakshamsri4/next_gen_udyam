@@ -8,7 +8,7 @@ import 'package:next_gen/core/services/logger_service.dart';
 
 class AuthController extends GetxController {
   // Firebase instance
-  late FirebaseAuth _auth;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Check if user is logged in
   bool get isLoggedIn => _auth.currentUser != null;
@@ -48,9 +48,6 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
-    // Initialize Firebase Auth
-    _auth = FirebaseAuth.instance;
 
     // Reset all loading states
     isLoading.value = false;
