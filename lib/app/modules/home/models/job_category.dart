@@ -13,7 +13,7 @@ class JobCategory {
 
   /// Factory constructor from Firestore document
   factory JobCategory.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data()! as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>? ?? {};
     return JobCategory(
       id: doc.id,
       title: data['title'] as String? ?? '',
