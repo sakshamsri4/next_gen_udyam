@@ -46,14 +46,14 @@ class ComponentExamples extends StatelessWidget {
               children: [
                 CustomSaveButton(
                   isLiked: true,
-                  onTap: (isLiked) async {
+                  onTap: ({required bool isLiked}) async {
                     await Future<void>.delayed(const Duration(seconds: 1));
                     return !isLiked;
                   },
                 ),
                 SizedBox(width: 16.w),
                 CustomSaveButton(
-                  onTap: (isLiked) async {
+                  onTap: ({required bool isLiked}) async {
                     await Future<void>.delayed(const Duration(seconds: 1));
                     return !isLiked;
                   },
@@ -109,7 +109,7 @@ class ComponentExamples extends StatelessWidget {
               actionIcon: HeroIcons.bookmark,
               description:
                   'We are looking for a senior Flutter developer to join our team.',
-              onActionTap: (isLiked) async {
+              onActionTap: ({required bool isLiked}) async {
                 await Future<void>.delayed(const Duration(seconds: 1));
                 return !isLiked;
               },

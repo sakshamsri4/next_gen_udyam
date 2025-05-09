@@ -33,7 +33,7 @@ class ShimmerWidget extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Shimmer.fromColors(
-      baseColor: theme.primaryColor.withOpacity(0.38),
+      baseColor: theme.primaryColor.withAlpha((0.38 * 255).toInt()),
       highlightColor: theme.colorScheme.surface,
       child: Container(
         width: width,
@@ -41,7 +41,7 @@ class ShimmerWidget extends StatelessWidget {
         margin: margin ?? EdgeInsets.zero,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(radius ?? 14.r),
-          color: theme.primaryColor.withOpacity(0.38),
+          color: theme.primaryColor.withAlpha((0.38 * 255).toInt()),
         ),
         child: child,
       ),

@@ -72,8 +72,8 @@ class RecentJobs extends GetWidget<HomeController> {
                   Routes.profile,
                   arguments: job.company,
                 ),
-                onActionTap: (isSaved) =>
-                    controller.toggleSaveJob(isSaved: isSaved, jobId: job.id),
+                onActionTap: ({required bool isLiked}) =>
+                    controller.toggleSaveJob(isSaved: isLiked, jobId: job.id),
               );
             },
           );

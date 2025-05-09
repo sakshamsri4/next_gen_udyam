@@ -192,12 +192,7 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius.r),
           boxShadow: [
             BoxShadow(
-              color: Color.fromRGBO(
-                bgColor.red & 0xFF,
-                bgColor.green & 0xFF,
-                bgColor.blue & 0xFF,
-                0.3,
-              ),
+              color: bgColor.withAlpha((0.3 * 255).toInt()),
               blurRadius: elevation,
               offset: const Offset(0, 4),
             ),
@@ -210,7 +205,7 @@ class CustomButton extends StatelessWidget {
                 ? null
                 : () async {
                     // Add haptic feedback for physical sensation
-                    HapticFeedback.mediumImpact();
+                    await HapticFeedback.mediumImpact();
 
                     _isLoading.value = true;
                     try {
@@ -220,27 +215,12 @@ class CustomButton extends StatelessWidget {
                     }
                   },
             borderRadius: BorderRadius.circular(borderRadius.r),
-            splashColor: Color.fromRGBO(
-              foregroundColor.red & 0xFF,
-              foregroundColor.green & 0xFF,
-              foregroundColor.blue & 0xFF,
-              0.1,
-            ),
-            highlightColor: Color.fromRGBO(
-              foregroundColor.red & 0xFF,
-              foregroundColor.green & 0xFF,
-              foregroundColor.blue & 0xFF,
-              0.05,
-            ),
+            splashColor: foregroundColor.withAlpha((0.1 * 255).toInt()),
+            highlightColor: foregroundColor.withAlpha((0.05 * 255).toInt()),
             child: Ink(
               decoration: BoxDecoration(
                 color: _isLoading.value
-                    ? Color.fromRGBO(
-                        bgColor.red & 0xFF,
-                        bgColor.green & 0xFF,
-                        bgColor.blue & 0xFF,
-                        0.8,
-                      )
+                    ? bgColor.withAlpha((0.8 * 255).toInt())
                     : bgColor,
                 borderRadius: BorderRadius.circular(borderRadius.r),
                 gradient: LinearGradient(

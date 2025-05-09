@@ -29,7 +29,7 @@ class CustomSaveButton extends StatefulWidget {
 
   /// The async function to call when the button is tapped
   /// Returns the new liked state
-  final Future<bool?> Function(bool isLiked)? onTap;
+  final Future<bool?> Function({required bool isLiked})? onTap;
 
   /// Whether the item is saved/liked
   final bool isLiked;
@@ -106,7 +106,7 @@ class CustomSaveButtonState extends State<CustomSaveButton>
       isLoading = true;
     });
     if (widget.onTap != null) {
-      widget.onTap!(_isLiked).then(_handleIsLikeChanged);
+      widget.onTap!(isLiked: _isLiked).then(_handleIsLikeChanged);
     } else {
       _handleIsLikeChanged(!_isLiked);
     }

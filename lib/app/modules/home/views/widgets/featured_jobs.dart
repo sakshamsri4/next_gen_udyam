@@ -87,8 +87,8 @@ class FeaturedJobs extends GetWidget<HomeController> {
                   Routes.jobs,
                   arguments: job.id,
                 ),
-                onActionTap: (isSaved) =>
-                    controller.toggleSaveJob(isSaved: isSaved, jobId: job.id),
+                onActionTap: ({required bool isLiked}) =>
+                    controller.toggleSaveJob(isSaved: isLiked, jobId: job.id),
               );
             },
             options: CarouselOptions(

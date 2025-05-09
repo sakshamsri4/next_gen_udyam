@@ -59,8 +59,7 @@ class CustomJobCard extends StatelessWidget {
   final HeroIcons actionIcon;
   final bool isSaved;
   final void Function()? onAvatarTap;
-  // ignore: avoid_positional_boolean_parameters
-  final Future<bool?> Function(bool isLiked)? onActionTap;
+  final Future<bool?> Function({required bool isLiked})? onActionTap;
   final void Function()? onTap;
 
   @override
@@ -164,8 +163,7 @@ class _CardTile extends StatelessWidget {
   final String companyName;
   final String publishTime;
   final void Function()? onAvatarTap;
-  // ignore: avoid_positional_boolean_parameters
-  final Future<bool?> Function(bool isLiked)? onActionTap;
+  final Future<bool?> Function({required bool isLiked})? onActionTap;
   final HeroIcons actionIcon;
   final bool isSaved;
 
