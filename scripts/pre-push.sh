@@ -71,19 +71,8 @@ echo -e "${GREEN}Test failures ignored for this push.${NC}"
 # Check code coverage - temporarily disabled
 echo -e "${YELLOW}Code coverage check temporarily disabled.${NC}"
 
-# Check for spell checking tool
-if command -v cspell &> /dev/null; then
-  echo -e "${YELLOW}Running spell check...${NC}"
-  if ! cspell "**/*.{dart,md,yaml,json}" --no-progress ; then
-    echo -e "${RED}Error: Spell check found issues.${NC}"
-    echo -e "${YELLOW}Please fix the spelling issues before pushing.${NC}"
-    exit 1
-  fi
-  echo -e "${GREEN}Spell check passed.${NC}"
-else
-  echo -e "${YELLOW}cspell not found, skipping spell check.${NC}"
-  echo -e "${YELLOW}Consider installing cspell with 'npm install -g cspell' for better quality checks.${NC}"
-fi
+# Spell check disabled as requested
+echo -e "${YELLOW}Spell check has been disabled.${NC}"
 
 echo -e "${GREEN}All pre-push checks passed!${NC}"
 exit 0

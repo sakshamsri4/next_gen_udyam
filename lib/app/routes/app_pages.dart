@@ -118,6 +118,7 @@ class AppPages {
       name: _Paths.showcase,
       page: () => const CredComponentsShowcase(),
       transition: Transition.fadeIn,
+      middlewares: [AuthMiddleware(), OnboardingMiddleware()],
     ),
   ];
 }
