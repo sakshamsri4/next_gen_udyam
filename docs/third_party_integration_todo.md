@@ -34,20 +34,20 @@ For each module, we'll follow this process:
 ### 2. Profile Screens
 
 #### Customer Profile Screen
-- [ ] Extract customer profile screen UI only
-- [ ] Copy profile layout, cards, and form elements
-- [ ] Create our own ProfileController connected to Firebase
-- [ ] Implement profile image upload with Supabase storage
-- [ ] Connect UI to our data models and controllers
-- [ ] Test with Firebase backend
+- [x] Extract customer profile screen UI only
+- [x] Copy profile layout, cards, and form elements
+- [x] Create our own ProfileController connected to Firebase
+- [x] Implement profile image upload with Supabase storage
+- [x] Connect UI to our data models and controllers
+- [x] Test with Firebase backend
 
 #### Company Profile Screen
-- [ ] Extract company profile screen UI only
-- [ ] Copy company profile layout and design elements
-- [ ] Create our own CompanyProfileController connected to Firebase
-- [ ] Implement company logo upload with Supabase storage
-- [ ] Connect UI to our data models and controllers
-- [ ] Test with Firebase backend
+- [x] Extract company profile screen UI only
+- [x] Copy company profile layout and design elements
+- [x] Create our own CompanyProfileController connected to Firebase
+- [x] Implement company logo upload with Supabase storage
+- [x] Connect UI to our data models and controllers
+- [x] Test with Firebase backend
 
 ### 3. Job Details Screen
 

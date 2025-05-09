@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 
 /// A shimmer effect widget for loading states
@@ -20,28 +19,61 @@ class ShimmerWidget extends StatelessWidget {
     this.radius,
     this.child,
     this.margin,
-  });
+  })  : isCircular = false,
+        borderRadius = 0;
+
+  /// Creates a rectangular shimmer widget
+  const ShimmerWidget.rectangular({
+    required this.width,
+    required this.height,
+    this.borderRadius = 0,
+    super.key,
+    this.margin,
+  })  : isCircular = false,
+        radius = borderRadius,
+        child = null;
+
+  /// Creates a circular shimmer widget
+  const ShimmerWidget.circular({
+    required this.width,
+    required this.height,
+    super.key,
+    this.margin,
+  })  : isCircular = true,
+        radius = null,
+        borderRadius = 0,
+        child = null;
 
   final double width;
   final double height;
   final double? radius;
   final Widget? child;
   final EdgeInsetsGeometry? margin;
+  final bool isCircular;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final baseColor = theme.brightness == Brightness.light
+        ? Colors.grey.shade300
+        : Colors.grey.shade700;
+    final highlightColor = theme.brightness == Brightness.light
+        ? Colors.grey.shade100
+        : Colors.grey.shade500;
 
     return Shimmer.fromColors(
-      baseColor: theme.primaryColor.withAlpha((0.38 * 255).toInt()),
-      highlightColor: theme.colorScheme.surface,
+      baseColor: baseColor,
+      highlightColor: highlightColor,
       child: Container(
         width: width,
         height: height,
         margin: margin ?? EdgeInsets.zero,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(radius ?? 14.r),
-          color: theme.primaryColor.withAlpha((0.38 * 255).toInt()),
+          borderRadius:
+              isCircular ? null : BorderRadius.circular(radius ?? borderRadius),
+          shape: isCircular ? BoxShape.circle : BoxShape.rectangle,
+          color: Colors.white,
         ),
         child: child,
       ),

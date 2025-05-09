@@ -14,6 +14,8 @@ abstract class Routes {
   static const jobs = _Paths.jobs;
   static const resume = _Paths.resume;
   static const profile = _Paths.profile;
+  static const customerProfile = _Paths.customerProfile;
+  static const companyProfile = _Paths.companyProfile;
   static const search = _Paths.search;
   static const showcase = _Paths.showcase;
 }
@@ -31,6 +33,8 @@ abstract class _Paths {
   static const jobs = '/jobs';
   static const resume = '/resume';
   static const profile = '/profile';
+  static const customerProfile = '/customer-profile';
+  static const companyProfile = '/company-profile';
   static const search = '/search';
   static const showcase = '/showcase';
 }

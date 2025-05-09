@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neopop/neopop.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/auth/views/widgets/edit_profile_dialog.dart';
+import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
@@ -164,11 +166,10 @@ class _ProfileViewState extends State<ProfileView> {
               NeoPopButton(
                 color: AppTheme.electricBlue,
                 onTapUp: () {
-                  // TODO(auth): Implement edit profile functionality
-                  Get.snackbar(
-                    'Coming Soon',
-                    'Edit profile functionality will be available soon!',
-                    snackPosition: SnackPosition.BOTTOM,
+                  // Show edit profile dialog
+                  Get.dialog<void>(
+                    EditProfileDialog(user: user),
+                    barrierDismissible: false,
                   );
                 },
                 onTapDown: () => {},
@@ -177,6 +178,54 @@ class _ProfileViewState extends State<ProfileView> {
                   child: Center(
                     child: Text(
                       'EDIT PROFILE',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Enhanced Profile Button
+              NeoPopButton(
+                color: const Color.fromARGB(204, 0, 122, 255), // 80% opacity
+                onTapUp: () {
+                  // Navigate to customer profile
+                  Get.toNamed<dynamic>(Routes.customerProfile);
+                },
+                onTapDown: () => {},
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  child: Center(
+                    child: Text(
+                      'ENHANCED PROFILE',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Company Profile Button
+              NeoPopButton(
+                color: const Color.fromARGB(153, 0, 122, 255), // 60% opacity
+                onTapUp: () {
+                  // Navigate to company profile
+                  Get.toNamed<dynamic>(Routes.companyProfile);
+                },
+                onTapDown: () => {},
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  child: Center(
+                    child: Text(
+                      'COMPANY PROFILE',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

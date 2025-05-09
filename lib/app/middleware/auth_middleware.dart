@@ -53,6 +53,8 @@ class AuthMiddleware extends GetMiddleware {
         Routes.jobs,
         Routes.resume,
         Routes.profile,
+        Routes.customerProfile,
+        Routes.companyProfile,
         Routes.search,
       ];
 
@@ -78,6 +80,8 @@ class AuthMiddleware extends GetMiddleware {
       Routes.jobs,
       Routes.resume,
       Routes.profile,
+      Routes.customerProfile,
+      Routes.companyProfile,
       Routes.search,
     ];
 

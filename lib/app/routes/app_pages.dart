@@ -8,6 +8,10 @@ import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/profile_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
+import 'package:next_gen/app/modules/company_profile/bindings/company_profile_binding.dart';
+import 'package:next_gen/app/modules/company_profile/views/company_profile_view.dart';
+import 'package:next_gen/app/modules/customer_profile/bindings/customer_profile_binding.dart';
+import 'package:next_gen/app/modules/customer_profile/views/customer_profile_view.dart';
 import 'package:next_gen/app/modules/dashboard/bindings/dashboard_binding.dart';
 import 'package:next_gen/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
@@ -107,6 +111,20 @@ class AppPages {
       name: _Paths.profile,
       page: () => const ProfileView(),
       bindings: [AuthBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.customerProfile,
+      page: () => const CustomerProfileView(),
+      bindings: [CustomerProfileBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.companyProfile,
+      page: () => const CompanyProfileView(),
+      bindings: [CompanyProfileBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
