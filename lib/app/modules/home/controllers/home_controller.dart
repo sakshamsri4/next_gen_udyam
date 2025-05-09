@@ -179,7 +179,8 @@ class HomeController extends GetxController {
     }
   }
 
-  /// Update selected category
+  /// Update selected category (for backward compatibility)
+  // ignore: use_setters_to_change_properties
   void updateSelectedCategory(String category) {
     selectedCategory = category;
   }
