@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Extension on ThemeData to provide backward compatibility for deprecated properties
-/// and ensure consistent theme access across the app
+/// Extension on ThemeData to provide backward compatibility for deprecated
+/// properties and ensure consistent theme access across the app
 extension ThemeDataExtensions on ThemeData {
   /// Replacement for the deprecated backgroundColor property
   Color get backgroundColor => colorScheme.surface;
@@ -10,8 +10,8 @@ extension ThemeDataExtensions on ThemeData {
   Color get errorColor => colorScheme.error;
 }
 
-/// Extension on ColorScheme to provide backward compatibility for deprecated properties
-/// and ensure consistent color access across the app
+/// Extension on ColorScheme to provide backward compatibility for deprecated
+/// properties and ensure consistent color access across the app
 extension ColorSchemeExtensions on ColorScheme {
   /// Replacement for the deprecated background property
   Color get background => surface;
@@ -20,8 +20,8 @@ extension ColorSchemeExtensions on ColorScheme {
   Color get onBackground => onSurface;
 }
 
-/// Extension on TextTheme to provide backward compatibility for deprecated properties
-/// and ensure consistent typography access across the app
+/// Extension on TextTheme to provide backward compatibility for deprecated
+/// properties and ensure consistent typography access across the app
 extension TextThemeExtensions on TextTheme {
   /// Replacement for the deprecated headline6 property
   TextStyle? get headline6 => titleLarge;
