@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
-
+import 'package:next_gen/ui/components/avatars/custom_avatar.dart';
 import 'package:next_gen/ui/components/buttons/cred_button.dart';
 import 'package:next_gen/ui/components/cards/custom_info_card.dart';
 import 'package:next_gen/ui/components/cards/custom_tag.dart';
 import 'package:next_gen/ui/components/fields/custom_text_field.dart';
-import 'package:next_gen/ui/components/avatars/custom_avatar.dart';
 
 /// A showcase screen for CRED-styled components
 ///
@@ -32,7 +31,7 @@ class CredComponentsShowcase extends StatelessWidget {
           children: [
             _buildSectionTitle('Buttons', theme),
             SizedBox(height: 16.h),
-            
+
             // Primary Button
             CredButton.primary(
               title: 'Primary Button',
@@ -43,10 +42,9 @@ class CredComponentsShowcase extends StatelessWidget {
                   snackPosition: SnackPosition.BOTTOM,
                 );
               },
-              icon: HeroIcons.bolt,
             ),
             SizedBox(height: 16.h),
-            
+
             // Secondary Button
             CredButton.secondary(
               title: 'Secondary Button',
@@ -59,7 +57,7 @@ class CredComponentsShowcase extends StatelessWidget {
               },
             ),
             SizedBox(height: 16.h),
-            
+
             // Success Button
             CredButton.success(
               title: 'Success Button',
@@ -70,10 +68,9 @@ class CredComponentsShowcase extends StatelessWidget {
                   snackPosition: SnackPosition.BOTTOM,
                 );
               },
-              icon: HeroIcons.check,
             ),
             SizedBox(height: 16.h),
-            
+
             // Danger Button
             CredButton.danger(
               title: 'Danger Button',
@@ -84,10 +81,9 @@ class CredComponentsShowcase extends StatelessWidget {
                   snackPosition: SnackPosition.BOTTOM,
                 );
               },
-              icon: HeroIcons.exclamationTriangle,
             ),
             SizedBox(height: 16.h),
-            
+
             // Outline Button
             CredButton.outline(
               title: 'Outline Button',
@@ -100,18 +96,18 @@ class CredComponentsShowcase extends StatelessWidget {
               },
             ),
             SizedBox(height: 16.h),
-            
+
             // Loading Button
             CredButton.primary(
               title: 'Loading Button',
               onTap: () {},
               isLoading: true,
             ),
-            
+
             SizedBox(height: 32.h),
             _buildSectionTitle('Cards', theme),
             SizedBox(height: 16.h),
-            
+
             // Info Card
             CustomInfoCard(
               icon: HeroIcons.briefcase,
@@ -135,7 +131,9 @@ class CredComponentsShowcase extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'We are looking for a senior Flutter developer to join our team. The ideal candidate will have experience building high-quality mobile applications with Flutter.',
+                    'We are looking for a senior Flutter developer to join our team. '
+                    'The ideal candidate will have experience building high-quality '
+                    'mobile applications with Flutter.',
                     style: theme.textTheme.bodyMedium,
                   ),
                   SizedBox(height: 16.h),
@@ -146,25 +144,31 @@ class CredComponentsShowcase extends StatelessWidget {
                       CustomTag(
                         icon: HeroIcons.briefcase,
                         title: 'Remote',
+                        backgroundColor: theme.colorScheme.surface,
+                        titleColor: theme.colorScheme.secondary,
                       ),
                       CustomTag(
                         icon: HeroIcons.clock,
                         title: 'Full-time',
+                        backgroundColor: theme.colorScheme.surface,
+                        titleColor: theme.colorScheme.secondary,
                       ),
                       CustomTag(
                         icon: HeroIcons.currencyDollar,
-                        title: '\$100k-\$150k',
+                        title: r'$100k-$150k',
+                        backgroundColor: theme.colorScheme.surface,
+                        titleColor: theme.colorScheme.secondary,
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            
+
             SizedBox(height: 32.h),
             _buildSectionTitle('Text Fields', theme),
             SizedBox(height: 16.h),
-            
+
             // Regular Text Field
             const CustomTextField(
               title: 'Email',
@@ -172,7 +176,7 @@ class CredComponentsShowcase extends StatelessWidget {
               isRequired: true,
             ),
             SizedBox(height: 16.h),
-            
+
             // Password Text Field
             const CustomTextField(
               title: 'Password',
@@ -181,11 +185,11 @@ class CredComponentsShowcase extends StatelessWidget {
               obscureText: true,
               suffixIcon: HeroIcons.eye,
             ),
-            
+
             SizedBox(height: 32.h),
             _buildSectionTitle('Avatars', theme),
             SizedBox(height: 16.h),
-            
+
             // Avatars
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -204,7 +208,7 @@ class CredComponentsShowcase extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             SizedBox(height: 32.h),
           ],
         ),
