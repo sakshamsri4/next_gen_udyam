@@ -20,8 +20,9 @@ import 'package:next_gen/app/modules/resume/bindings/resume_binding.dart';
 import 'package:next_gen/app/modules/resume/views/resume_view.dart';
 import 'package:next_gen/app/modules/search/bindings/search_binding.dart';
 import 'package:next_gen/app/modules/search/views/search_view.dart';
+import 'package:next_gen/app/modules/showcase/bindings/showcase_binding.dart';
+import 'package:next_gen/app/modules/showcase/views/showcase_view.dart';
 import 'package:next_gen/app/shared/bindings/navigation_binding.dart';
-import 'package:next_gen/ui/components/showcase/cred_components_showcase.dart';
 
 part 'app_routes.dart';
 
@@ -116,7 +117,8 @@ class AppPages {
     ),
     GetPage<dynamic>(
       name: _Paths.showcase,
-      page: () => const CredComponentsShowcase(),
+      page: () => const ShowcaseView(),
+      binding: ShowcaseBinding(),
       transition: Transition.fadeIn,
       middlewares: [AuthMiddleware(), OnboardingMiddleware()],
     ),
