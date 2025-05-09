@@ -88,14 +88,14 @@ class FeaturedJobs extends GetWidget<HomeController> {
                   arguments: job.id,
                 ),
                 onActionTap: (isSaved) =>
-                    controller.toggleSaveJob(isSaved, job.id),
+                    controller.toggleSaveJob(isSaved: isSaved, jobId: job.id),
               );
             },
             options: CarouselOptions(
               height: 170.h,
               viewportFraction: 1,
               onPageChanged: (index, reason) =>
-                  controller.updateCarouselIndex(index),
+                  controller.carouselIndex = index,
               autoPlay: true,
               autoPlayInterval: const Duration(seconds: 5),
             ),

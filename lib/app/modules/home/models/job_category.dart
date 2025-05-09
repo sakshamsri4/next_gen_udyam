@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 /// Model class for job categories
+@immutable
 class JobCategory {
   /// Constructor
-  JobCategory({
+  const JobCategory({
     required this.id,
     required this.title,
     this.count = 0,
@@ -21,7 +23,7 @@ class JobCategory {
 
   /// Factory constructor for "All" category
   factory JobCategory.all() {
-    return JobCategory(
+    return const JobCategory(
       id: 'all',
       title: 'All',
     );
