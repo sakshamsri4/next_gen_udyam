@@ -174,13 +174,16 @@ class HomeController extends GetxController {
   /// Update selected category
   void updateSelectedCategory(String category) {
     if (_selectedCategory.value != category) {
-      selectedCategory = category;
+      _selectedCategory.value = category;
       _loadRecentJobs();
     }
   }
 
   /// Set selected category
-  set selectedCategory(String value) => _selectedCategory.value = value;
+  set selectedCategory(String value) {
+    _selectedCategory.value = value;
+    _loadRecentJobs();
+  }
 
   /// Update carousel index
   set carouselIndex(int value) => _carouselIndex.value = value;
