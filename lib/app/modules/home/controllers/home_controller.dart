@@ -168,15 +168,18 @@ class HomeController extends GetxController {
   /// Update selected category
   void updateSelectedCategory(String category) {
     if (_selectedCategory.value != category) {
-      _selectedCategory.value = category;
+      selectedCategory = category;
       _loadRecentJobs();
     }
   }
 
+  /// Set selected category
+  set selectedCategory(String value) => _selectedCategory.value = value;
+
   /// Update carousel index
-  void updateCarouselIndex(int index) {
-    _carouselIndex.value = index;
-  }
+  set carouselIndex(int value) => _carouselIndex.value = value;
+
+  // Method removed as we're using the setter directly
 
   /// Check if a job is saved
   bool isJobSaved(String jobId) {
@@ -184,7 +187,10 @@ class HomeController extends GetxController {
   }
 
   /// Toggle job saved state
-  Future<bool> toggleSaveJob(bool isSaved, String jobId) async {
+  Future<bool> toggleSaveJob({
+    required bool isSaved,
+    required String jobId,
+  }) async {
     try {
       if (!_authController.isLoggedIn) {
         Get.snackbar(
@@ -198,7 +204,11 @@ class HomeController extends GetxController {
       final userId = _authController.user.value?.uid ?? '';
       if (userId.isEmpty) return isSaved;
 
-      final result = await _jobService.toggleSaveJob(userId, jobId, isSaved);
+      final result = await _jobService.toggleSaveJob(
+        userId: userId,
+        jobId: jobId,
+        isSaved: isSaved,
+      );
 
       // Update local saved jobs list
       if (result) {

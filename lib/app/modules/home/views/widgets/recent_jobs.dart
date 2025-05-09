@@ -73,7 +73,7 @@ class RecentJobs extends GetWidget<HomeController> {
                   arguments: job.company,
                 ),
                 onActionTap: (isSaved) =>
-                    controller.toggleSaveJob(isSaved, job.id),
+                    controller.toggleSaveJob(isSaved: isSaved, jobId: job.id),
               );
             },
           );

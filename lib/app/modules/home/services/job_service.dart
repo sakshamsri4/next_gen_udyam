@@ -39,17 +39,19 @@ class JobService {
   Future<List<JobModel>> getRecentJobs({String? category}) async {
     try {
       _logger.i('Fetching recent jobs with category: $category');
-      Query query = _firestore
+
+      // Create base query
+      final query = _firestore
           .collection('jobs')
           .where('isActive', isEqualTo: true)
           .orderBy('postedDate', descending: true);
 
       // Apply category filter if provided and not "All"
-      if (category != null && category != 'All') {
-        query = query.where('jobType', isEqualTo: category);
-      }
+      final filteredQuery = (category != null && category != 'All')
+          ? query.where('jobType', isEqualTo: category)
+          : query;
 
-      final snapshot = await query.limit(10).get();
+      final snapshot = await filteredQuery.limit(10).get();
       return snapshot.docs.map(JobModel.fromFirestore).toList();
     } catch (e) {
       _logger.e('Error fetching recent jobs', e);
@@ -63,13 +65,11 @@ class JobService {
       _logger.i('Fetching job categories');
       final snapshot = await _firestore.collection('jobCategories').get();
 
-      // Create list with "All" category first
-      final categories = [JobCategory.all()];
-
-      // Add other categories
-      categories.addAll(snapshot.docs.map(JobCategory.fromFirestore));
-
-      return categories;
+      // Create list with "All" category first, then add other categories
+      return [
+        JobCategory.all(),
+        ...snapshot.docs.map(JobCategory.fromFirestore),
+      ];
     } catch (e) {
       _logger.e('Error fetching job categories', e);
       rethrow;
@@ -77,7 +77,11 @@ class JobService {
   }
 
   /// Save or unsave a job
-  Future<bool> toggleSaveJob(String userId, String jobId, bool isSaved) async {
+  Future<bool> toggleSaveJob({
+    required String userId,
+    required String jobId,
+    required bool isSaved,
+  }) async {
     try {
       _logger.i(
         '${isSaved ? "Unsaving" : "Saving"} job: $jobId for user: $userId',
