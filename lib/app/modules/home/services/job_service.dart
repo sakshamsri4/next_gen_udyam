@@ -130,4 +130,22 @@ class JobService {
       return [];
     }
   }
+
+  /// Get job by ID
+  Future<JobModel?> getJobById(String jobId) async {
+    try {
+      _logger.i('Fetching job details for job: $jobId');
+      final doc = await _firestore.collection('jobs').doc(jobId).get();
+
+      if (!doc.exists) {
+        _logger.w('Job not found: $jobId');
+        return null;
+      }
+
+      return JobModel.fromFirestore(doc);
+    } catch (e) {
+      _logger.e('Error fetching job details', e);
+      rethrow;
+    }
+  }
 }

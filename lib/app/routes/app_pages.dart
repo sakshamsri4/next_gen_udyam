@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-
 import 'package:next_gen/app/middleware/auth_middleware.dart';
 import 'package:next_gen/app/middleware/onboarding_middleware.dart';
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';
@@ -24,6 +23,8 @@ import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
 import 'package:next_gen/app/modules/resume/bindings/resume_binding.dart';
 import 'package:next_gen/app/modules/resume/views/resume_view.dart';
+import 'package:next_gen/app/modules/saved_jobs/bindings/saved_jobs_binding.dart';
+import 'package:next_gen/app/modules/saved_jobs/views/saved_jobs_view.dart';
 import 'package:next_gen/app/modules/search/bindings/search_binding.dart';
 import 'package:next_gen/app/modules/search/views/search_view.dart';
 import 'package:next_gen/app/modules/showcase/bindings/showcase_binding.dart';
@@ -141,6 +142,13 @@ class AppPages {
       binding: ShowcaseBinding(),
       transition: Transition.fadeIn,
       middlewares: [AuthMiddleware(), OnboardingMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.savedJobs,
+      page: () => const SavedJobsView(),
+      bindings: [SavedJobsBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
   ];
 }

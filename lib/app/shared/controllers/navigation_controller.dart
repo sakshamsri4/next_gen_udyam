@@ -13,7 +13,8 @@ class NavigationController extends GetxController {
   // List of routes corresponding to each tab
   final List<String> _routes = [
     Routes.dashboard,
-    Routes.jobs,
+    Routes.search,
+    Routes.savedJobs,
     Routes.resume,
     Routes.profile,
   ];
