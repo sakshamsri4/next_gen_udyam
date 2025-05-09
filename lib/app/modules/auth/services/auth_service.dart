@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
+import 'package:next_gen/app/modules/auth/models/user_role.dart';
 import 'package:next_gen/core/di/service_locator.dart';
 // Analytics service commented out for now, will be implemented later
 // import 'package:next_gen/core/services/analytics_service.dart';
@@ -352,6 +353,34 @@ class AuthService {
       }
     } catch (e, stackTrace) {
       _logger.e('Failed to update user profile', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  // Update user role
+  Future<void> updateUserRole(UserRole role) async {
+    _logger.i('Attempting to update user role to: ${role.name}');
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        // Get current user model from Hive or create a new one
+        var userModel = await getUserFromHive();
+        userModel ??= UserModel.fromFirebaseUser(user);
+
+        // Update the role
+        final updatedUserModel = userModel.copyWith(role: role);
+
+        // Save to Hive
+        await _saveUserToHive(updatedUserModel);
+        _logger
+          ..d('User role updated to ${role.name} and saved to local storage')
+          // TODO(dev): Save user role to Firestore in future implementation
+          ..i('User role updated successfully');
+      } else {
+        throw Exception('No user logged in');
+      }
+    } catch (e, stackTrace) {
+      _logger.e('Failed to update user role', e, stackTrace);
       rethrow;
     }
   }

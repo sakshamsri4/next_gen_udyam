@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:next_gen/app/modules/auth/models/user_role.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/services/logger_service.dart';
@@ -31,8 +32,12 @@ class AuthController extends GetxController {
   final isLoading = false.obs;
   final isResetLoading = false.obs;
   final isSignOutLoading = false.obs;
+  final isRoleSelectionLoading = false.obs;
   final isPasswordVisible = false.obs;
   final isConfirmPasswordVisible = false.obs;
+
+  // Role selection
+  final Rx<UserRole?> selectedRole = Rx<UserRole?>(null);
 
   // Button state
   final isLoginButtonEnabled = false.obs;
@@ -393,13 +398,13 @@ class AuthController extends GetxController {
       passwordController.clear();
       confirmPasswordController.clear();
 
-      // Navigate to dashboard
-      log.d('Navigating to dashboard screen');
-      await Get.offAllNamed<dynamic>(Routes.dashboard);
+      // Navigate to role selection screen
+      log.d('Navigating to role selection screen');
+      await Get.offAllNamed<dynamic>(Routes.roleSelection);
 
       Get.snackbar(
         'Success',
-        'Account created successfully!',
+        'Account created successfully! Please select your role.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
@@ -547,11 +552,28 @@ class AuthController extends GetxController {
         return;
       }
 
-      log
-        ..i('Google sign-in successful for user: ${userCredential.user?.uid}')
-        // Navigate to dashboard
-        ..d('Navigating to dashboard screen');
-      await Get.offAllNamed<dynamic>(Routes.dashboard);
+      log.i('Google sign-in successful for user: ${userCredential.user?.uid}');
+
+      // Check if this is a new user (first time sign in)
+      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+
+      if (isNewUser) {
+        // For new users, navigate to role selection
+        log.d('New user detected, navigating to role selection screen');
+        await Get.offAllNamed<dynamic>(Routes.roleSelection);
+
+        Get.snackbar(
+          'Welcome!',
+          'Please select your role to continue.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        // For existing users, navigate to dashboard
+        log.d('Existing user, navigating to dashboard screen');
+        await Get.offAllNamed<dynamic>(Routes.dashboard);
+      }
     } on FirebaseAuthException catch (e, stackTrace) {
       log.e('Firebase Auth Exception during Google sign-in', e, stackTrace);
 
@@ -601,7 +623,79 @@ class AuthController extends GetxController {
     isLoading.value = false;
     isResetLoading.value = false;
     isSignOutLoading.value = false;
+    isRoleSelectionLoading.value = false;
+    selectedRole.value = null;
     log.d('All loading states reset');
+  }
+
+  // Role selection methods
+  void selectUserRole(UserRole? role) {
+    if (role == null) {
+      log.d('User deselected role');
+      selectedRole.value = null;
+      return;
+    }
+
+    log.d('User selected role: ${role.name}');
+    selectedRole.value = role;
+  }
+
+  Future<void> confirmRoleSelection() async {
+    if (selectedRole.value == null) {
+      log.d('No role selected, cannot proceed');
+      return;
+    }
+
+    try {
+      log.i('Confirming role selection: ${selectedRole.value?.name}');
+      isRoleSelectionLoading.value = true;
+
+      // Get the auth service
+      AuthService? authService;
+      try {
+        authService = Get.find<AuthService>();
+      } catch (e) {
+        log.e('AuthService not found, cannot proceed with role selection', e);
+        Get.snackbar(
+          'Error',
+          'Internal error: Authentication service not available. '
+              'Please try again later.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        isRoleSelectionLoading.value = false;
+        return;
+      }
+
+      // Update user role in Firestore and Hive
+      await authService.updateUserRole(selectedRole.value!);
+
+      log
+        ..i('User role updated successfully')
+        ..d('Navigating to dashboard screen');
+
+      await Get.offAllNamed<dynamic>(Routes.dashboard);
+
+      Get.snackbar(
+        'Success',
+        'Your profile has been set up successfully!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e, stackTrace) {
+      log.e('Error confirming role selection', e, stackTrace);
+      Get.snackbar(
+        'Error',
+        'Failed to update your profile. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isRoleSelectionLoading.value = false;
+    }
   }
 
   Future<void> signOut() async {

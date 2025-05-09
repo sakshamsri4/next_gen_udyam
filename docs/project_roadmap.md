@@ -3,6 +3,8 @@
 ## Project Overview
 This roadmap outlines the step-by-step implementation plan for the Next Gen Job Portal Flutter app using GetX for state management, NeoPOP UI library for CRED-inspired design, and Firebase for backend services. The app will be structured as a modular monorepo using Melos, with a focus on rapid development and responsive UI.
 
+The app is an automobile sector-focused job portal that connects employers and job seekers. It features role-based access (employer, employee, admin), company profiles, job posting and application functionality, and a comprehensive admin dashboard for platform management.
+
 ## Development Approach
 - **Rapid Development**: Focus on building features quickly with minimal testing overhead
 - **CRED Design System**: Implement NeoPOP UI components following CRED design principles
@@ -414,16 +416,102 @@ dependencies:
 - Resume management interface with NeoPOP styling
 - Responsive UI that works well on mobile and web
 
-### 11. Job Feed Module (3-4 days)
+### 11. User Role Management Module (2-3 days) ✅
 
 **Tasks:**
-1. Create JobModel with serialization
-2. Implement JobController with Firestore
-3. Create responsive job list page with custom job cards
-4. Implement adaptive job detail page
-5. Add search and filtering functionality
-6. Implement animations for list and transitions
+1. Create UserRole enum and update UserModel ✅
+2. Update authentication flow to include role selection ✅
+3. Implement role-based navigation and access control
+4. Create role-specific home screens and redirects
+5. Update profile view to display role information
+6. Implement role-based middleware for route protection
 7. Ensure cross-platform compatibility
+
+**Implementation Details:**
+```bash
+# Update Auth module
+getx generate model user_role --on=auth
+```
+
+**Dependencies:**
+```yaml
+dependencies:
+  cloud_firestore: ^4.4.5
+  get: ^4.6.5
+  neopop: ^1.0.2
+  responsive_builder: ^0.7.0
+```
+
+**UI Components:**
+- Role selection during signup with NeoPOP styling
+- Role-specific navigation items and home screens
+- Role information display in profile view
+- Role-based access control for protected routes
+- Adaptive layouts for different screen sizes
+
+**Deliverables:**
+- Complete role-based user management system
+- Role-specific navigation and access control
+- Enhanced signup flow with role selection
+- Responsive UI that works well on mobile and web
+
+### 12. Company Profile Module (3-4 days)
+
+**Tasks:**
+1. Create CompanyModel with serialization
+2. Implement CompanyController with Firestore
+3. Create responsive company profile creation/edit screens
+4. Implement company logo upload with Firebase Storage
+5. Add company verification process
+6. Create company dashboard with statistics
+7. Implement public company profile view
+8. Ensure cross-platform compatibility
+
+**Implementation Details:**
+```bash
+# Scaffold Company module
+getx create module:company
+```
+
+**Dependencies:**
+```yaml
+dependencies:
+  cloud_firestore: ^4.4.5
+  firebase_storage: ^11.0.0
+  get: ^4.6.5
+  neopop: ^1.0.2
+  responsive_builder: ^0.7.0
+  image_picker: ^0.8.6
+  cached_network_image: ^3.3.0
+```
+
+**UI Components:**
+- Responsive company profile form with NeoPOP styling
+- Company logo upload with preview
+- Company dashboard with statistics cards
+- Public company profile view with responsive layout
+- Verification badge for verified companies
+- Loading states with shimmer effect
+- Platform-specific UI optimizations
+
+**Deliverables:**
+- Complete company profile management system
+- Company verification process
+- Company dashboard with statistics
+- Public company profile view
+- Responsive UI that works well on mobile and web
+
+### 13. Job Posting Module (3-4 days)
+
+**Tasks:**
+1. Enhance JobModel with company reference and detailed fields
+2. Implement JobController with Firestore
+3. Create responsive job posting form with validation
+4. Implement job management interface for employers
+5. Add job status management (active, closed, draft)
+6. Create job analytics dashboard
+7. Implement job application tracking system
+8. Ensure cross-platform compatibility
 
 **Implementation Details:**
 ```bash
@@ -442,30 +530,78 @@ dependencies:
 ```
 
 **UI Components:**
-- Responsive job list with custom NeoPOP cards
-- Grid layout for larger screens, list for mobile
-- Adaptive job detail page with responsive layout
-- Search bar with filters optimized for different devices
-- Apply button with NeoPOP styling
+- Responsive job posting form with NeoPOP styling
+- Job management interface with status controls
+- Job analytics dashboard with charts
+- Application tracking interface with status updates
+- Adaptive layouts for different screen sizes
 - Loading states with shimmer effect
 - Platform-specific UI optimizations
 
 **Deliverables:**
-- Job feed with search and filtering
-- Job detail view with application functionality
-- NeoPOP styled job cards and buttons
+- Complete job posting and management system
+- Job analytics dashboard
+- Application tracking system
 - Responsive UI that works well on mobile and web
 
-### 12. Admin Panel Module (4-5 days)
+### 14. Employee Profile Module (2-3 days)
+
+**Tasks:**
+1. Create EmployeeProfileModel with professional details
+2. Implement ProfileController with Firestore
+3. Create responsive profile editing interface
+4. Implement resume/CV upload and management
+5. Create portfolio section
+6. Develop job application form
+7. Implement application history tracking
+8. Create job recommendations based on profile
+
+**Implementation Details:**
+```bash
+# Scaffold Profile module
+getx create module:profile
+```
+
+**Dependencies:**
+```yaml
+dependencies:
+  cloud_firestore: ^4.4.5
+  firebase_storage: ^11.0.0
+  get: ^4.6.5
+  neopop: ^1.0.2
+  responsive_builder: ^0.7.0
+  image_picker: ^0.8.6
+  file_picker: ^5.2.2
+```
+
+**UI Components:**
+- Responsive profile editing form with NeoPOP styling
+- Resume/CV upload with preview
+- Portfolio section with project showcase
+- Job application form with NeoPOP styling
+- Application history view with status tracking
+- Job recommendations section
+- Adaptive layouts for different screen sizes
+
+**Deliverables:**
+- Complete employee profile management system
+- Resume/CV upload and management
+- Portfolio showcase
+- Job application functionality
+- Application history tracking
+- Responsive UI that works well on mobile and web
+
+### 15. Admin Dashboard Module (4-5 days)
 
 **Tasks:**
 1. Implement AdminController with role-based access
 2. Create responsive admin dashboard with statistics
-3. Implement adaptive job management interface
-4. Create responsive user management interface
-5. Add data visualization components optimized for all devices
-6. Implement animations for charts and transitions
-7. Ensure cross-platform compatibility
+3. Implement user management interface
+4. Create content management for jobs and companies
+5. Add system settings interface
+6. Implement reporting and analytics dashboard
+7. Add data visualization components optimized for all devices
+8. Ensure cross-platform compatibility
 
 **Implementation Details:**
 ```bash
@@ -486,16 +622,20 @@ dependencies:
 
 **UI Components:**
 - Responsive dashboard with statistics cards
-- Adaptive job management interface (create, edit, delete)
-- Responsive user management interface with data tables
+- User management interface with role controls
+- Content management interface for jobs and companies
+- System settings interface with configuration options
 - Interactive charts and data visualization
 - NeoPOP styled admin controls
 - Sidebar navigation for desktop, bottom navigation for mobile
 - Platform-specific optimizations
 
 **Deliverables:**
-- Admin dashboard with statistics
-- Job and user management functionality
+- Admin dashboard with comprehensive statistics
+- User management with role controls
+- Content management for jobs and companies
+- System settings configuration
+- Reporting and analytics dashboard
 - NeoPOP styled admin interface
 - Responsive UI that works well on mobile and web
 
@@ -645,13 +785,15 @@ dependencies:
 8. Performance Optimization: 1-2 days
 9. Localization & Accessibility Enhancements: 1-2 days
 10. Resume Upload Module: 2-3 days
-11. Job Feed Module: 3-4 days
-12. Admin Panel Module: 4-5 days
-13. Notifications Module: 1-2 days
-14. Profile Module: 1-2 days
-15. Integration & Polishing: 2-3 days
+11. User Role Management Module: 2-3 days
+12. Company Profile Module: 3-4 days
+13. Job Posting Module: 3-4 days
+14. Employee Profile Module: 2-3 days
+15. Admin Dashboard Module: 4-5 days
+16. Notifications Module: 1-2 days
+17. Integration & Polishing: 2-3 days
 
-**Total Estimated Time**: 26-41 days (5-8 weeks)
+**Total Estimated Time**: 33-48 days (7-10 weeks)
 
 ## Git Workflow
 

@@ -23,6 +23,7 @@ class AppTheme {
 
   /// Secondary color palette
   static const Color slateGray = Color(0xFF6C757D);
+  static const Color darkGray = Color(0xFF495057); // Medium gray for text
   static const Color darkSlateGray =
       Color(0xFF343A40); // Darker slate for surfaces
   static const Color lavender = Color(0xFF7F5AF0);
