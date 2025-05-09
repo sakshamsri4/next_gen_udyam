@@ -14,6 +14,8 @@ import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
 import 'package:next_gen/app/modules/error/views/error_view.dart';
 import 'package:next_gen/app/modules/home/bindings/home_binding.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
+import 'package:next_gen/app/modules/job_details/bindings/job_details_binding.dart';
+import 'package:next_gen/app/modules/job_details/views/job_details_view.dart';
 import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
 import 'package:next_gen/app/modules/resume/bindings/resume_binding.dart';
@@ -86,11 +88,11 @@ class AppPages {
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
-    // Jobs route using SearchView for job search functionality
+    // Jobs route using JobDetailsView for job details
     GetPage<dynamic>(
       name: _Paths.jobs,
-      page: () => const SearchView(),
-      bindings: [SearchBinding(), NavigationBinding()],
+      page: () => const JobDetailsView(),
+      bindings: [JobDetailsBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
