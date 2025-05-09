@@ -171,18 +171,17 @@ class HomeController extends GetxController {
     }
   }
 
-  /// Update selected category
-  void updateSelectedCategory(String category) {
-    if (_selectedCategory.value != category) {
-      _selectedCategory.value = category;
+  /// Set selected category and reload jobs if category has changed
+  set selectedCategory(String value) {
+    if (_selectedCategory.value != value) {
+      _selectedCategory.value = value;
       _loadRecentJobs();
     }
   }
 
-  /// Set selected category
-  set selectedCategory(String value) {
-    _selectedCategory.value = value;
-    _loadRecentJobs();
+  /// Update selected category
+  void updateSelectedCategory(String category) {
+    selectedCategory = category;
   }
 
   /// Update carousel index
@@ -206,6 +205,10 @@ class HomeController extends GetxController {
           'Sign In Required',
           'Please sign in to save jobs',
           snackPosition: SnackPosition.BOTTOM,
+          mainButton: TextButton(
+            onPressed: () => Get.toNamed<dynamic>('/login'),
+            child: const Text('Sign In', style: TextStyle(color: Colors.white)),
+          ),
         );
         return isSaved;
       }
