@@ -196,7 +196,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
     try {
       final authService = Get.find<AuthService>();
       final authController = Get.find<AuthController>();
-      final storageService = Get.put(StorageService());
+      final storageService = Get.find<StorageService>();
       final logger = Get.find<LoggerService>();
 
       // Upload image if selected

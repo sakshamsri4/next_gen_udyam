@@ -19,6 +19,9 @@ abstract class Routes {
   static const search = _Paths.search;
   static const showcase = _Paths.showcase;
   static const savedJobs = _Paths.savedJobs;
+  static const settings = _Paths.settings;
+  static const support = _Paths.support;
+  static const about = _Paths.about;
 }
 
 abstract class _Paths {
@@ -39,4 +42,7 @@ abstract class _Paths {
   static const search = '/search';
   static const showcase = '/showcase';
   static const savedJobs = '/saved-jobs';
+  static const settings = '/settings';
+  static const support = '/support';
+  static const about = '/about';
 }

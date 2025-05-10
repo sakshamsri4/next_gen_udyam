@@ -64,11 +64,24 @@ class CompanyProfileController extends GetxController
       }
     });
 
-    // Get the current user
-    user.value = _authController.user.value;
+    // Keep user in sync with AuthController
+    user.bindStream(_authController.user.stream);
 
-    // Load the profile
-    _loadProfile();
+    // Listen for user changes and reload profile when user changes
+    ever(user, (User? newUser) {
+      if (newUser != null) {
+        _loadProfile();
+      } else {
+        // Clear profile when user is null (signed out)
+        profile.value = null;
+        jobs.clear();
+      }
+    });
+
+    // Initial load of the profile
+    if (user.value != null) {
+      _loadProfile();
+    }
   }
 
   @override
@@ -103,11 +116,21 @@ class CompanyProfileController extends GetxController
       } else {
         // Create a basic profile from the user data
         _logger.i('No profile found, creating a basic profile');
-        profile.value = CompanyProfileModel(
+        final tempProfile = CompanyProfileModel(
           uid: user.value!.uid,
           name: user.value!.displayName ?? 'Company',
           email: user.value!.email ?? '',
           logoURL: user.value!.photoURL,
+        );
+        profile.value = tempProfile;
+
+        // Persist the skeleton profile so that subsequent loads
+        // hit the fast-path.
+        await _profileService.updateCompanyProfile(
+          uid: tempProfile.uid,
+          name: tempProfile.name,
+          email: tempProfile.email,
+          logoURL: tempProfile.logoURL,
         );
       }
     } catch (e) {

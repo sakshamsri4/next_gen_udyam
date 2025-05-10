@@ -39,12 +39,12 @@ class DetailsSliverAppBar extends StatelessWidget {
       actions: [
         Obx(() {
           return CustomSaveButton(
-            isLiked: controller.hasUserApplied.value,
+            isLiked: controller.isJobSaved.value,
             onTap: controller.isSaveLoading.value
                 ? null
                 : ({required bool isLiked}) async {
                     await controller.toggleSaveJob();
-                    return !isLiked;
+                    return controller.isJobSaved.value;
                   },
             size: 24.w,
             color: isDarkMode ? Colors.white : Colors.black,

@@ -16,10 +16,17 @@ class CompanyProfileService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// The storage service for uploading company logos
-  final StorageService _storageService = Get.find<StorageService>();
+  late final StorageService _storageService;
 
   /// The logger service
-  final LoggerService _logger = Get.find<LoggerService>();
+  late final LoggerService _logger;
+
+  @override
+  void onInit() {
+    _storageService = Get.find<StorageService>();
+    _logger = Get.find<LoggerService>();
+    super.onInit();
+  }
 
   /// Get the current user's company profile
   Future<CompanyProfileModel?> getCurrentCompanyProfile() async {
@@ -88,10 +95,12 @@ class CompanyProfileService extends GetxService {
   }
 
   /// Create or update a company profile
+  ///
+  /// Only specified fields will be updated, allowing for partial updates
   Future<CompanyProfileModel?> updateCompanyProfile({
     required String uid,
-    required String name,
-    required String email,
+    String? name,
+    String? email,
     String? logoURL,
     String? website,
     String? description,
@@ -124,16 +133,22 @@ class CompanyProfileService extends GetxService {
       final existingProfile = await getCompanyProfileByUid(uid);
       final now = DateTime.now();
 
+      // If no existing profile and required fields are missing, we can't create a new one
+      if (existingProfile == null && (name == null || email == null)) {
+        _logger.e('Cannot create new profile without name and email');
+        throw Exception('Name and email are required to create a new profile');
+      }
+
       final updatedProfile = (existingProfile ??
               CompanyProfileModel(
                 uid: uid,
-                name: name,
-                email: email,
+                name: name!, // Safe to use ! here because of the check above
+                email: email!, // Safe to use ! here because of the check above
                 createdAt: now,
               ))
           .copyWith(
-        name: name,
-        email: email,
+        name: name ?? existingProfile?.name,
+        email: email ?? existingProfile?.email,
         logoURL: imageUrl,
         website: website,
         description: description,
@@ -144,12 +159,11 @@ class CompanyProfileService extends GetxService {
         socialLinks: socialLinks,
         updatedAt: now,
       );
-
       // Save to Firestore
-      await _firestore
-          .collection('company_profiles')
-          .doc(uid)
-          .set(updatedProfile.toMap());
+      await _firestore.collection('company_profiles').doc(uid).set(
+            updatedProfile.toMap(),
+            SetOptions(merge: true),
+          );
 
       _logger.i('Company profile updated successfully');
 
@@ -161,10 +175,15 @@ class CompanyProfileService extends GetxService {
   }
 
   /// Get all jobs posted by a company
+  ///
+  /// Note: This query requires a composite index on 'companyId' and 'postedDate'
+  /// If you encounter a FirebaseException about missing indexes, you need to create
+  /// this index in the Firebase console or follow the link in the error message.
   Future<List<Map<String, dynamic>>> getCompanyJobs(String companyUid) async {
     try {
       _logger.i('Getting jobs for company: $companyUid');
 
+      // This query requires a composite index on 'companyId' and 'postedDate'
       final querySnapshot = await _firestore
           .collection('jobs')
           .where('companyId', isEqualTo: companyUid)
@@ -182,8 +201,21 @@ class CompanyProfileService extends GetxService {
       _logger.i('Retrieved ${jobs.length} jobs for company');
       return jobs;
     } catch (e, stackTrace) {
-      _logger.e('Error getting company jobs', e, stackTrace);
-      return [];
+      // Check if this is a missing index error
+      if (e.toString().contains('FAILED_PRECONDITION') &&
+          e.toString().contains('index')) {
+        _logger.e(
+          'Missing Firestore index for company jobs query. '
+          'Please create a composite index on "companyId" and "postedDate".',
+          e,
+          stackTrace,
+        );
+        // Return empty list but with a special error message that can be shown to the user
+        return [];
+      } else {
+        _logger.e('Error getting company jobs', e, stackTrace);
+        return [];
+      }
     }
   }
 }

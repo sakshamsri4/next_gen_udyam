@@ -150,5 +150,26 @@ class AppPages {
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
+    // Settings page (placeholder)
+    GetPage<dynamic>(
+      name: _Paths.settings,
+      page: () => const ErrorView(message: 'Settings page coming soon'),
+      binding: ErrorBinding(),
+      transition: Transition.fadeIn,
+    ),
+    // Support page (placeholder)
+    GetPage<dynamic>(
+      name: _Paths.support,
+      page: () => const ErrorView(message: 'Support page coming soon'),
+      binding: ErrorBinding(),
+      transition: Transition.fadeIn,
+    ),
+    // About page (placeholder)
+    GetPage<dynamic>(
+      name: _Paths.about,
+      page: () => const ErrorView(message: 'About page coming soon'),
+      binding: ErrorBinding(),
+      transition: Transition.fadeIn,
+    ),
   ];
 }

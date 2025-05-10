@@ -44,7 +44,7 @@ class CustomDrawer extends StatelessWidget {
                     title: 'Home',
                     onTap: () {
                       navigationController.changeIndex(0);
-                      Get.back();
+                      Get.back<void>();
                     },
                     isSelected: navigationController.selectedIndex.value == 0,
                   ),
@@ -54,7 +54,7 @@ class CustomDrawer extends StatelessWidget {
                     title: 'Search',
                     onTap: () {
                       navigationController.changeIndex(1);
-                      Get.back();
+                      Get.back<void>();
                     },
                     isSelected: navigationController.selectedIndex.value == 1,
                   ),
@@ -64,7 +64,7 @@ class CustomDrawer extends StatelessWidget {
                     title: 'Saved Jobs',
                     onTap: () {
                       navigationController.changeIndex(2);
-                      Get.back();
+                      Get.back<void>();
                     },
                     isSelected: navigationController.selectedIndex.value == 2,
                   ),
@@ -74,7 +74,7 @@ class CustomDrawer extends StatelessWidget {
                     title: 'Resume',
                     onTap: () {
                       navigationController.changeIndex(3);
-                      Get.back();
+                      Get.back<void>();
                     },
                     isSelected: navigationController.selectedIndex.value == 3,
                   ),
@@ -84,7 +84,7 @@ class CustomDrawer extends StatelessWidget {
                     title: 'Profile',
                     onTap: () {
                       navigationController.changeIndex(4);
-                      Get.back();
+                      Get.back<void>();
                     },
                     isSelected: navigationController.selectedIndex.value == 4,
                   ),
@@ -98,7 +98,7 @@ class CustomDrawer extends StatelessWidget {
                     title: 'Settings',
                     onTap: () {
                       Get.toNamed<dynamic>(Routes.settings);
-                      Get.back();
+                      Get.back<void>();
                     },
                   ),
                   _buildNavItem(
@@ -107,7 +107,7 @@ class CustomDrawer extends StatelessWidget {
                     title: 'Help & Support',
                     onTap: () {
                       Get.toNamed<dynamic>(Routes.support);
-                      Get.back();
+                      Get.back<void>();
                     },
                   ),
                   _buildNavItem(
@@ -116,7 +116,7 @@ class CustomDrawer extends StatelessWidget {
                     title: 'About',
                     onTap: () {
                       Get.toNamed<dynamic>(Routes.about);
-                      Get.back();
+                      Get.back<void>();
                     },
                   ),
                 ],
@@ -151,7 +151,7 @@ class CustomDrawer extends StatelessWidget {
               alignment: Alignment.topRight,
               child: IconButton(
                 icon: const HeroIcon(HeroIcons.xMark),
-                onPressed: Get.back,
+                onPressed: () => Get.back<void>(),
               ),
             ),
 
@@ -165,7 +165,8 @@ class CustomDrawer extends StatelessWidget {
             else
               CircleAvatar(
                 radius: 40.r,
-                backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                backgroundColor:
+                    theme.colorScheme.primary.withValues(alpha: 0.1),
                 child: HeroIcon(
                   HeroIcons.user,
                   color: theme.colorScheme.primary,
@@ -195,7 +196,7 @@ class CustomDrawer extends StatelessWidget {
               Text(
                 user.email ?? '',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
           ],
@@ -218,7 +219,7 @@ class CustomDrawer extends StatelessWidget {
         icon,
         color: isSelected
             ? theme.colorScheme.primary
-            : theme.colorScheme.onSurface.withOpacity(0.7),
+            : theme.colorScheme.onSurface.withValues(alpha: 0.7),
         size: 20.r,
       ),
       title: Text(
@@ -232,7 +233,7 @@ class CustomDrawer extends StatelessWidget {
       ),
       onTap: onTap,
       selected: isSelected,
-      selectedTileColor: theme.colorScheme.primary.withOpacity(0.1),
+      selectedTileColor: theme.colorScheme.primary.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.r),
       ),
@@ -265,13 +266,13 @@ class CustomDrawer extends StatelessWidget {
           ),
         ),
         onTap: () async {
-          Get.back();
+          Get.back<void>();
           await authController.signOut();
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
           side: BorderSide(
-            color: theme.colorScheme.error.withOpacity(0.3),
+            color: theme.colorScheme.error.withValues(alpha: 0.3),
           ),
         ),
         contentPadding: EdgeInsets.symmetric(

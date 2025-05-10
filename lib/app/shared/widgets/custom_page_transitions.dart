@@ -84,9 +84,9 @@ class CustomPageTransitions {
   ) {
     const curve = Curves.easeInOutCubic;
     final scaleTween =
-        Tween(begin: 0.8, end: 1).chain(CurveTween(curve: curve));
+        Tween<double>(begin: 0.8, end: 1).chain(CurveTween(curve: curve));
     final opacityTween =
-        Tween(begin: 0, end: 1).chain(CurveTween(curve: curve));
+        Tween<double>(begin: 0, end: 1).chain(CurveTween(curve: curve));
 
     return ScaleTransition(
       scale: animation.drive(scaleTween),

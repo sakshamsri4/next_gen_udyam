@@ -115,4 +115,4 @@ app.*.map.json
 !.idea/runConfigurations/
 
 # Third-party libraries
-third_party_lib/
+/third_party_lib/

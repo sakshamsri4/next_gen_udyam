@@ -37,7 +37,7 @@ class SimilarJobCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -108,8 +108,8 @@ class SimilarJobCard extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isDarkMode
-                      ? AppTheme.neonGreen.withAlpha(51)
-                      : AppTheme.neonGreen.withAlpha(30),
+                      ? AppTheme.neonGreen.withValues(alpha: 51)
+                      : AppTheme.neonGreen.withValues(alpha: 30),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Text(
@@ -138,8 +138,8 @@ class SimilarJobCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isDarkMode
-                          ? AppTheme.electricBlue.withAlpha(51)
-                          : AppTheme.electricBlue.withAlpha(30),
+                          ? AppTheme.electricBlue.withValues(alpha: 51)
+                          : AppTheme.electricBlue.withValues(alpha: 30),
                       borderRadius: BorderRadius.circular(4.r),
                     ),
                     child: Text(
@@ -175,8 +175,8 @@ class SimilarJobCard extends StatelessWidget {
         height: 40.w,
         decoration: BoxDecoration(
           color: isDarkMode
-              ? AppTheme.electricBlue.withAlpha(51)
-              : AppTheme.electricBlue.withAlpha(30),
+              ? AppTheme.electricBlue.withValues(alpha: 51)
+              : AppTheme.electricBlue.withValues(alpha: 30),
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -203,7 +203,7 @@ class SimilarJobCard extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),

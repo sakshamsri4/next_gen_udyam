@@ -36,6 +36,7 @@ class JobDetailsController extends GetxController {
   final similarJobs = <JobModel>[].obs;
   final companyDetails = Rx<Map<String, dynamic>?>(null);
   final hasUserApplied = false.obs;
+  final isJobSaved = false.obs; // New flag to track if job is saved
   final errorMessage = ''.obs;
 
   @override
@@ -101,14 +102,20 @@ class JobDetailsController extends GetxController {
       );
       similarJobs.value = similar;
 
-      // Check if user has applied
+      // Check if user has applied and if job is saved
       if (_authController.isLoggedIn) {
         final userId = _authController.user.value?.uid;
         if (userId != null) {
+          // Check if user has applied for the job
           hasUserApplied.value = await _jobDetailsService.hasApplied(
             userId: userId,
             jobId: jobId,
           );
+
+          // Check if job is saved
+          final jobService = Get.find<JobService>();
+          final savedJobs = await jobService.getSavedJobs(userId);
+          isJobSaved.value = savedJobs.contains(jobId);
         }
       }
     } catch (e) {
@@ -218,27 +225,24 @@ class JobDetailsController extends GetxController {
         throw Exception('User ID not available');
       }
 
-      // Get current saved status
-      final isSaved = await _jobDetailsService.hasApplied(
-        userId: userId,
-        jobId: job.value!.id,
-      );
-
-      // Toggle saved status
+      // Toggle saved status using the current value from isJobSaved
       // Note: We're reusing the JobService from the home module
       final jobService = Get.find<JobService>();
-      await jobService.toggleSaveJob(
+      final result = await jobService.toggleSaveJob(
         userId: userId,
         jobId: job.value!.id,
-        isSaved: isSaved,
+        isSaved: isJobSaved.value,
       );
+
+      // Update the saved status
+      isJobSaved.value = result;
 
       // Show success message
       Get.snackbar(
-        isSaved ? 'Job Unsaved' : 'Job Saved',
-        isSaved
-            ? 'Job removed from your saved jobs'
-            : 'Job added to your saved jobs',
+        isJobSaved.value ? 'Job Saved' : 'Job Unsaved',
+        isJobSaved.value
+            ? 'Job added to your saved jobs'
+            : 'Job removed from your saved jobs',
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
