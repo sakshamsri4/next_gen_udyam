@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+
 import 'package:next_gen/app/middleware/auth_middleware.dart';
 import 'package:next_gen/app/middleware/onboarding_middleware.dart';
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';

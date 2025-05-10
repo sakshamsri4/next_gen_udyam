@@ -55,29 +55,21 @@ class JobDetailsView extends GetView<JobDetailsController> {
         }
 
         // Show job details
-        return Stack(
-          children: [
-            // Main content
-            CustomScrollView(
-              slivers: [
-                // App bar
-                DetailsSliverAppBar(job: controller.job.value!),
+        return Scaffold(
+          backgroundColor:
+              isDarkMode ? AppTheme.darkBackground : AppTheme.lightBackground,
+          body: CustomScrollView(
+            slivers: [
+              // App bar
+              DetailsSliverAppBar(job: controller.job.value!),
 
-                // Body
-                const SliverToBoxAdapter(
-                  child: JobDetailsBody(),
-                ),
-              ],
-            ),
-
-            // Bottom navigation bar
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: DetailsBottomNavBar(job: controller.job.value!),
-            ),
-          ],
+              // Body
+              const SliverToBoxAdapter(
+                child: JobDetailsBody(),
+              ),
+            ],
+          ),
+          bottomNavigationBar: DetailsBottomNavBar(job: controller.job.value!),
         );
       }),
     );

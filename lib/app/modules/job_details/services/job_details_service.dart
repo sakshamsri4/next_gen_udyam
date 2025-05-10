@@ -91,13 +91,30 @@ class JobDetailsService {
     try {
       _logger.i('Applying for job: $jobId by user: $userId');
 
+      // Validate and sanitize application data
+      final validFields = [
+        'name',
+        'email',
+        'phone',
+        'coverLetter',
+        'resume',
+        'jobTitle',
+        'company',
+      ];
+      final sanitizedData = <String, dynamic>{};
+      for (final field in validFields) {
+        if (applicationData.containsKey(field)) {
+          sanitizedData[field] = applicationData[field];
+        }
+      }
+
       // Create application document
       await _firestore.collection('applications').add({
         'userId': userId,
         'jobId': jobId,
         'status': 'pending',
         'appliedAt': FieldValue.serverTimestamp(),
-        ...applicationData,
+        ...sanitizedData,
       });
 
       // Update user's applications list

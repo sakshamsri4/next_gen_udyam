@@ -12,6 +12,12 @@ import 'package:next_gen/ui/components/avatars/custom_avatar.dart';
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
 
+  /// Get a non-empty photo URL or empty string
+  String _getNonEmptyPhotoUrl(AuthController authController) {
+    final photoURL = authController.user.value?.photoURL;
+    return (photoURL != null && photoURL.isNotEmpty) ? photoURL : '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -42,7 +48,7 @@ class HomeView extends GetView<HomeController> {
             child: Obx(
               () => authController.isLoggedIn
                   ? CustomAvatar(
-                      imageUrl: authController.user.value?.photoURL ?? '',
+                      imageUrl: _getNonEmptyPhotoUrl(authController),
                       height: 46.h,
                     )
                   : CircleAvatar(

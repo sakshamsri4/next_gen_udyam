@@ -89,6 +89,9 @@ class JobService {
 
       final userRef = _firestore.collection('users').doc(userId);
 
+      // Ensure the doc exists; merge keeps existing fields intact.
+      await userRef.set({'savedJobs': <String>[]}, SetOptions(merge: true));
+
       if (isSaved) {
         // Remove job from saved jobs
         await userRef.update({
@@ -116,6 +119,7 @@ class JobService {
       final userDoc = await _firestore.collection('users').doc(userId).get();
 
       if (!userDoc.exists) {
+        _logger.w('User document not found: $userId');
         return [];
       }
 
@@ -127,7 +131,7 @@ class JobService {
       return [];
     } catch (e) {
       _logger.e('Error fetching saved jobs', e);
-      return [];
+      rethrow;
     }
   }
 

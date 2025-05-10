@@ -17,6 +17,9 @@ class ApplyDialog extends StatelessWidget {
     super.key,
   });
 
+  /// Form key for validation
+  static final formKey = GlobalKey<FormState>();
+
   /// The job model
   final JobModel job;
 
@@ -61,6 +64,7 @@ class ApplyDialog extends StatelessWidget {
 
               // Application form
               Form(
+                key: formKey,
                 child: Column(
                   children: [
                     // Name field
@@ -156,7 +160,11 @@ class ApplyDialog extends StatelessWidget {
                           Expanded(
                             child: CustomButton.primary(
                               title: 'Apply',
-                              onTap: controller.applyForJob,
+                              onTap: () async {
+                                if (formKey.currentState!.validate()) {
+                                  await controller.applyForJob();
+                                }
+                              },
                             ),
                           ),
                         ],
