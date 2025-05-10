@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:intl/intl.dart';
 
+import 'package:next_gen/app/utils/date_formatter.dart';
 import 'package:next_gen/ui/components/avatars/custom_avatar.dart';
 import 'package:next_gen/ui/components/buttons/custom_save_button.dart';
 import 'package:next_gen/ui/components/cards/custom_tag.dart';
@@ -66,7 +66,7 @@ class CustomJobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final datetime = DateTime.parse(publishTime);
-    final strDate = DateFormat.yMMMMd().format(datetime);
+    final strDate = DateFormatter.formatStandardDate(datetime);
 
     final cardPadding = 20.w;
     final cardMarginH = 16.w;

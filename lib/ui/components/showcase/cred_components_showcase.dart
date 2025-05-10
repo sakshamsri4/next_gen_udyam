@@ -131,9 +131,9 @@ class CredComponentsShowcase extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'We are looking for a senior Flutter developer to join our team. '
-                    'The ideal candidate will have experience building high-quality '
-                    'mobile applications with Flutter.',
+                    'We are looking for a senior Flutter developer to join '
+                    'our team. The ideal candidate will have experience '
+                    'building high-quality mobile applications with Flutter.',
                     style: theme.textTheme.bodyMedium,
                   ),
                   SizedBox(height: 16.h),

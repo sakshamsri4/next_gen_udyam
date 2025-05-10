@@ -32,14 +32,31 @@ class CustomLottie extends StatelessWidget {
     this.descriptionStyle,
   });
 
+  /// The main title text to display
   final String title;
+
+  /// Optional additional description text
   final String? description;
+
+  /// Lottie animation asset path
   final String asset;
+
+  /// Whether the animation should repeat
   final bool repeat;
+
+  /// Callback when the try again button is tapped
   final void Function()? onTryAgain;
+
+  /// Height of the Lottie animation
   final double? assetHeight;
+
+  /// Padding around the component
   final EdgeInsetsGeometry? padding;
+
+  /// Style for the title text
   final TextStyle? titleStyle;
+
+  /// Style for the description text
   final TextStyle? descriptionStyle;
 
   @override

@@ -50,7 +50,7 @@ class CustomTag extends StatelessWidget {
           ),
           SizedBox(width: 5.w),
           Text(
-            title.capitalize!,
+            title.isNotEmpty ? title.capitalize! : '',
             style: GoogleFonts.poppins(
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,

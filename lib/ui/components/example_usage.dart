@@ -107,8 +107,8 @@ class ComponentExamples extends StatelessWidget {
               employmentType: 'Full-time',
               location: 'New York',
               actionIcon: HeroIcons.bookmark,
-              description:
-                  'We are looking for a senior Flutter developer to join our team.',
+              description: 'We are looking for a senior Flutter developer '
+                  'to join our team.',
               onActionTap: ({required bool isLiked}) async {
                 await Future<void>.delayed(const Duration(seconds: 1));
                 return !isLiked;

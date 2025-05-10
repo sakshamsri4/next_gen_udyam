@@ -43,10 +43,11 @@ class CustomSaveButtonState extends State<CustomSaveButton>
     with TickerProviderStateMixin {
   AnimationController? _controller;
 
+  /// Whether the item is saved/liked
   bool _isLiked = false;
 
-  /// Whether the item is saved/liked
-  bool? get isLiked => _isLiked;
+  /// Getter for the saved/liked state
+  bool get isLiked => _isLiked;
 
   /// Whether the button is in loading state
   bool isLoading = false;
@@ -80,7 +81,7 @@ class CustomSaveButtonState extends State<CustomSaveButton>
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       child: isLoading
           ? SizedBox(
               height: widget.size,
