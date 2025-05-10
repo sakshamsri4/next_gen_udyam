@@ -1,4 +1,4 @@
-# Third-Party Integration Todo List
+# Third-Party Integration To-do List
 
 ## Overview
 This document outlines the step-by-step process for extracting UI components and assets from the third-party JobsFlutterApp and integrating them into our existing Next Gen Job Portal application. We'll use our Firebase backend for data and Supabase for storage, while leveraging only the UI components and assets from the third-party app.
