@@ -163,6 +163,7 @@ class CustomTextField extends StatelessWidget {
                     )
                   : null,
             ),
+            // Custom validator for text field
             validator: validator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             autofocus: autofocus,
@@ -184,6 +185,13 @@ class CustomTextField extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
             onCountryChanged: onCountryChanged,
+            // Phone field has its own validator type
+            validator: (phone) {
+              if (validator != null && phone?.number != null) {
+                return validator!(phone!.number);
+              }
+              return null;
+            },
           ),
       ],
     );

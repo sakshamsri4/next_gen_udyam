@@ -123,8 +123,8 @@ class CompanyProfileService extends GetxService {
             uid,
           );
           _logger.i('Company logo uploaded: $imageUrl');
-        } catch (e) {
-          _logger.e('Error uploading company logo', e);
+        } catch (e, stackTrace) {
+          _logger.e('Error uploading company logo', e, stackTrace);
           // Continue with profile update even if image upload fails
         }
       }

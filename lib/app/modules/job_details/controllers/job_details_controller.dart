@@ -175,7 +175,9 @@ class JobDetailsController extends GetxController {
       hasUserApplied.value = true;
 
       // Show success message
+      // ignore: cascade_invocations
       Get.back<dynamic>(); // Close application dialog
+      // ignore: cascade_invocations
       Get.snackbar(
         'Application Submitted',
         'Your application has been submitted successfully',

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:intl/intl.dart';
 import 'package:next_gen/app/modules/home/controllers/home_controller.dart';
 import 'package:next_gen/app/modules/home/views/widgets/section_header.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
@@ -14,6 +15,22 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 class FeaturedJobs extends GetWidget<HomeController> {
   /// Creates a featured jobs carousel
   const FeaturedJobs({super.key});
+
+  /// Format date to a more readable format
+  static String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays < 1) {
+      return 'Today';
+    } else if (difference.inDays < 2) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else {
+      return DateFormat('MMM d, yyyy').format(date);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +89,7 @@ class FeaturedJobs extends GetWidget<HomeController> {
                 isFeatured: true,
                 avatar: job.logoUrl ?? '',
                 companyName: job.company,
-                publishTime: job.postedDate.toIso8601String(),
+                publishTime: _formatDate(job.postedDate),
                 jobPosition: job.title,
                 workplace: job.isRemote ? 'Remote' : 'On-site',
                 employmentType: job.jobType,
