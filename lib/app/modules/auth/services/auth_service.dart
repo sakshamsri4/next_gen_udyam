@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -438,6 +439,26 @@ class AuthService {
     } catch (e, stackTrace) {
       _logger.e('Error retrieving user from local storage', e, stackTrace);
       return null;
+    }
+  }
+
+  // Update user in Firestore
+  Future<void> updateUserInFirestore(UserModel user) async {
+    _logger.i('Updating user in Firestore: ${user.uid}');
+    try {
+      // Save to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set(user.toMap(), SetOptions(merge: true));
+
+      // Update local storage
+      await _saveUserToHive(user);
+
+      _logger.i('User updated in Firestore successfully');
+    } catch (e, stackTrace) {
+      _logger.e('Error updating user in Firestore', e, stackTrace);
+      rethrow;
     }
   }
 

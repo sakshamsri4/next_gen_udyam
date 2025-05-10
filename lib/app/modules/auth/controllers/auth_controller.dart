@@ -393,9 +393,9 @@ class AuthController extends GetxController {
       passwordController.clear();
       confirmPasswordController.clear();
 
-      // Navigate to dashboard
-      log.d('Navigating to dashboard screen');
-      await Get.offAllNamed<dynamic>(Routes.dashboard);
+      // Navigate to role selection screen
+      log.d('Navigating to role selection screen');
+      await Get.offAllNamed<dynamic>(Routes.roleSelection);
 
       Get.snackbar(
         'Success',

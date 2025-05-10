@@ -32,8 +32,11 @@ class _ProfileViewState extends State<ProfileView> {
       navigationController = Get.put(NavigationController(), permanent: true);
     }
 
-    // Set the selected index to the Profile tab (index 3)
-    navigationController.selectedIndex.value = 3;
+    // We need to use addPostFrameCallback to update the Rx value after the build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Set the selected index to the Profile tab (index 4)
+      navigationController.selectedIndex.value = 4;
+    });
   }
 
   @override

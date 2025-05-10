@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
+import 'package:next_gen/app/modules/auth/models/user_type_adapter.dart';
 import 'package:next_gen/app/modules/onboarding/models/onboarding_status.dart';
 import 'package:next_gen/app/modules/search/models/hive_adapters.dart';
 import 'package:next_gen/app/modules/search/models/search_history.dart';
@@ -60,6 +61,13 @@ class HiveManager {
       if (!Hive.isAdapterRegistered(themeSettingsTypeId)) {
         _logger.d('Registering ThemeSettings adapter');
         Hive.registerAdapter(ThemeSettingsAdapter());
+      }
+
+      // Register UserType adapter
+      if (!Hive.isAdapterRegistered(20)) {
+        // UserType typeId is 20
+        _logger.d('Registering UserType adapter');
+        Hive.registerAdapter(UserTypeAdapter());
       }
 
       // Register UserModel adapter

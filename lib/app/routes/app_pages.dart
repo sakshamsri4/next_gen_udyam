@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-
 import 'package:next_gen/app/middleware/auth_middleware.dart';
 import 'package:next_gen/app/middleware/onboarding_middleware.dart';
+import 'package:next_gen/app/middleware/role_middleware.dart';
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';
 import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
@@ -24,6 +24,8 @@ import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
 import 'package:next_gen/app/modules/resume/bindings/resume_binding.dart';
 import 'package:next_gen/app/modules/resume/views/resume_view.dart';
+import 'package:next_gen/app/modules/role_selection/bindings/role_selection_binding.dart';
+import 'package:next_gen/app/modules/role_selection/views/role_selection_view.dart';
 import 'package:next_gen/app/modules/saved_jobs/bindings/saved_jobs_binding.dart';
 import 'package:next_gen/app/modules/saved_jobs/views/saved_jobs_view.dart';
 import 'package:next_gen/app/modules/search/bindings/search_binding.dart';
@@ -44,7 +46,7 @@ class AppPages {
       name: _Paths.home,
       page: () => const HomeView(),
       bindings: [HomeBinding(), AuthBinding()],
-      middlewares: [OnboardingMiddleware()],
+      middlewares: [OnboardingMiddleware(), AuthMiddleware(), RoleMiddleware()],
     ),
     GetPage<dynamic>(
       name: _Paths.auth,
@@ -92,7 +94,7 @@ class AppPages {
       page: () => const DashboardView(),
       bindings: [DashboardBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
-      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+      middlewares: [OnboardingMiddleware(), AuthMiddleware(), RoleMiddleware()],
     ),
     // Jobs route using JobDetailsView for job details
     GetPage<dynamic>(
@@ -171,6 +173,14 @@ class AppPages {
       page: () => const ErrorView(message: 'About page coming soon'),
       binding: ErrorBinding(),
       transition: Transition.fadeIn,
+    ),
+    // Role selection page
+    GetPage<dynamic>(
+      name: _Paths.roleSelection,
+      page: () => const RoleSelectionView(),
+      binding: RoleSelectionBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
   ];
 }

@@ -22,6 +22,7 @@ abstract class Routes {
   static const settings = _Paths.settings;
   static const support = _Paths.support;
   static const about = _Paths.about;
+  static const roleSelection = _Paths.roleSelection;
 }
 
 abstract class _Paths {
@@ -45,4 +46,5 @@ abstract class _Paths {
   static const settings = '/settings';
   static const support = '/support';
   static const about = '/about';
+  static const roleSelection = '/role-selection';
 }

@@ -97,13 +97,48 @@ class HomeController extends GetxController {
 
   /// Load all home screen data
   Future<void> _loadHomeData() async {
-    await Future.wait([
-      _loadCategories(),
-      _loadFeaturedJobs(),
-      _loadSavedJobs(),
-    ]);
+    try {
+      // Add a timeout to prevent infinite loading
+      await Future.wait([
+        _loadCategories().timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            _logger.w('Categories loading timed out');
+            _isCategoriesLoading.value = false;
+            _categoriesError.value = 'Loading timed out. Pull to refresh.';
+          },
+        ),
+        _loadFeaturedJobs().timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            _logger.w('Featured jobs loading timed out');
+            _isFeaturedJobsLoading.value = false;
+            _featuredJobsError.value = 'Loading timed out. Pull to refresh.';
+          },
+        ),
+        _loadSavedJobs().timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            _logger.w('Saved jobs loading timed out');
+          },
+        ),
+      ]);
 
-    await _loadRecentJobs();
+      await _loadRecentJobs().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          _logger.w('Recent jobs loading timed out');
+          _isRecentJobsLoading.value = false;
+          _recentJobsError.value = 'Loading timed out. Pull to refresh.';
+        },
+      );
+    } catch (e) {
+      _logger.e('Error loading home data', e);
+      // Ensure loading states are reset even if there's an error
+      _isCategoriesLoading.value = false;
+      _isFeaturedJobsLoading.value = false;
+      _isRecentJobsLoading.value = false;
+    }
   }
 
   /// Load featured jobs

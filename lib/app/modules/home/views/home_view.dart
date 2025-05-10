@@ -6,11 +6,38 @@ import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/home/controllers/home_controller.dart';
 import 'package:next_gen/app/modules/home/views/widgets/body.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
 import 'package:next_gen/ui/components/avatars/custom_avatar.dart';
 
-class HomeView extends GetView<HomeController> {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  late final HomeController controller;
+  late final NavigationController navigationController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the controllers
+    controller = Get.find<HomeController>();
+
+    // Get or register NavigationController
+    if (Get.isRegistered<NavigationController>()) {
+      navigationController = Get.find<NavigationController>();
+    } else {
+      navigationController = Get.put(NavigationController(), permanent: true);
+    }
+
+    // Set the selected index to the Home tab (index 0)
+    navigationController.selectedIndex.value = 0;
+  }
 
   /// Get a non-empty photo URL or empty string
   String _getNonEmptyPhotoUrl(AuthController authController) {
@@ -25,7 +52,9 @@ class HomeView extends GetView<HomeController> {
     final themeController = ThemeController.to;
 
     return Scaffold(
+      key: navigationController.scaffoldKey,
       backgroundColor: theme.scaffoldBackgroundColor,
+      bottomNavigationBar: const RoleBasedBottomNav(),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
