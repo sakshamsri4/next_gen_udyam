@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
-import 'package:next_gen/app/modules/auth/models/user_type_adapter.dart';
+// Import UserTypeAdapter explicitly from user_type_adapter.dart to avoid ambiguity
+import 'package:next_gen/app/modules/auth/models/user_type_adapter.dart'
+    as user_type;
 import 'package:next_gen/app/modules/onboarding/models/onboarding_status.dart';
 import 'package:next_gen/app/modules/resume/models/resume_model.dart';
 import 'package:next_gen/app/modules/search/models/hive_adapters.dart';
@@ -19,6 +21,24 @@ const String resumesBoxName = 'resumes_box';
 
 /// Type IDs for Hive adapters
 const int userModelTypeId = 0; // Already defined in the project
+const int applicationStatusTypeId = 11; // Type ID for ApplicationStatus enum
+
+/// Adapter for ApplicationStatus enum
+class ApplicationStatusAdapter extends TypeAdapter<ApplicationStatus> {
+  @override
+  final int typeId = applicationStatusTypeId;
+
+  @override
+  ApplicationStatus read(BinaryReader reader) {
+    final index = reader.readByte();
+    return ApplicationStatus.values[index];
+  }
+
+  @override
+  void write(BinaryWriter writer, ApplicationStatus obj) {
+    writer.writeByte(obj.index);
+  }
+}
 
 /// Manager class for Hive operations
 class HiveManager {
@@ -71,7 +91,7 @@ class HiveManager {
       if (!Hive.isAdapterRegistered(20)) {
         // UserType typeId is 20
         _logger.d('Registering UserType adapter');
-        Hive.registerAdapter(UserTypeAdapter());
+        Hive.registerAdapter<UserType>(user_type.UserTypeAdapter());
       }
 
       // Register UserModel adapter
@@ -97,10 +117,10 @@ class HiveManager {
       }
 
       // Register ApplicationStatus adapter
-      if (!Hive.isAdapterRegistered(11)) {
+      if (!Hive.isAdapterRegistered(applicationStatusTypeId)) {
         // ApplicationStatus typeId is 11
         _logger.d('Registering ApplicationStatus adapter');
-        Hive.registerAdapter(ApplicationStatusAdapter());
+        Hive.registerAdapter<ApplicationStatus>(ApplicationStatusAdapter());
       }
 
       // Register ResumeModel adapter
