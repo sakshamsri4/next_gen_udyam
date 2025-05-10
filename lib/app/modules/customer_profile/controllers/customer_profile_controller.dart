@@ -40,6 +40,9 @@ class CustomerProfileController extends GetxController {
   /// The tab controller for the profile tabs
   final RxInt selectedTabIndex = 0.obs;
 
+  /// Profile completeness percentage (0.0 to 1.0)
+  final RxDouble profileCompleteness = 0.0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -90,6 +93,9 @@ class CustomerProfileController extends GetxController {
           photoURL: user.value!.photoURL,
         );
       }
+
+      // Calculate profile completeness
+      _calculateProfileCompleteness();
     } catch (e) {
       _logger.e('Error loading customer profile', e);
       Get.snackbar(
@@ -374,5 +380,59 @@ class CustomerProfileController extends GetxController {
   // ignore: use_setters_to_change_properties
   void setSelectedTabIndex(int index) {
     selectedTabIndex.value = index;
+  }
+
+  /// Calculate profile completeness
+  void _calculateProfileCompleteness() {
+    if (profile.value == null) {
+      profileCompleteness.value = 0.0;
+      return;
+    }
+
+    // Define the total number of profile fields to check
+    const totalFields = 8;
+    var completedFields = 0;
+
+    // Basic info
+    if (profile.value!.name.isNotEmpty) {
+      completedFields++;
+    }
+    if (profile.value!.email.isNotEmpty) {
+      completedFields++;
+    }
+    if (profile.value!.photoURL != null &&
+        profile.value!.photoURL!.isNotEmpty) {
+      completedFields++;
+    }
+    if (profile.value!.jobTitle != null &&
+        profile.value!.jobTitle!.isNotEmpty) {
+      completedFields++;
+    }
+    if (profile.value!.description != null &&
+        profile.value!.description!.isNotEmpty) {
+      completedFields++;
+    }
+
+    // Work experience
+    if (profile.value!.workExperience.isNotEmpty) {
+      completedFields++;
+    }
+
+    // Education
+    if (profile.value!.education.isNotEmpty) {
+      completedFields++;
+    }
+
+    // Skills
+    if (profile.value!.skills.isNotEmpty) {
+      completedFields++;
+    }
+
+    // Calculate percentage
+    profileCompleteness.value = completedFields / totalFields;
+
+    _logger.d(
+      'Profile completeness: ${(profileCompleteness.value * 100).toStringAsFixed(0)}%',
+    );
   }
 }

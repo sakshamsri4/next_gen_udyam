@@ -27,15 +27,15 @@ class NavigationController extends GetxController {
     Routes.home,
     Routes.search,
     Routes.savedJobs,
-    Routes.resume,
+    Routes.applications,
     Routes.profile,
   ];
 
   // List of routes for employer
   final List<String> _employerRoutes = [
     Routes.dashboard,
-    Routes.jobs,
-    Routes.search, // Placeholder for applicants screen
+    Routes.jobPosting, // Job posting management
+    Routes.search, // Applicants search
     Routes.companyProfile,
     Routes.profile,
   ];

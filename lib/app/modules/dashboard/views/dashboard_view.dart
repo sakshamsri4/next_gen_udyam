@@ -230,12 +230,12 @@ class _DashboardViewState extends State<DashboardView> {
               const SizedBox(width: 16),
               _buildQuickActionButton(
                 theme,
-                'Apply Now',
-                FontAwesomeIcons.fileCirclePlus,
+                'My Applications',
+                FontAwesomeIcons.fileCircleCheck,
                 Colors.green,
                 buttonWidth,
                 buttonHeight,
-                () => Get.toNamed<dynamic>('/applications/new'),
+                () => Get.toNamed<dynamic>(Routes.applications),
               ),
               const SizedBox(width: 16),
               _buildQuickActionButton(

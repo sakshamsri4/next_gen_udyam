@@ -23,8 +23,8 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       photoUrl: fields[3] as String?,
       emailVerified: fields[4] as bool,
       phoneNumber: fields[5] as String?,
+      userType: fields[7] as UserType?,
       createdAt: fields[6] as DateTime?,
-      userType: fields.containsKey(7) ? fields[7] as UserType? : null,
     );
   }
 
@@ -57,6 +57,45 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is UserModelAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class UserTypeAdapter extends TypeAdapter<UserType> {
+  @override
+  final int typeId = 20;
+
+  @override
+  UserType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return UserType.employee;
+      case 1:
+        return UserType.employer;
+      default:
+        return UserType.employee;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, UserType obj) {
+    switch (obj) {
+      case UserType.employee:
+        writer.writeByte(0);
+        break;
+      case UserType.employer:
+        writer.writeByte(1);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

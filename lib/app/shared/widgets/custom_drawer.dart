@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
@@ -38,56 +39,133 @@ class CustomDrawer extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  _buildNavItem(
-                    context: context,
-                    icon: FontAwesomeIcons.house,
-                    title: 'Home',
-                    onTap: () {
-                      navigationController.changeIndex(0);
-                      Get.back<void>();
-                    },
-                    isSelected: navigationController.selectedIndex.value == 0,
-                  ),
-                  _buildNavItem(
-                    context: context,
-                    icon: FontAwesomeIcons.magnifyingGlass,
-                    title: 'Search',
-                    onTap: () {
-                      navigationController.changeIndex(1);
-                      Get.back<void>();
-                    },
-                    isSelected: navigationController.selectedIndex.value == 1,
-                  ),
-                  _buildNavItem(
-                    context: context,
-                    icon: FontAwesomeIcons.bookmark,
-                    title: 'Saved Jobs',
-                    onTap: () {
-                      navigationController.changeIndex(2);
-                      Get.back<void>();
-                    },
-                    isSelected: navigationController.selectedIndex.value == 2,
-                  ),
-                  _buildNavItem(
-                    context: context,
-                    icon: FontAwesomeIcons.fileLines,
-                    title: 'Resume',
-                    onTap: () {
-                      navigationController.changeIndex(3);
-                      Get.back<void>();
-                    },
-                    isSelected: navigationController.selectedIndex.value == 3,
-                  ),
-                  _buildNavItem(
-                    context: context,
-                    icon: FontAwesomeIcons.user,
-                    title: 'Profile',
-                    onTap: () {
-                      navigationController.changeIndex(4);
-                      Get.back<void>();
-                    },
-                    isSelected: navigationController.selectedIndex.value == 4,
-                  ),
+                  // Show different navigation items based on user role
+                  Obx(() {
+                    if (navigationController.userRole.value ==
+                        UserType.employer) {
+                      // Employer navigation items
+                      return Column(
+                        children: [
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.house,
+                            title: 'Dashboard',
+                            onTap: () {
+                              navigationController.changeIndex(0);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 0,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.briefcase,
+                            title: 'Manage Jobs',
+                            onTap: () {
+                              navigationController.changeIndex(1);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 1,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.users,
+                            title: 'Applicants',
+                            onTap: () {
+                              navigationController.changeIndex(2);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 2,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.buildingUser,
+                            title: 'Company Profile',
+                            onTap: () {
+                              navigationController.changeIndex(3);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 3,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.user,
+                            title: 'Profile',
+                            onTap: () {
+                              navigationController.changeIndex(4);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 4,
+                          ),
+                        ],
+                      );
+                    } else {
+                      // Employee navigation items
+                      return Column(
+                        children: [
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.house,
+                            title: 'Home',
+                            onTap: () {
+                              navigationController.changeIndex(0);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 0,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.magnifyingGlass,
+                            title: 'Search',
+                            onTap: () {
+                              navigationController.changeIndex(1);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 1,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.bookmark,
+                            title: 'Saved Jobs',
+                            onTap: () {
+                              navigationController.changeIndex(2);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 2,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.fileCircleCheck,
+                            title: 'My Applications',
+                            onTap: () {
+                              navigationController.changeIndex(3);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 3,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            icon: FontAwesomeIcons.user,
+                            title: 'Profile',
+                            onTap: () {
+                              navigationController.changeIndex(4);
+                              Get.back<void>();
+                            },
+                            isSelected:
+                                navigationController.selectedIndex.value == 4,
+                          ),
+                        ],
+                      );
+                    }
+                  }),
 
                   const Divider(),
 

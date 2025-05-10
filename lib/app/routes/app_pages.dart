@@ -2,6 +2,9 @@ import 'package:get/get.dart';
 import 'package:next_gen/app/middleware/auth_middleware.dart';
 import 'package:next_gen/app/middleware/onboarding_middleware.dart';
 import 'package:next_gen/app/middleware/role_middleware.dart';
+import 'package:next_gen/app/modules/applications/bindings/applications_binding.dart';
+import 'package:next_gen/app/modules/applications/views/application_details_view.dart';
+import 'package:next_gen/app/modules/applications/views/applications_view.dart';
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';
 import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
@@ -20,6 +23,8 @@ import 'package:next_gen/app/modules/home/bindings/home_binding.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
 import 'package:next_gen/app/modules/job_details/bindings/job_details_binding.dart';
 import 'package:next_gen/app/modules/job_details/views/job_details_view.dart';
+import 'package:next_gen/app/modules/job_posting/bindings/job_posting_binding.dart';
+import 'package:next_gen/app/modules/job_posting/views/job_posting_view.dart';
 import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
 import 'package:next_gen/app/modules/resume/bindings/resume_binding.dart';
@@ -181,6 +186,30 @@ class AppPages {
       binding: RoleSelectionBinding(),
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    // Applications list page
+    GetPage<dynamic>(
+      name: _Paths.applications,
+      page: () => const ApplicationsView(),
+      bindings: [ApplicationsBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    // Application details page
+    GetPage<dynamic>(
+      name: '${_Paths.applications}/:id',
+      page: () => const ApplicationDetailsView(),
+      bindings: [ApplicationsBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    // Job posting management page
+    GetPage<dynamic>(
+      name: _Paths.jobPosting,
+      page: () => const JobPostingView(),
+      bindings: [JobPostingBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware(), RoleMiddleware()],
     ),
   ];
 }

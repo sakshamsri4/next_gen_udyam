@@ -12,13 +12,12 @@ class RoleSelectionBinding extends Bindings {
     final logger = Get.find<LoggerService>();
     logger.i('RoleSelectionBinding: Registering dependencies');
 
-    // Ensure AuthController is registered
+    // Ensure required services are registered
     if (!Get.isRegistered<AuthController>()) {
       logger.i('RoleSelectionBinding: Registering AuthController');
       Get.put(AuthController(), permanent: true);
     }
 
-    // Ensure AuthService is registered
     if (!Get.isRegistered<AuthService>()) {
       logger.i('RoleSelectionBinding: Registering AuthService');
       Get.put(AuthService(), permanent: true);

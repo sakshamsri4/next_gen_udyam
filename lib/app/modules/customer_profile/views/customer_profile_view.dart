@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/customer_profile/controllers/customer_profile_controller.dart';
 import 'package:next_gen/app/modules/customer_profile/views/widgets/customer_profile_sliver_app_bar.dart';
+import 'package:next_gen/app/modules/customer_profile/views/widgets/profile_completeness_indicator.dart';
 import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/profile_shimmer.dart';
 
@@ -51,6 +52,11 @@ class CustomerProfileView extends GetView<CustomerProfileController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Profile Completeness Indicator
+                        const ProfileCompletenessIndicator(),
+
+                        SizedBox(height: 16.h),
+
                         // About Me section
                         if (profile.description != null &&
                             profile.description!.isNotEmpty)

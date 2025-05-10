@@ -23,6 +23,8 @@ abstract class Routes {
   static const support = _Paths.support;
   static const about = _Paths.about;
   static const roleSelection = _Paths.roleSelection;
+  static const applications = _Paths.applications;
+  static const jobPosting = _Paths.jobPosting;
 }
 
 abstract class _Paths {
@@ -47,4 +49,6 @@ abstract class _Paths {
   static const support = '/support';
   static const about = '/about';
   static const roleSelection = '/role-selection';
+  static const applications = '/applications';
+  static const jobPosting = '/job-posting';
 }
