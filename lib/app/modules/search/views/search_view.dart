@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/search/controllers/search_controller.dart'
     as app_search;
 import 'package:next_gen/app/modules/search/models/job_model.dart';
@@ -9,6 +10,7 @@ import 'package:next_gen/app/modules/search/views/widgets/job_card.dart';
 import 'package:next_gen/app/modules/search/views/widgets/search_history_item.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
+import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
 import 'package:responsive_builder/responsive_builder.dart';
@@ -50,10 +52,16 @@ class _SearchViewState extends State<SearchView> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      key: navigationController.scaffoldKey,
+      drawer: const CustomDrawer(),
       appBar: AppBar(
         title: const Text('Job Search'),
         centerTitle: true,
         elevation: 0,
+        leading: IconButton(
+          icon: const HeroIcon(HeroIcons.bars3),
+          onPressed: navigationController.toggleDrawer,
+        ),
         actions: [
           // Filter button
           IconButton(

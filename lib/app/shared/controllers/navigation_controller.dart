@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/services/logger_service.dart';
@@ -9,6 +10,11 @@ class NavigationController extends GetxController {
 
   // Observable state variables
   final RxInt selectedIndex = 0.obs;
+  final RxBool isDrawerOpen = false.obs;
+  final RxBool isAnimating = false.obs;
+
+  // Global key for the scaffold drawer
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   // List of routes corresponding to each tab
   final List<String> _routes = [
@@ -19,11 +25,20 @@ class NavigationController extends GetxController {
     Routes.profile,
   ];
 
+  // Map of route names to tab indices
+  late final Map<String, int> _routeIndices;
+
   @override
   void onInit() {
     super.onInit();
     _logger = Get.find<LoggerService>();
     _logger.i('NavigationController initialized');
+
+    // Initialize route indices map
+    _routeIndices = {};
+    for (var i = 0; i < _routes.length; i++) {
+      _routeIndices[_routes[i]] = i;
+    }
   }
 
   /// Change the selected tab index and navigate to the corresponding route
@@ -41,9 +56,45 @@ class NavigationController extends GetxController {
 
   /// Set the selected index based on the current route
   void updateIndexFromRoute(String route) {
-    final index = _routes.indexOf(route);
-    if (index != -1) {
+    final index = _routeIndices[route];
+    if (index != null) {
       selectedIndex.value = index;
     }
+  }
+
+  /// Open the drawer
+  void openDrawer() {
+    if (scaffoldKey.currentState != null &&
+        !scaffoldKey.currentState!.isDrawerOpen) {
+      scaffoldKey.currentState!.openDrawer();
+      isDrawerOpen.value = true;
+    }
+  }
+
+  /// Close the drawer
+  void closeDrawer() {
+    if (scaffoldKey.currentState != null &&
+        scaffoldKey.currentState!.isDrawerOpen) {
+      scaffoldKey.currentState!.closeDrawer();
+      isDrawerOpen.value = false;
+    }
+  }
+
+  /// Toggle the drawer
+  void toggleDrawer() {
+    if (scaffoldKey.currentState != null) {
+      if (scaffoldKey.currentState!.isDrawerOpen) {
+        closeDrawer();
+      } else {
+        openDrawer();
+      }
+    }
+  }
+
+  /// Navigate to a named route with animation
+  Future<void> navigateWithAnimation(String route, {Object? arguments}) async {
+    isAnimating.value = true;
+    await Get.toNamed<dynamic>(route, arguments: arguments);
+    isAnimating.value = false;
   }
 }

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:neopop/neopop.dart' hide NeoPopCard;
 import 'package:next_gen/app/modules/dashboard/controllers/dashboard_controller.dart';
@@ -9,6 +10,7 @@ import 'package:next_gen/app/modules/dashboard/widgets/dashboard_widgets.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
+import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -46,11 +48,17 @@ class _DashboardViewState extends State<DashboardView> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      key: navigationController.scaffoldKey,
+      drawer: const CustomDrawer(),
       bottomNavigationBar: const CustomAnimatedBottomNavBar(),
       appBar: AppBar(
         title: const Text('Automotive Jobs Dashboard'),
         centerTitle: true,
         elevation: 0,
+        leading: IconButton(
+          icon: const HeroIcon(HeroIcons.bars3),
+          onPressed: navigationController.toggleDrawer,
+        ),
         actions: [
           // Profile button
           Padding(
