@@ -3,9 +3,17 @@
 ## Project Overview
 This roadmap outlines the step-by-step implementation plan for the Next Gen Job Portal Flutter app using GetX for state management, NeoPOP UI library for CRED-inspired design, and Firebase for backend services. The app will be structured as a modular monorepo using Melos, with a focus on rapid development and responsive UI.
 
+## Updated Approach (2024-07-28)
+We've integrated a third-party job portal app (JobsFlutterApp) to accelerate development. The updated approach focuses on:
+- **Functionality First**: Implement core functionality from the third-party app before enhancing UI
+- **Dual User Roles**: Support both employee and employer functionality from day one
+- **CRED Design From Start**: Apply CRED design principles from the beginning using our `docs/cred_design_guide.md`
+- **Firebase Backend**: Use our Firebase backend instead of the third-party API
+
 ## Development Approach
 - **Rapid Development**: Focus on building features quickly with minimal testing overhead
-- **CRED Design System**: Implement NeoPOP UI components following CRED design principles
+- **CRED Design System**: Implement UI components following CRED design principles as documented in `docs/cred_design_guide.md`
+- **Consistent Design Language**: Apply CRED design principles consistently across all screens from the beginning
 - **Responsive UI**: Ensure excellent user experience across Android, iOS, and web platforms
 - **GetX CLI**: Use for scaffolding modules and managing state
 - **Modular Architecture**: Organize code in feature modules with clear separation of concerns
@@ -620,11 +628,15 @@ dependencies:
 
 ## Design Guidelines
 
-### NeoPOP Implementation
-- Use elevated buttons with proper depth
-- Apply consistent color palette
-- Implement physical feedback on interactions
-- Follow CRED design principles for typography and spacing
+### CRED Design Implementation
+- **Follow the CRED Design Guide**: Refer to `docs/cred_design_guide.md` for comprehensive design principles
+- **Core Design Philosophy**: Implement "Beauty as the Central Goal" with balance of form and function
+- **NeoPOP Design System**: Apply the current CRED design system with bold, colorful, and physical elements
+- **Typography**: Use the specified font system with clear hierarchy and weight contrast
+- **Color System**: Apply the defined color palette with high contrast and purposeful usage
+- **Component Design**: Implement buttons, cards, navigation, and forms according to CRED specifications
+- **Motion and Animation**: Follow animation principles for purpose-driven, natural, and subtle movements
+- **Illustrations and Icons**: Use the defined style for bold, colorful, and consistent visual elements
 
 ### Responsive UI Guidelines
 - Use responsive_builder for adaptive layouts
@@ -632,33 +644,150 @@ dependencies:
 - Use flexible widgets that adapt to available space
 - Ensure touch targets are appropriate for each platform
 - Optimize navigation for different devices (drawer for mobile, sidebar for desktop)
+- Maintain CRED design principles across all screen sizes
 
-## Time Estimation Summary
+## Revised Implementation Plan (2024-07-28)
 
-1. Initial Setup & Architecture: 2-3 days
-2. Auth Module: 2-3 days ✅
-3. Onboarding Module: 1-2 days
-4. Error Handling & Connectivity Module: 1-2 days
-5. Dashboard Module: 2-3 days
-6. Core Infrastructure Improvements: 1-2 days
-7. Search & Filter Module: 2-3 days
-8. Performance Optimization: 1-2 days
-9. Localization & Accessibility Enhancements: 1-2 days
-10. Resume Upload Module: 2-3 days
-11. Job Feed Module: 3-4 days
-12. Admin Panel Module: 4-5 days
-13. Notifications Module: 1-2 days
-14. Profile Module: 1-2 days
-15. Integration & Polishing: 2-3 days
+### Phase 1: Third-Party Integration & Core Functionality (1-2 weeks)
 
-**Total Estimated Time**: 26-41 days (5-8 weeks)
+1. **Third-Party App Integration (2-3 days)** ✅
+   - Integrate JobsFlutterApp codebase
+   - Fix dependency issues and upgrade packages
+   - Resolve linting and syntax errors
+   - Ensure basic functionality works
+
+2. **Authentication Module with Firebase (2-3 days)**
+   - Implement dual authentication for both employee and employer using Firebase Auth
+   - Integrate existing login/register UI screens from JobsFlutterApp
+   - Adapt authentication flow to use Firebase instead of the original API
+   - Ensure proper validation and error handling
+   - Implement user role management in Firestore
+
+3. **Job Feed & Search with Firestore (2-3 days)**
+   - Implement job listing functionality using Firestore collections
+   - Adapt search functionality to use Firestore queries
+   - Implement filtering and sorting using Firestore capabilities
+   - Adapt job details view with Firebase-based apply functionality
+   - Create proper data models for Firestore integration
+
+4. **User Profiles with Firebase (1-2 days)**
+   - Implement both employee and employer profile views
+   - Store profile data in Firestore with proper security rules
+   - Integrate profile editing functionality with Firebase Storage for images
+   - Ensure proper data validation and error handling
+   - Implement real-time profile updates using Firestore listeners
+
+### Phase 2: UI Enhancement & Additional Features (2-3 weeks)
+
+5. **CRED Design Implementation (3-4 days)**
+   - Apply CRED design principles from `docs/cred_design_guide.md` to all screens
+   - Implement custom buttons and cards following CRED design specifications
+   - Create consistent theme across the app based on the CRED color system
+   - Ensure responsive design for all screen sizes while maintaining CRED design language
+   - Implement animations and micro-interactions according to CRED motion guidelines
+
+6. **Resume Upload Module (2-3 days)**
+   - Implement resume upload functionality
+   - Create resume management interface
+   - Add download and delete capabilities
+   - Ensure proper error handling and validation
+
+7. **Employer Job Management (2-3 days)**
+   - Implement job posting functionality for employers
+   - Create job management interface (edit, delete, pause)
+   - Add applicant tracking and management
+   - Ensure proper validation and error handling
+
+8. **Dashboard & Analytics (2-3 days)**
+   - Create dashboard for both user types
+   - Implement analytics and statistics
+   - Add data visualization components
+   - Ensure responsive design for all screen sizes
+
+### Phase 3: Polishing & Deployment (1-2 weeks)
+
+9. **Performance Optimization (1-2 days)**
+   - Implement lazy loading and pagination
+   - Optimize image loading and caching
+   - Improve state management
+   - Add performance monitoring
+
+10. **Testing & Bug Fixing (2-3 days)**
+    - Conduct comprehensive testing on all platforms
+    - Fix identified bugs and issues
+    - Ensure cross-platform compatibility
+    - Optimize for different screen sizes
+
+11. **Deployment & Documentation (1-2 days)**
+    - Prepare for deployment to app stores
+    - Create user documentation
+    - Update technical documentation
+    - Finalize release version
+
+**Total Revised Estimate**: 15-26 days (3-5 weeks)
+
+## Third-Party Integration Details
+
+### JobsFlutterApp Components to Integrate
+
+1. **Authentication System**
+   - Login/Register screens with dual user types (Customer/Company)
+   - Form validation and error handling
+   - User session management
+
+2. **Job Feed & Search**
+   - Home view with featured and recent jobs
+   - Search functionality with filters
+   - Job details view with apply functionality
+   - Saved jobs functionality
+
+3. **User Profiles**
+   - Customer profile view and edit
+   - Company profile view and edit
+   - Profile image upload
+
+4. **Navigation & Structure**
+   - Bottom navigation bar
+   - Drawer menu
+   - Tab-based navigation where appropriate
+
+### Backend Integration
+
+**IMPORTANT: We will use our Firebase backend, not the third-party API**
+- We'll adopt the UI components and structure from the third-party app
+- All API calls will be redirected to our Firebase backend
+- The third-party app originally used these endpoints (for reference only):
+  - Base URL: `https://kasmtj.pythonanywhere.com`
+  - Authentication: `/api/auth/login`, `/api/auth/company_signup`, `/api/auth/customer_signup`
+  - Jobs: `/api/jobs/`
+  - Companies: `/api/companies/`
+  - Search: `/api/companies/search`
+  - Applications: `/api/applications/`
+
+### Integration Strategy
+
+1. **Adapt UI Components While Using Firebase Backend**
+   - Replace all API calls with Firebase services
+   - Implement Firebase Authentication for both user types
+   - Use Firestore for job listings, applications, and user profiles
+   - Keep the dual user role system (employee/employer)
+
+2. **Enhance UI with NeoPOP**
+   - Gradually replace UI components with NeoPOP styled versions
+   - Maintain responsive design across all screen sizes
+   - Ensure consistent theme throughout the app
+
+3. **Add Missing Features**
+   - Implement resume upload functionality
+   - Add dashboard with analytics
+   - Enhance employer job management
 
 ## Git Workflow
 
-1. Create feature branches for each module: `feature/auth`, `feature/resume`, etc.
+1. Create feature branches for each integration phase: `feature/third-party-integration`, `feature/auth`, etc.
 2. Follow conventional commits: `feat:`, `fix:`, `test:`, `docs:`, etc.
 3. Require code reviews before merging
-4. Update activity_log.md after completing each module
+4. Update activity_log.md after completing each phase
 5. Maintain README.md with setup instructions and features
 
 ## CI/CD Pipeline
@@ -674,4 +803,4 @@ dependencies:
    - Run basic smoke tests
    - Tag release version
 
-This roadmap provides a comprehensive guide for implementing the Next Gen Job Portal app using GetX, NeoPOP UI, and CRED design principles with a focus on rapid development and responsive design. Each module has clear requirements, design specifications, and cross-platform considerations to ensure a high-quality user experience across all devices.
+This revised roadmap provides a practical guide for integrating the third-party JobsFlutterApp while enhancing it with NeoPOP UI and additional features. The focus is on getting a functional app with both employee and employer capabilities first, then gradually improving the UI and adding more features.

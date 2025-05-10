@@ -8,7 +8,10 @@ import 'package:next_gen/core/services/logger_service.dart';
 
 class AuthController extends GetxController {
   // Firebase instance
-  late FirebaseAuth _auth;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  /// Check if user is logged in
+  bool get isLoggedIn => _auth.currentUser != null;
 
   // User state
   final Rx<User?> user = Rx<User?>(null);
@@ -45,9 +48,6 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
-    // Initialize Firebase Auth
-    _auth = FirebaseAuth.instance;
 
     // Reset all loading states
     isLoading.value = false;
@@ -602,6 +602,32 @@ class AuthController extends GetxController {
     isResetLoading.value = false;
     isSignOutLoading.value = false;
     log.d('All loading states reset');
+  }
+
+  /// Refresh the current user data
+  Future<void> refreshUser() async {
+    try {
+      log.i('Refreshing user data');
+
+      // Reload the current user to get updated profile
+      if (_auth.currentUser != null) {
+        await _auth.currentUser!.reload();
+        // Update the user value to trigger UI updates
+        user.value = _auth.currentUser;
+        log.d('User data refreshed successfully');
+      } else {
+        log.w('Cannot refresh user data: No user is currently logged in');
+      }
+    } catch (e, stackTrace) {
+      log.e('Error refreshing user data', e, stackTrace);
+      Get.snackbar(
+        'Error',
+        'Failed to refresh user data. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   Future<void> signOut() async {

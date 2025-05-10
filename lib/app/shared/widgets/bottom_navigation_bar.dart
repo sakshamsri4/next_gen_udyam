@@ -41,15 +41,21 @@ class CustomAnimatedBottomNavBar extends GetView<NavigationController> {
             ),
             _buildNavItem(
               context,
+              icon: FontAwesomeIcons.bookmark,
+              label: 'Saved',
+              index: 2,
+            ),
+            _buildNavItem(
+              context,
               icon: FontAwesomeIcons.fileLines,
               label: 'Resume',
-              index: 2,
+              index: 3,
             ),
             _buildNavItem(
               context,
               icon: FontAwesomeIcons.user,
               label: 'Profile',
-              index: 3,
+              index: 4,
             ),
           ],
         ),

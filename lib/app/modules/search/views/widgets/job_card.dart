@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
+import 'package:next_gen/app/utils/date_formatter.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
 /// A card widget for displaying job information
@@ -153,26 +154,7 @@ class JobCard extends StatelessWidget {
 
   /// Format date as relative time
   String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.isNegative) {
-      // Handle future dates
-      return DateFormat('MMM d').format(date); // Future date
-    } else if (difference.inDays > 7) {
-      return DateFormat('MMM d').format(date);
-    } else if (difference.inDays > 0) {
-      return '${difference.inDays} '
-          '${difference.inDays == 1 ? 'day' : 'days'} ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} '
-          '${difference.inHours == 1 ? 'hour' : 'hours'} ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} '
-          '${difference.inMinutes == 1 ? 'minute' : 'minutes'} ago';
-    } else {
-      return 'just now';
-    }
+    return DateFormatter.formatRelativeTime(date);
   }
 }
 

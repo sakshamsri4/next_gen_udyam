@@ -8,17 +8,28 @@ import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/profile_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
+import 'package:next_gen/app/modules/company_profile/bindings/company_profile_binding.dart';
+import 'package:next_gen/app/modules/company_profile/views/company_profile_view.dart';
+import 'package:next_gen/app/modules/customer_profile/bindings/customer_profile_binding.dart';
+import 'package:next_gen/app/modules/customer_profile/views/customer_profile_view.dart';
 import 'package:next_gen/app/modules/dashboard/bindings/dashboard_binding.dart';
 import 'package:next_gen/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
 import 'package:next_gen/app/modules/error/views/error_view.dart';
+import 'package:next_gen/app/modules/home/bindings/home_binding.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
+import 'package:next_gen/app/modules/job_details/bindings/job_details_binding.dart';
+import 'package:next_gen/app/modules/job_details/views/job_details_view.dart';
 import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
 import 'package:next_gen/app/modules/resume/bindings/resume_binding.dart';
 import 'package:next_gen/app/modules/resume/views/resume_view.dart';
+import 'package:next_gen/app/modules/saved_jobs/bindings/saved_jobs_binding.dart';
+import 'package:next_gen/app/modules/saved_jobs/views/saved_jobs_view.dart';
 import 'package:next_gen/app/modules/search/bindings/search_binding.dart';
 import 'package:next_gen/app/modules/search/views/search_view.dart';
+import 'package:next_gen/app/modules/showcase/bindings/showcase_binding.dart';
+import 'package:next_gen/app/modules/showcase/views/showcase_view.dart';
 import 'package:next_gen/app/shared/bindings/navigation_binding.dart';
 
 part 'app_routes.dart';
@@ -32,7 +43,7 @@ class AppPages {
     GetPage<dynamic>(
       name: _Paths.home,
       page: () => const HomeView(),
-      binding: AuthBinding(),
+      bindings: [HomeBinding(), AuthBinding()],
       middlewares: [OnboardingMiddleware()],
     ),
     GetPage<dynamic>(
@@ -83,11 +94,11 @@ class AppPages {
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
-    // Jobs route using SearchView for job search functionality
+    // Jobs route using JobDetailsView for job details
     GetPage<dynamic>(
       name: _Paths.jobs,
-      page: () => const SearchView(),
-      bindings: [SearchBinding(), NavigationBinding()],
+      page: () => const JobDetailsView(),
+      bindings: [JobDetailsBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
@@ -106,11 +117,60 @@ class AppPages {
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
     GetPage<dynamic>(
+      name: _Paths.customerProfile,
+      page: () => const CustomerProfileView(),
+      bindings: [CustomerProfileBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.companyProfile,
+      page: () => const CompanyProfileView(),
+      bindings: [CompanyProfileBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
       name: _Paths.search,
       page: () => const SearchView(),
       bindings: [SearchBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.showcase,
+      page: () => const ShowcaseView(),
+      binding: ShowcaseBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [AuthMiddleware(), OnboardingMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: _Paths.savedJobs,
+      page: () => const SavedJobsView(),
+      bindings: [SavedJobsBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    // Settings page (placeholder)
+    GetPage<dynamic>(
+      name: _Paths.settings,
+      page: () => const ErrorView(message: 'Settings page coming soon'),
+      binding: ErrorBinding(),
+      transition: Transition.fadeIn,
+    ),
+    // Support page (placeholder)
+    GetPage<dynamic>(
+      name: _Paths.support,
+      page: () => const ErrorView(message: 'Support page coming soon'),
+      binding: ErrorBinding(),
+      transition: Transition.fadeIn,
+    ),
+    // About page (placeholder)
+    GetPage<dynamic>(
+      name: _Paths.about,
+      page: () => const ErrorView(message: 'About page coming soon'),
+      binding: ErrorBinding(),
+      transition: Transition.fadeIn,
     ),
   ];
 }

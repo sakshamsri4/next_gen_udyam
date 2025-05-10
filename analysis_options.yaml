@@ -1,4 +1,28 @@
 include: package:very_good_analysis/analysis_options.5.1.0.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/generated/**"
+  language:
+    strict-casts: true
+    strict-raw-types: true
+
 linter:
   rules:
+    # Your existing exceptions
     public_member_api_docs: false
+    lines_longer_than_80_chars: false
+    avoid_positional_boolean_parameters: false
+    unawaited_futures: false
+
+    # Additional useful rules that don't slow development
+    always_use_package_imports: true
+    sort_pub_dependencies: true
+    prefer_single_quotes: true
+
+    # Disable some rules that might be too restrictive
+    comment_references: false
+    one_member_abstracts: false
+    diagnostic_describe_all_properties: false

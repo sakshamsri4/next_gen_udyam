@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
+import 'package:next_gen/app/modules/auth/services/storage_service.dart';
 import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
@@ -46,6 +47,15 @@ class AuthBinding extends Bindings {
       // Register with GetX
       Get.put<AuthService>(
         authService,
+        permanent: true,
+      );
+    }
+
+    // Register StorageService if not already registered
+    if (!Get.isRegistered<StorageService>()) {
+      logger.d('AuthBinding: Registering StorageService');
+      Get.put<StorageService>(
+        StorageService(),
         permanent: true,
       );
     }

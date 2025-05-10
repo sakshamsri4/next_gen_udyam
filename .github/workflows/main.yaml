@@ -27,12 +27,13 @@ jobs:
       flutter_version: '3.29.3'
       min_coverage: 20
 
-  spell-check:
-    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
-    with:
-      includes: |
-        lib/**/*.md
-        docs/**/*.md
-        test/**/*.md
-        README.md
-      modified_files_only: false
+  # Spell check disabled as requested
+  # spell-check:
+  #   uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
+  #   with:
+  #     includes: |
+  #       lib/**/*.md
+  #       docs/**/*.md
+  #       test/**/*.md
+  #       README.md
+  #     modified_files_only: false

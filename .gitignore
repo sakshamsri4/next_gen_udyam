@@ -113,3 +113,6 @@ app.*.map.json
 !.idea/codeStyles/
 !.idea/dictionaries/
 !.idea/runConfigurations/
+
+# Third-party libraries
+/third_party_lib/
