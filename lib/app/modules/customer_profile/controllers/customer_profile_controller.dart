@@ -360,6 +360,7 @@ class CustomerProfileController extends GetxController {
   }
 
   /// Set the selected profile image
+  // ignore: use_setters_to_change_properties
   void setSelectedImage(File image) {
     selectedImage.value = image;
   }
@@ -370,6 +371,7 @@ class CustomerProfileController extends GetxController {
   }
 
   /// Set the selected tab index
+  // ignore: use_setters_to_change_properties
   void setSelectedTabIndex(int index) {
     selectedTabIndex.value = index;
   }

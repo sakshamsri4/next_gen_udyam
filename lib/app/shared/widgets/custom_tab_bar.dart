@@ -42,7 +42,8 @@ class CustomTabBar extends StatelessWidget {
         fontWeight: FontWeight.w500,
       ),
       labelColor: theme.colorScheme.onPrimary,
-      unselectedLabelColor: theme.colorScheme.onSurface.withOpacity(0.7),
+      unselectedLabelColor:
+          theme.colorScheme.onSurface.withValues(alpha: 179), // 0.7 * 255 ≈ 179
       indicator: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
         color: theme.colorScheme.primary,

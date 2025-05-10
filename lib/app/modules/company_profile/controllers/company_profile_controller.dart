@@ -259,6 +259,7 @@ class CompanyProfileController extends GetxController
   }
 
   /// Set the selected logo image
+  // ignore: use_setters_to_change_properties
   void setSelectedImage(File image) {
     selectedImage.value = image;
   }

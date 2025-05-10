@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 class ShowcaseController extends GetxController {
-  //TODO: Implement ShowcaseController
+  // TODO(dev): Implement ShowcaseController
 
   final count = 0.obs;
 

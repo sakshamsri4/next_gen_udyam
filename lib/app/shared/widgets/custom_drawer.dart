@@ -97,7 +97,9 @@ class CustomDrawer extends StatelessWidget {
                     icon: FontAwesomeIcons.gear,
                     title: 'Settings',
                     onTap: () {
+                      // ignore: cascade_invocations
                       Get.toNamed<dynamic>(Routes.settings);
+                      // ignore: cascade_invocations
                       Get.back<void>();
                     },
                   ),
@@ -106,7 +108,9 @@ class CustomDrawer extends StatelessWidget {
                     icon: FontAwesomeIcons.circleQuestion,
                     title: 'Help & Support',
                     onTap: () {
+                      // ignore: cascade_invocations
                       Get.toNamed<dynamic>(Routes.support);
+                      // ignore: cascade_invocations
                       Get.back<void>();
                     },
                   ),
@@ -115,7 +119,9 @@ class CustomDrawer extends StatelessWidget {
                     icon: FontAwesomeIcons.circleInfo,
                     title: 'About',
                     onTap: () {
+                      // ignore: cascade_invocations
                       Get.toNamed<dynamic>(Routes.about);
+                      // ignore: cascade_invocations
                       Get.back<void>();
                     },
                   ),

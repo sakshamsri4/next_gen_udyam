@@ -13,15 +13,14 @@ class JobDetailsBinding extends Bindings {
         : Get.put(LoggerService(), permanent: true)
       ..d('JobDetailsBinding: Registering dependencies');
 
-    // Register JobDetailsService
-    Get.lazyPut<JobDetailsService>(
-      JobDetailsService.new,
-    );
-
-    // Register JobDetailsController
-    Get.lazyPut<JobDetailsController>(
-      JobDetailsController.new,
-    );
+    // Register JobDetailsService and JobDetailsController
+    Get
+      ..lazyPut<JobDetailsService>(
+        JobDetailsService.new,
+      )
+      ..lazyPut<JobDetailsController>(
+        JobDetailsController.new,
+      );
 
     logger.d('JobDetailsBinding: Dependencies registered successfully');
   }
