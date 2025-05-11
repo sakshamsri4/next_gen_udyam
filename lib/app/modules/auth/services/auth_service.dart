@@ -38,6 +38,21 @@ class AuthService {
     // Analytics service commented out for now, will be implemented later
     // _analyticsService = serviceLocator<AnalyticsService>();
 
+    // Initialize Firebase Auth safely
+    try {
+      // We don't need to initialize Firebase here as it's already done in bootstrap.dart
+      // Just get the FirebaseAuth instance directly
+      _logger.d('Getting FirebaseAuth instance');
+
+      // Get FirebaseAuth instance
+      _auth = FirebaseAuth.instance;
+      _logger.d('FirebaseAuth instance initialized successfully');
+    } catch (e) {
+      _logger.e('Error initializing FirebaseAuth instance', e);
+      // Create a fallback instance that will be replaced when Firebase is properly initialized
+      _auth = FirebaseAuth.instance;
+    }
+
     // Initialize GoogleSignIn with appropriate configuration
     if (kIsWeb) {
       // For web, we'll disable Google Sign-In for now
@@ -65,7 +80,7 @@ class AuthService {
   static final AuthService _instance = AuthService._internal();
 
   // Changed from final to late so it can be mocked in tests
-  late FirebaseAuth _auth = FirebaseAuth.instance;
+  late FirebaseAuth _auth;
   late GoogleSignIn _googleSignIn;
   late final LoggerService _logger;
   late final StorageService _storageService;
@@ -105,10 +120,17 @@ class AuthService {
       await credential.user?.sendEmailVerification();
       _logger.i('Verification email sent to: $email');
 
-      // Save user to storage
+      // Save user to storage and Firestore
       if (credential.user != null) {
-        await _saveUserToHive(UserModel.fromFirebaseUser(credential.user!));
+        final userModel = UserModel.fromFirebaseUser(credential.user!);
+
+        // Save to Hive
+        await _saveUserToHive(userModel);
         _logger.d('User data saved to local storage');
+
+        // Save to Firestore
+        await updateUserInFirestore(userModel);
+        _logger.d('User data saved to Firestore');
       }
 
       return credential;

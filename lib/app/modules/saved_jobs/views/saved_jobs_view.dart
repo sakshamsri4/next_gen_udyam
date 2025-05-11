@@ -24,8 +24,11 @@ class SavedJobsView extends GetView<SavedJobsController> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final navigationController = Get.find<NavigationController>();
 
+    // Create a local scaffold key for this view
+    final scaffoldKey = GlobalKey<ScaffoldState>();
+
     return Scaffold(
-      key: navigationController.scaffoldKey,
+      key: scaffoldKey,
       drawer: const CustomDrawer(),
       appBar: AppBar(
         title: const Text('Saved Jobs'),
@@ -35,7 +38,7 @@ class SavedJobsView extends GetView<SavedJobsController> {
             isDarkMode ? AppTheme.darkSurface : AppTheme.lightSurface,
         leading: IconButton(
           icon: const HeroIcon(HeroIcons.bars3),
-          onPressed: navigationController.toggleDrawer,
+          onPressed: () => navigationController.toggleDrawer(scaffoldKey),
         ),
       ),
       bottomNavigationBar: const CustomAnimatedBottomNavBar(),

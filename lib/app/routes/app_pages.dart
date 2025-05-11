@@ -11,6 +11,8 @@ import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
 import 'package:next_gen/app/modules/auth/views/profile_view.dart';
 import 'package:next_gen/app/modules/auth/views/signup_view.dart';
+import 'package:next_gen/app/modules/auth/views/verification_success_view.dart';
+import 'package:next_gen/app/modules/auth/views/welcome_view.dart';
 import 'package:next_gen/app/modules/company_profile/bindings/company_profile_binding.dart';
 import 'package:next_gen/app/modules/company_profile/views/company_profile_view.dart';
 import 'package:next_gen/app/modules/customer_profile/bindings/customer_profile_binding.dart';
@@ -23,6 +25,7 @@ import 'package:next_gen/app/modules/home/bindings/home_binding.dart';
 import 'package:next_gen/app/modules/home/views/home_view.dart';
 import 'package:next_gen/app/modules/job_details/bindings/job_details_binding.dart';
 import 'package:next_gen/app/modules/job_details/views/job_details_view.dart';
+import 'package:next_gen/app/modules/job_details/views/test_job_details_view.dart';
 import 'package:next_gen/app/modules/job_posting/bindings/job_posting_binding.dart';
 import 'package:next_gen/app/modules/job_posting/views/job_posting_view.dart';
 import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
@@ -108,6 +111,13 @@ class AppPages {
       bindings: [JobDetailsBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    // Test route for job details
+    GetPage<dynamic>(
+      name: '${_Paths.jobs}/test',
+      page: () => const TestJobDetailsView(),
+      bindings: [JobDetailsBinding(), NavigationBinding()],
+      transition: Transition.fadeIn,
     ),
     GetPage<dynamic>(
       name: _Paths.resume,
@@ -210,6 +220,22 @@ class AppPages {
       bindings: [JobPostingBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware(), RoleMiddleware()],
+    ),
+    // Welcome screen after signup
+    GetPage<dynamic>(
+      name: _Paths.welcome,
+      page: () => const WelcomeView(),
+      binding: AuthBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    // Email verification success screen
+    GetPage<dynamic>(
+      name: _Paths.verificationSuccess,
+      page: () => const VerificationSuccessView(),
+      binding: AuthBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
   ];
 }

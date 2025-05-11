@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:neopop/neopop.dart' hide NeoPopCard;
+import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/auth/widgets/email_verification_banner.dart';
 import 'package:next_gen/app/modules/dashboard/controllers/dashboard_controller.dart';
 import 'package:next_gen/app/modules/dashboard/widgets/dashboard_widgets.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
@@ -26,6 +28,9 @@ class _DashboardViewState extends State<DashboardView> {
   late final DashboardController controller;
   late final NavigationController navigationController;
 
+  // Create a unique scaffold key for this view
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +44,17 @@ class _DashboardViewState extends State<DashboardView> {
       navigationController = Get.put(NavigationController(), permanent: true);
     }
 
+    // Refresh user data to check email verification status
+    if (Get.isRegistered<AuthController>()) {
+      Get.find<AuthController>().refreshUser();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     // Set the selected index to the Dashboard tab (index 0)
+    // This is safer than using initState with a direct value assignment
     navigationController.selectedIndex.value = 0;
   }
 
@@ -48,7 +63,7 @@ class _DashboardViewState extends State<DashboardView> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      key: navigationController.scaffoldKey,
+      key: _scaffoldKey,
       drawer: const CustomDrawer(),
       bottomNavigationBar: const RoleBasedBottomNav(),
       appBar: AppBar(
@@ -57,7 +72,7 @@ class _DashboardViewState extends State<DashboardView> {
         elevation: 0,
         leading: IconButton(
           icon: const HeroIcon(HeroIcons.bars3),
-          onPressed: navigationController.toggleDrawer,
+          onPressed: () => navigationController.toggleDrawer(_scaffoldKey),
         ),
         actions: [
           // Profile button
@@ -67,54 +82,91 @@ class _DashboardViewState extends State<DashboardView> {
           ),
         ],
       ),
-      body: ResponsiveBuilder(
-        builder: (context, sizingInformation) {
-          // Determine if we're on a mobile device
-          final isMobile =
-              sizingInformation.deviceScreenType == DeviceScreenType.mobile;
+      body: Column(
+        children: [
+          // Email verification banner
+          Obx(() {
+            final authController = Get.find<AuthController>();
+            final user = authController.user.value;
 
-          return RefreshIndicator(
-            onRefresh: controller.refreshDashboard,
-            child: controller.isLoading.value
-                ? _buildLoadingState(isMobile)
-                : SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Welcome message
-                        _buildWelcomeSection(theme, isMobile, controller),
-                        SizedBox(height: isMobile ? 16.0 : 24.0),
+            // Only show banner if user exists, email is not verified, and banner is visible
+            if (user != null &&
+                !user.emailVerified &&
+                authController.isVerificationBannerVisible.value) {
+              return EmailVerificationBanner(
+                onResendPressed: authController.sendEmailVerification,
+                onDismissed: authController.toggleVerificationBanner,
+              );
+            }
+            return const SizedBox.shrink();
+          }),
 
-                        // Quick action buttons
-                        _buildQuickActionButtons(theme, isMobile),
-                        SizedBox(height: isMobile ? 24.0 : 32.0),
+          // Main content
+          Expanded(
+            child: ResponsiveBuilder(
+              builder: (context, sizingInformation) {
+                // Determine if we're on a mobile device
+                final isMobile = sizingInformation.deviceScreenType ==
+                    DeviceScreenType.mobile;
 
-                        // Statistics section
-                        _buildStatisticsSection(
-                          theme,
-                          isMobile,
-                          controller,
-                        ),
-                        SizedBox(height: isMobile ? 24.0 : 32.0),
+                return RefreshIndicator(
+                  onRefresh: controller.refreshDashboard,
+                  // IMPORTANT: Use a single Obx widget to observe controller.isLoading.value
+                  // Avoid nesting Obx widgets to prevent "improper use of GetX" errors
+                  child: Obx(
+                    () => controller.isLoading.value
+                        ? _buildLoadingState(isMobile)
+                        : SingleChildScrollView(
+                            // Always use physics to ensure proper scrolling behavior
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Welcome message
+                                _buildWelcomeSection(
+                                  theme,
+                                  isMobile,
+                                  controller,
+                                ),
+                                SizedBox(height: isMobile ? 16.0 : 24.0),
 
-                        // Recent activity section
-                        _buildRecentActivitySection(
-                          theme,
-                          isMobile,
-                          controller,
-                        ),
-                        SizedBox(height: isMobile ? 16.0 : 24.0),
+                                // Quick action buttons
+                                _buildQuickActionButtons(theme, isMobile),
+                                SizedBox(height: isMobile ? 24.0 : 32.0),
 
-                        // Sign out button
-                        _buildSignOutButton(theme, isMobile, controller),
-                        SizedBox(height: isMobile ? 16.0 : 24.0),
-                      ],
-                    ),
+                                // Statistics section
+                                _buildStatisticsSection(
+                                  theme,
+                                  isMobile,
+                                  controller,
+                                ),
+                                SizedBox(height: isMobile ? 24.0 : 32.0),
+
+                                // Recent activity section
+                                _buildRecentActivitySection(
+                                  theme,
+                                  isMobile,
+                                  controller,
+                                ),
+                                SizedBox(height: isMobile ? 16.0 : 24.0),
+
+                                // Sign out button
+                                _buildSignOutButton(
+                                  theme,
+                                  isMobile,
+                                  controller,
+                                ),
+                                SizedBox(height: isMobile ? 16.0 : 24.0),
+                              ],
+                            ),
+                          ),
                   ),
-          );
-        },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -431,6 +483,15 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   /// Build the recent activity section
+  ///
+  /// Note: This section previously caused a layout overflow error (99418 pixels on the bottom).
+  /// The issue was fixed by:
+  /// 1. Reducing the maxHeight constraint from 300 to 250
+  /// 2. Limiting the number of items to 3 instead of 4
+  /// 3. Using NeverScrollableScrollPhysics to prevent scrolling within this list
+  ///
+  /// If you need to show more items, consider implementing a "View All" button
+  /// that navigates to a dedicated screen for all activities.
   Widget _buildRecentActivitySection(
     ThemeData theme,
     bool isMobile,
@@ -448,18 +509,29 @@ class _DashboardViewState extends State<DashboardView> {
         const SizedBox(height: 16),
         NeoPopCard(
           color: theme.cardColor,
-          child: ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.recentActivity.length,
-            separatorBuilder: (context, index) => Divider(
-              color: theme.dividerColor.withAlpha(25),
-              height: 1,
+          child: ConstrainedBox(
+            // Add a maximum height constraint to prevent overflow
+            constraints: const BoxConstraints(
+              maxHeight: 250, // Reduced from 300 to 250 to prevent overflow
             ),
-            itemBuilder: (context, index) {
-              final activity = controller.recentActivity[index];
-              return _buildActivityItem(theme, activity);
-            },
+            child: ListView.separated(
+              shrinkWrap: true,
+              // Use NeverScrollableScrollPhysics to prevent scrolling within this list
+              // since it's inside a SingleChildScrollView
+              physics: const NeverScrollableScrollPhysics(),
+              // Limit the number of items to prevent overflow - reduced from 4 to 3
+              itemCount: controller.recentActivity.length > 3
+                  ? 3
+                  : controller.recentActivity.length,
+              separatorBuilder: (context, index) => Divider(
+                color: theme.dividerColor.withAlpha(25),
+                height: 1,
+              ),
+              itemBuilder: (context, index) {
+                final activity = controller.recentActivity[index];
+                return _buildActivityItem(theme, activity);
+              },
+            ),
           ),
         ),
       ],
@@ -515,49 +587,54 @@ class _DashboardViewState extends State<DashboardView> {
     bool isMobile,
     DashboardController controller,
   ) {
+    // IMPORTANT: This Obx is fine because it's not nested inside another Obx
+    // It's used to observe controller.isSignOutLoading.value
     return Center(
-      child: NeoPopButton(
-        color: theme.colorScheme.error.withAlpha(204),
-        onTapUp: controller.isSignOutLoading.value ? null : controller.signOut,
-        onTapDown: controller.isSignOutLoading.value ? null : () {},
-        border: Border.all(
-          color: theme.colorScheme.error,
-        ),
-        depth: 5,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 12,
+      child: Obx(
+        () => NeoPopButton(
+          color: theme.colorScheme.error.withAlpha(204),
+          onTapUp:
+              controller.isSignOutLoading.value ? null : controller.signOut,
+          onTapDown: controller.isSignOutLoading.value ? null : () {},
+          border: Border.all(
+            color: theme.colorScheme.error,
           ),
-          child: controller.isSignOutLoading.value
-              ? SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      theme.colorScheme.onError,
-                    ),
-                  ),
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.logout,
-                      color: theme.colorScheme.onError,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Sign Out',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: theme.colorScheme.onError,
-                        fontWeight: FontWeight.bold,
+          depth: 5,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 12,
+            ),
+            child: controller.isSignOutLoading.value
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.onError,
                       ),
                     ),
-                  ],
-                ),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.logout,
+                        color: theme.colorScheme.onError,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Sign Out',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.onError,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
@@ -646,9 +723,12 @@ class _DashboardViewState extends State<DashboardView> {
               color: Colors.white,
             ),
             const SizedBox(height: 16),
+            // Note: Keep this height in sync with the maxHeight in _buildRecentActivitySection
+            // to prevent layout overflow issues (reduced from 300 to 250)
             Container(
               width: double.infinity,
-              height: 300,
+              height:
+                  250, // Reduced from 300 to match the constraint in the actual widget
               color: Colors.white,
             ),
             SizedBox(height: isMobile ? 24.0 : 32.0),

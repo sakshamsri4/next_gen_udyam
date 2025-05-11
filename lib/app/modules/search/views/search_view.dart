@@ -29,6 +29,9 @@ class _SearchViewState extends State<SearchView> {
   late final app_search.SearchController controller;
   late final NavigationController navigationController;
 
+  // Create a unique scaffold key for this view
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -41,8 +44,13 @@ class _SearchViewState extends State<SearchView> {
     } else {
       navigationController = Get.put(NavigationController(), permanent: true);
     }
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     // Set the selected index to the Search tab (index 1)
+    // This is safer than using initState with a direct value assignment
     navigationController.selectedIndex.value = 1;
   }
 
@@ -52,7 +60,7 @@ class _SearchViewState extends State<SearchView> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      key: navigationController.scaffoldKey,
+      key: _scaffoldKey,
       drawer: const CustomDrawer(),
       appBar: AppBar(
         title: const Text('Job Search'),
@@ -60,7 +68,7 @@ class _SearchViewState extends State<SearchView> {
         elevation: 0,
         leading: IconButton(
           icon: const HeroIcon(HeroIcons.bars3),
-          onPressed: navigationController.toggleDrawer,
+          onPressed: () => navigationController.toggleDrawer(_scaffoldKey),
         ),
         actions: [
           // Filter button
@@ -165,26 +173,28 @@ class _SearchViewState extends State<SearchView> {
     ThemeData theme,
     bool isMobile,
   ) {
-    return Obx(() {
-      // Show loading state
-      if (controller.isLoading.value) {
-        return _buildLoadingState(isMobile);
-      }
+    // IMPORTANT: We're already inside an Obx in the parent widget (line 96),
+    // so we don't need another Obx here. Using nested Obx widgets can cause
+    // "improper use of GetX" errors.
 
-      // Show search history if no query and no results
-      if (controller.searchTextController.text.isEmpty &&
-          controller.searchResults.isEmpty) {
-        return _buildSearchHistory(context, theme);
-      }
+    // Show loading state
+    if (controller.isLoading.value) {
+      return _buildLoadingState(isMobile);
+    }
 
-      // Show empty state if no results
-      if (controller.searchResults.isEmpty) {
-        return _buildEmptyState(theme);
-      }
+    // Show search history if no query and no results
+    if (controller.searchTextController.text.isEmpty &&
+        controller.searchResults.isEmpty) {
+      return _buildSearchHistory(context, theme);
+    }
 
-      // Show search results
-      return _buildResultsList(context, theme, isMobile);
-    });
+    // Show empty state if no results
+    if (controller.searchResults.isEmpty) {
+      return _buildEmptyState(theme);
+    }
+
+    // Show search results
+    return _buildResultsList(context, theme, isMobile);
   }
 
   /// Build the filter view
@@ -229,56 +239,60 @@ class _SearchViewState extends State<SearchView> {
 
   /// Build the search history
   Widget _buildSearchHistory(BuildContext context, ThemeData theme) {
-    return Obx(() {
-      if (controller.searchHistory.isEmpty) {
-        return Center(
-          child: Text(
-            'No search history yet',
-            style: theme.textTheme.bodyLarge,
-          ),
-        );
-      }
+    // IMPORTANT: We're already inside an Obx in the parent widget (line 96),
+    // so we don't need another Obx here. Using nested Obx widgets can cause
+    // "improper use of GetX" errors.
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Recent Searches',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton(
-                  onPressed: controller.clearSearchHistory,
-                  child: const Text('Clear All'),
-                ),
-              ],
-            ),
-          ),
-
-          // History list
-          Expanded(
-            child: ListView.builder(
-              itemCount: controller.searchHistory.length,
-              itemBuilder: (context, index) {
-                final item = controller.searchHistory[index];
-                return SearchHistoryItem(
-                  item: item,
-                  onTap: () => controller.useSearchHistoryItem(item),
-                  onDelete: () => controller.deleteSearchHistoryItem(index),
-                );
-              },
-            ),
-          ),
-        ],
+    if (controller.searchHistory.isEmpty) {
+      return Center(
+        child: Text(
+          'No search history yet',
+          style: theme.textTheme.bodyLarge,
+        ),
       );
-    });
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Recent Searches',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextButton(
+                onPressed: controller.clearSearchHistory,
+                child: const Text('Clear All'),
+              ),
+            ],
+          ),
+        ),
+
+        // History list - Expanded gives it a bounded height to prevent overflow
+        Expanded(
+          child: ListView.builder(
+            // Add physics to make sure scrolling works properly
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: controller.searchHistory.length,
+            itemBuilder: (context, index) {
+              final item = controller.searchHistory[index];
+              return SearchHistoryItem(
+                item: item,
+                onTap: () => controller.useSearchHistoryItem(item),
+                onDelete: () => controller.deleteSearchHistoryItem(index),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   /// Build the empty state
@@ -331,6 +345,7 @@ class _SearchViewState extends State<SearchView> {
     ThemeData theme,
     bool isMobile,
   ) {
+    // Make sure we have a bounded height for the ListView
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -345,10 +360,12 @@ class _SearchViewState extends State<SearchView> {
           ),
         ),
 
-        // Results list
+        // Results list - Expanded gives it a bounded height
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
+            // Add physics to make sure scrolling works properly
+            physics: const AlwaysScrollableScrollPhysics(),
             itemCount: controller.searchResults.length,
             itemBuilder: (context, index) {
               final job = controller.searchResults[index];

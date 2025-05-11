@@ -13,6 +13,10 @@ enum UserType {
   /// Employer/company user type
   @HiveField(1)
   employer,
+
+  /// Admin user type
+  @HiveField(2)
+  admin,
 }
 
 @HiveType(typeId: 0)
@@ -50,6 +54,8 @@ class UserModel {
         userType = UserType.employee;
       } else if (userTypeString == 'employer') {
         userType = UserType.employer;
+      } else if (userTypeString == 'admin') {
+        userType = UserType.admin;
       }
     }
 

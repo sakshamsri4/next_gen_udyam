@@ -24,8 +24,11 @@ class ApplicationsView extends GetView<ApplicationsController> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final navigationController = Get.find<NavigationController>();
 
+    // Create a local scaffold key for this view
+    final scaffoldKey = GlobalKey<ScaffoldState>();
+
     return Scaffold(
-      key: navigationController.scaffoldKey,
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text(
           'My Applications',
@@ -36,7 +39,7 @@ class ApplicationsView extends GetView<ApplicationsController> {
         centerTitle: true,
         leading: IconButton(
           icon: const HeroIcon(HeroIcons.bars3),
-          onPressed: navigationController.toggleDrawer,
+          onPressed: () => navigationController.toggleDrawer(scaffoldKey),
         ),
       ),
       drawer: const CustomDrawer(),

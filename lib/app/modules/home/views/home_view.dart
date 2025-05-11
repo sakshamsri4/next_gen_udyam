@@ -22,6 +22,9 @@ class _HomeViewState extends State<HomeView> {
   late final HomeController controller;
   late final NavigationController navigationController;
 
+  // Create a unique scaffold key for this view
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -34,8 +37,13 @@ class _HomeViewState extends State<HomeView> {
     } else {
       navigationController = Get.put(NavigationController(), permanent: true);
     }
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     // Set the selected index to the Home tab (index 0)
+    // This is safer than using initState with a direct value assignment
     navigationController.selectedIndex.value = 0;
   }
 
@@ -52,7 +60,7 @@ class _HomeViewState extends State<HomeView> {
     final themeController = ThemeController.to;
 
     return Scaffold(
-      key: navigationController.scaffoldKey,
+      key: _scaffoldKey,
       backgroundColor: theme.scaffoldBackgroundColor,
       bottomNavigationBar: const RoleBasedBottomNav(),
       appBar: AppBar(
@@ -91,6 +99,14 @@ class _HomeViewState extends State<HomeView> {
           ),
         ),
         actions: [
+          // Debug button for testing job details
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            tooltip: 'Test Job Details',
+            onPressed: () {
+              Get.toNamed<dynamic>('${Routes.jobs}/test');
+            },
+          ),
           IconButton(
             icon: Obx(
               () => Icon(

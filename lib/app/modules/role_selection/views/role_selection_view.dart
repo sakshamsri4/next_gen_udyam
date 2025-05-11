@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
+import 'package:next_gen/app/modules/auth/widgets/auth_progress_indicator.dart';
 import 'package:next_gen/app/modules/role_selection/controllers/role_selection_controller.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
 import 'package:next_gen/widgets/neopop_card.dart';
@@ -50,6 +51,15 @@ class RoleSelectionView extends GetView<RoleSelectionController> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Progress indicator
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: AuthProgressIndicator(
+                            currentStep: AuthStep.roleSelection,
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+
                         // Header
                         Text(
                           'Choose Your Role',
@@ -93,6 +103,16 @@ class RoleSelectionView extends GetView<RoleSelectionController> {
                                   'Post jobs, manage applications, and find talent',
                               icon: HeroIcons.buildingOffice2,
                               role: UserType.employer,
+                            ),
+
+                            // Admin role card
+                            _buildRoleCard(
+                              context,
+                              title: 'Admin',
+                              description:
+                                  'Manage users, jobs, and system settings',
+                              icon: HeroIcons.wrenchScrewdriver,
+                              role: UserType.admin,
                             ),
                           ],
                         ),

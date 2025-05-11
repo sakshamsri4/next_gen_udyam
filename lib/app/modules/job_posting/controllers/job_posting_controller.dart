@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/company_profile/controllers/company_profile_controller.dart';
+import 'package:next_gen/app/modules/company_profile/models/company_profile_model.dart';
 import 'package:next_gen/app/modules/job_posting/models/job_post_model.dart';
 import 'package:next_gen/app/modules/job_posting/services/job_posting_service.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
@@ -22,6 +23,14 @@ class JobPostingController extends GetxController
   final JobPostingService _jobPostingService;
   final LoggerService _logger;
   final CompanyProfileController _companyProfileController;
+
+  // For testing purposes only
+  Rx<CompanyProfileModel?>? _testProfile;
+
+  /// Set a test profile for testing purposes
+  void setTestProfile(Rx<CompanyProfileModel?> profile) {
+    _testProfile = profile;
+  }
 
   // Tab controller for job management
   late TabController tabController;
@@ -129,7 +138,9 @@ class JobPostingController extends GetxController
       _isLoading.value = true;
       _error.value = '';
 
-      final companyId = _companyProfileController.profile.value?.uid;
+      // Use test profile if available, otherwise use the real profile
+      final profile = _testProfile ?? _companyProfileController.profile;
+      final companyId = profile.value?.uid;
       if (companyId == null) {
         throw Exception('Company ID not available');
       }
@@ -231,7 +242,9 @@ class JobPostingController extends GetxController
     try {
       _isCreating.value = true;
 
-      final companyId = _companyProfileController.profile.value?.uid;
+      // Use test profile if available, otherwise use the real profile
+      final profile = _testProfile ?? _companyProfileController.profile;
+      final companyId = profile.value?.uid;
       if (companyId == null) {
         throw Exception('Company ID not available');
       }
@@ -453,29 +466,36 @@ class JobPostingController extends GetxController
   /// Delete a job posting
   Future<bool> deleteJobPosting(String jobId) async {
     try {
-      final result = await Get.dialog<bool>(
-        AlertDialog(
-          title: const Text('Delete Job Posting'),
-          content: const Text(
-            'Are you sure you want to delete this job posting? This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back<bool>(result: false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Get.back<bool>(result: true),
-              child: const Text(
-                'Delete',
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        ),
-      );
+      // Skip confirmation dialog in test mode
+      var shouldDelete = true;
 
-      if (result != true) {
+      if (!Get.testMode) {
+        final result = await Get.dialog<bool>(
+          AlertDialog(
+            title: const Text('Delete Job Posting'),
+            content: const Text(
+              'Are you sure you want to delete this job posting? This action cannot be undone.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back<bool>(result: false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Get.back<bool>(result: true),
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        );
+
+        shouldDelete = result ?? false;
+      }
+
+      if (!shouldDelete) {
         return false;
       }
 
@@ -487,13 +507,16 @@ class JobPostingController extends GetxController
         _applyStatusFilter();
         _calculateStatusCounts();
 
-        Get.snackbar(
-          'Success',
-          'Job posting deleted successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        // Only show snackbar if not in test mode
+        if (!Get.testMode) {
+          Get.snackbar(
+            'Success',
+            'Job posting deleted successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        }
 
         return true;
       } else {
@@ -501,13 +524,17 @@ class JobPostingController extends GetxController
       }
     } catch (e) {
       _logger.e('Error deleting job posting', e);
-      Get.snackbar(
-        'Error',
-        'Failed to delete job posting: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+
+      // Only show snackbar if not in test mode
+      if (!Get.testMode) {
+        Get.snackbar(
+          'Error',
+          'Failed to delete job posting: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
       return false;
     }
   }
@@ -533,13 +560,16 @@ class JobPostingController extends GetxController
         _applyStatusFilter();
         _calculateStatusCounts();
 
-        Get.snackbar(
-          'Success',
-          'Job status updated successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        // Only show snackbar if not in test mode
+        if (!Get.testMode) {
+          Get.snackbar(
+            'Success',
+            'Job status updated successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        }
 
         return true;
       } else {
@@ -547,13 +577,18 @@ class JobPostingController extends GetxController
       }
     } catch (e) {
       _logger.e('Error updating job status', e);
-      Get.snackbar(
-        'Error',
-        'Failed to update job status: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+
+      // Only show snackbar if not in test mode
+      if (!Get.testMode) {
+        Get.snackbar(
+          'Error',
+          'Failed to update job status: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
       return false;
     }
   }

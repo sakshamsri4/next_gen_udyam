@@ -19,8 +19,8 @@ class NavigationController extends GetxController {
   final RxBool isAnimating = false.obs;
   final Rx<UserType?> userRole = Rx<UserType?>(null);
 
-  // Global key for the scaffold drawer
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  // We no longer use a shared scaffold key to avoid duplicate key errors
+  // Each view should create its own scaffold key
 
   // List of routes for employee
   final List<String> _employeeRoutes = [
@@ -40,14 +40,27 @@ class NavigationController extends GetxController {
     Routes.profile,
   ];
 
+  // List of routes for admin
+  final List<String> _adminRoutes = [
+    Routes.dashboard,
+    Routes.jobPosting, // Job posting management
+    Routes.search, // User management
+    Routes.settings, // System settings
+    Routes.profile,
+  ];
+
   // Map of route names to tab indices
-  late final Map<String, int> _routeIndices;
+  final Map<String, int> _routeIndices = {};
 
   // Get current routes based on user role
   List<String> get _routes {
-    return userRole.value == UserType.employer
-        ? _employerRoutes
-        : _employeeRoutes;
+    if (userRole.value == UserType.employer) {
+      return _employerRoutes;
+    } else if (userRole.value == UserType.admin) {
+      return _adminRoutes;
+    } else {
+      return _employeeRoutes;
+    }
   }
 
   @override
@@ -74,18 +87,32 @@ class NavigationController extends GetxController {
       if (_authController.isLoggedIn) {
         final userModel = await _authService.getUserFromHive();
         if (userModel != null) {
-          userRole.value = userModel.userType;
-          _logger.i('User role loaded: ${userRole.value}');
+          // Check if the role has changed before updating
+          final oldRole = userRole.value;
+          final newRole = userModel.userType;
 
-          // Update route indices when role changes
-          _updateRouteIndices();
+          if (oldRole != newRole) {
+            _logger.i('User role changed from $oldRole to $newRole');
+            userRole.value = newRole;
+
+            // Only update route indices when role actually changes
+            _updateRouteIndices();
+          } else {
+            _logger.d('User role unchanged: $newRole');
+          }
         } else {
           _logger.w('User model not found in storage');
-          userRole.value = null;
+          if (userRole.value != null) {
+            userRole.value = null;
+            _updateRouteIndices();
+          }
         }
       } else {
         _logger.d('User not logged in, clearing role');
-        userRole.value = null;
+        if (userRole.value != null) {
+          userRole.value = null;
+          _updateRouteIndices();
+        }
       }
     } catch (e) {
       _logger.e('Error loading user role', e);
@@ -95,11 +122,16 @@ class NavigationController extends GetxController {
 
   /// Update route indices map based on current role
   void _updateRouteIndices() {
-    _routeIndices = {};
+    // Clear the existing map instead of reassigning
+    _routeIndices.clear();
+
+    // Add new route indices based on current role
     final routes = _routes;
     for (var i = 0; i < routes.length; i++) {
       _routeIndices[routes[i]] = i;
     }
+
+    _logger.d('Route indices updated for role: ${userRole.value}');
   }
 
   /// Change the selected tab index and navigate to the corresponding route
@@ -127,7 +159,7 @@ class NavigationController extends GetxController {
   }
 
   /// Open the drawer
-  void openDrawer() {
+  void openDrawer(GlobalKey<ScaffoldState> scaffoldKey) {
     if (scaffoldKey.currentState != null &&
         !scaffoldKey.currentState!.isDrawerOpen) {
       scaffoldKey.currentState!.openDrawer();
@@ -136,7 +168,7 @@ class NavigationController extends GetxController {
   }
 
   /// Close the drawer
-  void closeDrawer() {
+  void closeDrawer(GlobalKey<ScaffoldState> scaffoldKey) {
     if (scaffoldKey.currentState != null &&
         scaffoldKey.currentState!.isDrawerOpen) {
       scaffoldKey.currentState!.closeDrawer();
@@ -145,13 +177,17 @@ class NavigationController extends GetxController {
   }
 
   /// Toggle the drawer
-  void toggleDrawer() {
-    if (scaffoldKey.currentState != null) {
-      if (scaffoldKey.currentState!.isDrawerOpen) {
-        closeDrawer();
-      } else {
-        openDrawer();
-      }
+  void toggleDrawer([GlobalKey<ScaffoldState>? scaffoldKey]) {
+    // If no key is provided, we can't toggle the drawer
+    if (scaffoldKey == null || scaffoldKey.currentState == null) {
+      _logger.w('Cannot toggle drawer: No valid scaffold key provided');
+      return;
+    }
+
+    if (scaffoldKey.currentState!.isDrawerOpen) {
+      closeDrawer(scaffoldKey);
+    } else {
+      openDrawer(scaffoldKey);
     }
   }
 

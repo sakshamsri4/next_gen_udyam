@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
+import 'package:next_gen/app/modules/auth/services/signup_session_service.dart';
+import 'package:next_gen/core/firebase/firebase_initializer.dart';
 // Analytics service commented out for now, will be implemented later
 // import 'package:next_gen/core/services/analytics_service.dart';
 import 'package:next_gen/core/services/connectivity_service.dart';
@@ -19,18 +21,30 @@ Future<void> initializeServices() async {
   final logger = serviceLocator<LoggerService>()
     ..i('Service Locator: Logger service registered')
 
+    // Register Firebase initializer
+    ..i('Service Locator: Registering Firebase initializer...');
+
+  serviceLocator.registerSingleton<FirebaseInitializer>(FirebaseInitializer());
+
+  logger
+    ..i('Service Locator: Firebase initializer registered')
+
     // Register storage services
     ..i('Service Locator: Registering storage services...');
 
-  serviceLocator
-    ..registerSingleton<HiveManager>(HiveManager())
-    ..registerSingleton<StorageService>(StorageService());
+  // Register HiveManager first and initialize it
+  serviceLocator.registerSingleton<HiveManager>(HiveManager());
 
-  // Initialize Hive
+  // Initialize Hive before registering StorageService
   logger.i('Service Locator: Initializing Hive...');
   await serviceLocator<HiveManager>().initialize();
+
+  // Register StorageService after Hive is initialized
+  logger.i('Service Locator: Registering StorageService...');
+  serviceLocator.registerSingleton<StorageService>(StorageService());
+
   logger
-    ..i('Service Locator: Hive initialized')
+    ..i('Service Locator: Hive initialized and StorageService registered')
 
     // Register connectivity service
     ..i('Service Locator: Registering connectivity service...');
@@ -57,6 +71,13 @@ Future<void> initializeServices() async {
   serviceLocator.registerSingleton<AuthService>(AuthService());
   logger
     ..i('Service Locator: Auth service registered')
+
+    // Register signup session service
+    ..i('Service Locator: Registering signup session service...');
+  serviceLocator
+      .registerSingleton<SignupSessionService>(SignupSessionService());
+  logger
+    ..i('Service Locator: Signup session service registered')
 
     // Analytics service commented out for now, will be implemented later
     /*

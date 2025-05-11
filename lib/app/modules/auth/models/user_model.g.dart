@@ -72,6 +72,8 @@ class UserTypeAdapter extends TypeAdapter<UserType> {
         return UserType.employee;
       case 1:
         return UserType.employer;
+      case 2:
+        return UserType.admin;
       default:
         return UserType.employee;
     }
@@ -85,6 +87,9 @@ class UserTypeAdapter extends TypeAdapter<UserType> {
         break;
       case UserType.employer:
         writer.writeByte(1);
+        break;
+      case UserType.admin:
+        writer.writeByte(2);
         break;
     }
   }

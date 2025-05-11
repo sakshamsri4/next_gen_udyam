@@ -24,17 +24,20 @@ class ResumeView extends GetView<ResumeController> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final navigationController = Get.find<NavigationController>();
 
+    // Create a local scaffold key for this view
+    final scaffoldKey = GlobalKey<ScaffoldState>();
+
     // Set the selected index to the Resume tab (index 3)
     navigationController.selectedIndex.value = 3;
 
     return Scaffold(
-      key: navigationController.scaffoldKey,
+      key: scaffoldKey,
       appBar: AppBar(
         title: const Text('My Resume'),
         centerTitle: true,
         leading: IconButton(
           icon: const HeroIcon(HeroIcons.bars3),
-          onPressed: navigationController.toggleDrawer,
+          onPressed: () => navigationController.toggleDrawer(scaffoldKey),
         ),
       ),
       drawer: const CustomDrawer(),

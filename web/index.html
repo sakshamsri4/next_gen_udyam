@@ -109,6 +109,14 @@
   </div>
 
   <!-- Firebase Configuration -->
+  <!--
+    Note: Firebase is now initialized by the Flutter app using firebase_core package.
+    We don't need to initialize it here anymore.
+
+    If you need to use Firebase JS SDK directly, you can access the initialized app
+    through the window.firebase object that is exposed by the firebase_core_web package.
+  -->
+  <!--
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -128,18 +136,21 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
   </script>
+  -->
 
   <script src="flutter.js" defer></script>
   <script>
     // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = null;
+    // Use the template token as recommended in the deprecation notice
+    var serviceWorkerVersion = '{{flutter_service_worker_version}}';
 
     window.addEventListener('load', function (ev) {
       // Hide loading indicator when Flutter app is ready
       const loadingIndicator = document.querySelector('#loading-indicator');
 
       // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
+      // Use load instead of loadEntrypoint as recommended in the deprecation notice
+      _flutter.loader.load({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },

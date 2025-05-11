@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/auth/models/signup_session.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
@@ -23,7 +24,8 @@ class RoleSelectionController extends GetxController {
   /// Check if continue button is enabled
   bool get isContinueEnabled => selectedRole.value != null && !isLoading.value;
 
-  /// Set the selected role
+  /// Set the selected role (for backward compatibility)
+  // ignore: use_setters_to_change_properties
   void setRole(UserType role) {
     selectedRole.value = role;
   }
@@ -64,12 +66,22 @@ class RoleSelectionController extends GetxController {
       // Save to Firestore
       await _authService.updateUserInFirestore(updatedUserModel);
 
+      // Update signup session if we're in the signup flow
+      if (_authController.currentSignupStep.value == SignupStep.emailVerified) {
+        await _authController.saveSignupSession(step: SignupStep.roleSelected);
+      }
+
       // Navigate to appropriate screen based on role
       if (selectedRole.value == UserType.employee) {
+        await Get.offAllNamed<dynamic>(Routes.dashboard);
+      } else if (selectedRole.value == UserType.admin) {
         await Get.offAllNamed<dynamic>(Routes.dashboard);
       } else {
         await Get.offAllNamed<dynamic>(Routes.dashboard);
       }
+
+      // Clear signup session as we've completed the flow
+      await _authController.clearSignupSession();
     } catch (e) {
       _logger.e('Error setting user role', e);
       Get.snackbar(

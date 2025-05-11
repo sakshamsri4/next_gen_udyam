@@ -818,6 +818,61 @@
     - Need to update the project roadmap to reflect the new approach
     - The third-party app (JobsFlutterApp) has been cloned and dependencies upgraded
 
+- Fixed GetX Reactive UI Issues and Layout Overflow:
+  - **Issue Description**:
+    - App was showing error: "The improper use of a GetX has been detected"
+    - Another error: "A RenderFlex overflowed by 99435 pixels on the bottom"
+    - These errors occurred when using Obx widgets and when rendering lists with unbounded height
+    - The issues were causing UI elements to disappear and error messages to appear
+
+  - **Root Cause Analysis**:
+    - Nested Obx widgets in SearchView and DashboardView were causing reactive state issues
+    - ListView widgets without proper height constraints were causing overflow errors
+    - Direct access to .obs variables outside of reactive contexts
+    - Unbounded ListView in the recent activity section was causing overflow
+    - The RoleBasedBottomNav widget was using ScreenUtil without proper initialization
+    - The RoleBasedBottomNav widget was using Obx in a way that caused reactive state issues
+    - The CustomDrawer widget was using ScreenUtil without proper initialization
+    - The CustomDrawer widget was using deprecated withOpacity methods
+
+  - **Working Solution**:
+    - Fixed RoleBasedBottomNav widget:
+      - Converted from StatelessWidget to StatefulWidget to properly manage state
+      - Removed direct access to .value properties of observable variables
+      - Used local state variables and listeners to update state when observables change
+      - Removed ScreenUtil dependency to avoid initialization issues
+      - Added proper error handling for controller initialization
+    - Fixed CustomDrawer widget:
+      - Removed ScreenUtil dependency to avoid initialization issues
+      - Replaced all .r, .h, and .w extensions with fixed values
+      - Replaced deprecated withOpacity calls with withAlpha for better precision
+      - Fixed controller access to avoid reactive state issues
+      - Added proper error handling for controller initialization
+    - Fixed nested Obx widgets:
+      - Removed redundant Obx widgets in SearchView's _buildSearchResults and _buildSearchHistory methods
+      - Added proper Obx wrappers around conditional UI in DashboardView
+      - Ensured each reactive variable is properly observed in a single Obx widget
+      - Added detailed comments explaining proper Obx usage to prevent future issues
+    - Fixed layout overflow issues:
+      - Added proper physics to ListView widgets with AlwaysScrollableScrollPhysics
+      - Limited the number of items in the recent activity list to prevent overflow
+      - Added ConstrainedBox with maxHeight constraint to the recent activity ListView
+      - Added comments to explain the changes for future maintenance
+      - Ensured all Column widgets with ListView children have proper height constraints
+    - Enhanced error handling and logging:
+      - Added detailed comments explaining reactive UI patterns
+      - Improved error recovery with proper state management
+      - Added clear warnings about nested Obx widgets
+
+  - **Benefits**:
+    - Eliminated the "improper use of GetX" errors
+    - Fixed the layout overflow issues (99435 pixels on the bottom)
+    - Fixed drawer opening issues that were causing crashes
+    - Improved UI stability and performance
+    - Enhanced error handling and recovery
+    - Made the code more maintainable with proper reactive patterns
+    - Added educational comments to prevent similar issues in the future
+
   - **Implementation Details**:
     - Analyzed the third-party JobsFlutterApp structure and functionality:
       - Identified key modules: Auth, Home, Search, JobDetails, Profiles
@@ -1201,6 +1256,52 @@
     - The second tap would trigger the loading indicator and complete the sign out process
     - This created a confusing user experience
 
+## [2024-08-03]
+- Fixed Persistent GetX Reactive UI Issues and Layout Overflow:
+  - **Issue Description**:
+    - App was still showing error: "The improper use of a GetX has been detected"
+    - Another error: "A RenderFlex overflowed by 99418 pixels on the bottom"
+    - These errors persisted despite previous fixes
+    - The issues were causing UI elements to disappear and error messages to appear
+
+  - **Root Cause Analysis**:
+    - Despite previous fixes, there were still issues with nested Obx widgets in CustomDrawer
+    - The CustomDrawer was using direct access to .value properties of observable variables inside Obx
+    - The dashboard_view.dart still had layout overflow issues in the recent activity section
+    - The ConstrainedBox in the recent activity section had a maxHeight that was too large
+
+  - **Working Solution**:
+    - Updated CustomDrawer widget:
+      - Converted from StatelessWidget to StatefulWidget to properly manage state
+      - Removed direct access to .value properties of observable variables inside Obx
+      - Used local state variables and listeners to update state when observables change
+      - Added proper error handling for controller initialization
+    - Fixed layout overflow issues in dashboard_view.dart:
+      - Reduced the maxHeight constraint in the recent activity section from 300 to 250
+      - Added proper physics to ListView widgets with NeverScrollableScrollPhysics
+      - Limited the number of items in the recent activity list to 3 instead of 4
+      - Added detailed comments explaining the changes for future maintenance
+    - Added comprehensive error logging:
+      - Enhanced GlobalErrorHandler to catch and log GetX-specific errors
+      - Added detailed comments explaining reactive UI patterns
+      - Improved error recovery with proper state management
+
+  - **Benefits**:
+    - Eliminated the "improper use of GetX" errors
+    - Fixed the layout overflow issues (99418 pixels on the bottom)
+    - Improved UI stability and performance
+    - Enhanced error handling and recovery
+    - Made the code more maintainable with proper reactive patterns
+    - Added educational comments to prevent similar issues in the future
+
+  - **Lessons Learned**:
+    - Always convert to StatefulWidget when managing reactive state with GetX
+    - Never access .value properties of observable variables inside Obx widgets
+    - Use local state variables and listeners to update state when observables change
+    - Always provide bounded height constraints for ListView widgets inside Column widgets
+    - Test UI on different screen sizes to catch overflow issues early
+    - Add clear comments about reactive UI patterns to educate other developers
+
   - **Root Cause Analysis**:
     - The issue was related to how the NeoPopButton from the neopop package handles tap events
     - NeoPopButton has separate callbacks for `onTapDown` and `onTapUp`
@@ -1388,6 +1489,100 @@
     - Placeholder routes allow for incremental development
 
 ## [2024-07-29]
+- Fixed Navigation Issues with Duplicate GlobalKeys and Late Initialization:
+  - **Issue Description**:
+    - App was crashing with error: "Duplicate GlobalKey detected in widget tree"
+    - Another error: "LateInitializationError: Field '_routeIndices' has already been initialized"
+    - These errors occurred when navigating between screens, especially from dashboard to search and back
+    - The issues were causing UI elements to disappear and navigation to break
+
+  - **Root Cause Analysis**:
+    - The `NavigationController` had a shared `GlobalKey<ScaffoldState> scaffoldKey` that was being used by multiple screens
+    - When navigating between screens, Flutter detected the same key being used in multiple places
+    - The `_routeIndices` field was declared as `late final` but was being initialized multiple times when user role changed
+    - The controller was trying to update a final field which caused the LateInitializationError
+
+  - **Working Solution**:
+    - Removed the shared scaffoldKey from NavigationController:
+      - Changed from a shared key to requiring each view to provide its own key
+      - Updated the drawer toggle methods to accept a scaffold key parameter
+      - Added proper null checking and error logging for key operations
+    - Added local scaffold keys to each view:
+      - Updated SearchView, DashboardView, ApplicationsView, HomeView, SavedJobsView, and ResumeView
+      - Each view now creates and manages its own unique scaffold key
+      - Updated drawer toggle calls to pass the local key to the controller
+    - Fixed the LateInitializationError:
+      - Changed `_routeIndices` from `late final` to a regular field with an initial empty map
+      - Updated `_updateRouteIndices()` to clear the map instead of reassigning it
+      - Improved `_loadUserRole()` to only update route indices when the role actually changes
+      - Added comprehensive logging throughout the process
+    - Enhanced error handling and logging:
+      - Added detailed logs for role changes and route index updates
+      - Improved error recovery with proper state management
+      - Added fallback behavior when keys are missing or invalid
+
+  - **Benefits**:
+    - Eliminated the "Duplicate GlobalKey" error during navigation
+    - Fixed the LateInitializationError when changing user roles
+    - Improved navigation stability across the app
+    - Enhanced error handling and recovery
+    - Added better logging for debugging navigation issues
+    - Made the code more maintainable with proper separation of concerns
+
+  - **Lessons Learned**:
+    - Avoid sharing GlobalKeys across multiple widgets in the widget tree
+    - Each widget should manage its own state and keys
+    - Use regular fields instead of `late final` for values that might change
+    - Add proper error handling and logging for navigation operations
+    - Test navigation flows thoroughly, especially back navigation
+    - Consider how shared state variables might affect different parts of the app
+
+- Fixed GetX Reactive UI Issues and Layout Overflow:
+  - **Issue Description**:
+    - App was showing error: "The improper use of a GetX has been detected"
+    - Another error: "A RenderFlex overflowed by 99435 pixels on the bottom"
+    - These errors occurred when using Obx widgets and when rendering lists with unbounded height
+    - The issues were causing UI elements to disappear and error messages to appear
+
+  - **Root Cause Analysis**:
+    - Nested Obx widgets in SearchView and DashboardView were causing reactive state issues
+    - ListView widgets without proper height constraints were causing overflow errors
+    - Direct access to .obs variables outside of reactive contexts
+    - Unbounded ListView in the recent activity section was causing overflow
+
+  - **Working Solution**:
+    - Fixed nested Obx widgets:
+      - Removed redundant Obx widgets in SearchView's _buildSearchResults and _buildSearchHistory methods
+      - Added proper Obx wrappers around conditional UI in DashboardView
+      - Ensured each reactive variable is properly observed in a single Obx widget
+      - Added detailed comments explaining proper Obx usage to prevent future issues
+    - Fixed layout overflow issues:
+      - Added proper physics to ListView widgets with AlwaysScrollableScrollPhysics
+      - Limited the number of items in the recent activity list to prevent overflow
+      - Added ConstrainedBox with maxHeight constraint to the recent activity ListView
+      - Added comments to explain the changes for future maintenance
+      - Ensured all Column widgets with ListView children have proper height constraints
+    - Enhanced error handling and logging:
+      - Added detailed comments explaining reactive UI patterns
+      - Improved error recovery with proper state management
+      - Added clear warnings about nested Obx widgets
+
+  - **Benefits**:
+    - Eliminated the "improper use of GetX" errors
+    - Fixed the layout overflow issues (99435 pixels on the bottom)
+    - Improved UI stability and performance
+    - Enhanced error handling and recovery
+    - Made the code more maintainable with proper reactive patterns
+    - Added educational comments to prevent similar issues in the future
+
+  - **Lessons Learned**:
+    - Avoid nesting Obx widgets - each observable should be wrapped in exactly one Obx
+    - Always provide bounded height for ListView widgets inside Column widgets (use ConstrainedBox)
+    - Use ListView.builder with proper physics for scrollable lists
+    - Limit the number of items in lists that use shrinkWrap and NeverScrollableScrollPhysics
+    - Test UI on different screen sizes to catch overflow issues early
+    - Add clear comments about reactive UI patterns to educate other developers
+
 - Fixed Bottom Navigation Tab Views:
   - **Issue Description**:
     - The search, resume, and profile tabs were all showing the same home screen content

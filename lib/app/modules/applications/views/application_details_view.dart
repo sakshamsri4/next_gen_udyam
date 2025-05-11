@@ -336,7 +336,8 @@ class ApplicationDetailsView extends GetView<ApplicationsController> {
                         Text(
                           'Location',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface
+                                .withAlpha(153), // 0.6 * 255 = 153
                           ),
                         ),
                         SizedBox(height: 4.h),
@@ -368,7 +369,8 @@ class ApplicationDetailsView extends GetView<ApplicationsController> {
                         Text(
                           'Job Type',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface
+                                .withAlpha(153), // 0.6 * 255 = 153
                           ),
                         ),
                         SizedBox(height: 4.h),
@@ -498,7 +500,7 @@ class ApplicationDetailsView extends GetView<ApplicationsController> {
               SizedBox(height: 8.h),
               OutlinedButton.icon(
                 onPressed: () {
-                  // TODO: Implement resume viewing
+                  // TODO(resume): Implement resume viewing
                   Get.snackbar(
                     'Coming Soon',
                     'Resume viewing will be available soon',
@@ -544,7 +546,8 @@ class ApplicationDetailsView extends GetView<ApplicationsController> {
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface
+                      .withAlpha(153), // 0.6 * 255 = 153
                 ),
               ),
               SizedBox(height: 4.h),

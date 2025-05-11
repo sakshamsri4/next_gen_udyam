@@ -8,23 +8,21 @@ import 'package:next_gen/core/services/logger_service.dart';
 class RoleSelectionBinding extends Bindings {
   @override
   void dependencies() {
-    // Get logger service
-    final logger = Get.find<LoggerService>();
-    logger.i('RoleSelectionBinding: Registering dependencies');
-
-    // Ensure required services are registered
+    // Register dependencies
     if (!Get.isRegistered<AuthController>()) {
-      logger.i('RoleSelectionBinding: Registering AuthController');
       Get.put(AuthController(), permanent: true);
     }
 
     if (!Get.isRegistered<AuthService>()) {
-      logger.i('RoleSelectionBinding: Registering AuthService');
       Get.put(AuthService(), permanent: true);
     }
 
     // Register RoleSelectionController
-    logger.i('RoleSelectionBinding: Registering RoleSelectionController');
     Get.lazyPut<RoleSelectionController>(RoleSelectionController.new);
+
+    // Log registrations
+    Get.find<LoggerService>()
+      ..i('RoleSelectionBinding: Dependencies registered')
+      ..i('RoleSelectionController registered');
   }
 }

@@ -30,7 +30,13 @@ class _DashboardViewState extends State<DashboardView> {
     // Get the controllers
     controller = Get.find<DashboardController>();
     navigationController = Get.find<NavigationController>();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     // Set the selected index to the Dashboard tab (index 0)
+    // This is safer than using initState with a direct value assignment
     navigationController.selectedIndex.value = 0;
   }
 
