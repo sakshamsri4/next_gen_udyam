@@ -102,11 +102,6 @@
     - Ensured 100% test coverage for new components
     - Fixed all linting issues and trailing commas
 
-- Added Context 7 prompt requirement:
-  - Updated augment_rules.md with the requirement to include "use context 7 MCP server" in prompts
-  - Added dedicated section for Context 7 in augment_rules.md
-  - Established requirement to always include the Context 7 phrase in prompts to Augment Code
-
 - Implemented comprehensive development workflow automation:
   - Created feature branch `feature/workflow-automation` for these changes
   - Created scripts directory with utility scripts:
@@ -811,6 +806,163 @@
     - Stack trace showed the error happening during the AuthBinding.dependencies method
 
 ## [2024-07-28]
+- Fixed Hive Adapter Registration Issue for SignupSession:
+  - **Issue Description**:
+    - App was crashing with error: "HiveError: Cannot write, unknown type: SignupSession. Did you forget to register an adapter?"
+    - Error occurred in SignupSessionService.saveSession method
+    - The error was preventing signup sessions from being saved to Hive
+    - This affected the ability to resume signup process after interruption
+
+  - **Root Cause Analysis**:
+    - The SignupSession and SignupStep Hive adapters were defined but not properly registered before use
+    - There was a race condition where the SignupSessionService was used before HiveManager completed initialization
+    - The error occurred because Hive couldn't serialize the SignupSession object without a registered adapter
+    - Two different adapter implementations existed: generated adapters in signup_session.g.dart and custom adapters in signup_session_adapter_helper.dart
+
+  - **Working Solution**:
+    - Updated SignupSessionAdapterHelper to use the generated adapters:
+      - Removed custom adapter implementations that duplicated the generated ones
+      - Added constants for type IDs to improve code readability
+      - Improved error handling and logging
+    - Enhanced SignupSessionService with proper initialization:
+      - Added _adaptersRegistered flag to track registration status
+      - Implemented onInit method to register adapters during initialization
+      - Created _ensureAdaptersRegistered method for centralized adapter registration
+      - Updated all methods to use the new _ensureAdaptersRegistered method
+      - Improved error handling throughout the service
+
+  - **Benefits**:
+    - Fixed the "Cannot write, unknown type: SignupSession" error
+    - Improved adapter registration reliability
+    - Eliminated duplicate adapter implementations
+    - Enhanced error handling and logging
+    - Made the code more maintainable with centralized adapter registration
+
+  - **Lessons Learned**:
+    - Always register Hive adapters before using them
+    - Use a single approach for adapter registration to avoid conflicts
+    - Implement proper initialization in service classes
+    - Use flags to track initialization status
+    - Add comprehensive error handling for database operations
+
+- Fixed setState() Called During Build Error in RoleBasedBottomNav:
+  - **Issue Description**:
+    - App was showing error: "setState() or markNeedsBuild() called during build"
+    - The error occurred in the RoleBasedBottomNav widget
+    - The issue was caused by the DashboardView directly modifying NavigationController.selectedIndex.value in didChangeDependencies
+    - This was triggering a setState() call in the RoleBasedBottomNav widget during the build phase
+
+  - **Root Cause Analysis**:
+    - The RoleBasedBottomNav widget was using ever() listeners that called setState() when observable values changed
+    - These listeners were being triggered during the build phase when DashboardView updated selectedIndex.value
+    - Flutter doesn't allow calling setState() during the build phase as it can cause infinite rebuild loops
+    - The issue was exacerbated by multiple views updating the selectedIndex in their didChangeDependencies methods
+
+  - **Working Solution**:
+    - Completely refactored the RoleBasedBottomNav widget to use a more robust approach:
+      - Removed the ever() listeners that were calling setState() directly
+      - Added a didChangeDependencies method that uses Future.microtask to schedule setState() calls after the build phase
+      - Converted the widget to use Obx for reactive UI updates instead of relying on local state
+      - Made _buildNavItem use Obx to reactively respond to selectedIndex changes
+    - This approach ensures that:
+      - The widget still responds to changes in the NavigationController
+      - setState() is never called during the build phase
+      - The UI updates properly when the selected index or user role changes
+
+  - **Benefits**:
+    - Fixed the "setState() called during build" error
+    - Made the bottom navigation bar more robust against state changes
+    - Improved the widget's reactivity using GetX's Obx
+    - Prevented potential infinite rebuild loops
+    - Enhanced the overall stability of the navigation system
+
+  - **Lessons Learned**:
+    - Avoid using ever() listeners that call setState() directly
+    - Use Future.microtask to schedule setState() calls after the build phase
+    - Prefer Obx for reactive UI updates when using GetX
+    - Be careful when updating observable values in lifecycle methods like didChangeDependencies
+    - Test widgets with different state update patterns to ensure they handle all cases properly
+- Fixed Layout Overflow in Signup View:
+  - **Issue Description**:
+    - App was showing error: "A RenderFlex overflowed by 34 pixels on the right"
+    - This layout overflow was occurring in the signup view
+    - The error was affecting the UI appearance and causing error messages in the console
+    - This is a common Flutter UI issue where a widget is trying to render content that doesn't fit within its constraints
+
+  - **Root Cause Analysis**:
+    - Multiple UI components in the signup view were not handling overflow properly:
+      - The role selection section was using a Wrap widget but needed better alignment
+      - The Google Sign Up button had a Row that could overflow on smaller screens
+      - The "Already have an account?" section was using a Row that could overflow
+      - The "OR" divider had horizontal padding that was too large
+
+  - **Working Solution**:
+    - Updated the Google Sign Up button:
+      - Added `mainAxisSize: MainAxisSize.min` to prevent the Row from taking full width
+      - Wrapped the text in a Flexible widget to allow it to shrink if needed
+      - Added `overflow: TextOverflow.ellipsis` to handle text overflow gracefully
+    - Replaced the "Already have an account?" Row with a Wrap widget:
+      - Used `alignment: WrapAlignment.center` to center the content
+      - Used `crossAxisAlignment: WrapCrossAlignment.center` to align items vertically
+    - Improved the "OR" divider:
+      - Reduced horizontal padding from 16 to 8
+      - Reduced the font size to 12
+      - Added flex parameters to ensure equal sizing of dividers
+
+  - **Benefits**:
+    - Fixed the layout overflow error
+    - Improved UI appearance on smaller screens
+    - Prevented error messages in the console
+    - Made the signup view more responsive
+    - Enhanced user experience by ensuring all content is visible
+
+  - **Lessons Learned**:
+    - Use Wrap widgets instead of Row widgets when content might overflow
+    - Add Flexible widgets to allow text to shrink when needed
+    - Use TextOverflow.ellipsis to handle text overflow gracefully
+    - Reduce padding and font sizes on smaller screens
+    - Test UI on different screen sizes to catch overflow issues early
+- Fixed Hive Adapter Registration Issue for SignupSession:
+  - **Issue Description**:
+    - App was crashing with error: "HiveError: Cannot write, unknown type: SignupSession. Did you forget to register an adapter?"
+    - Error occurred in SignupSessionService.saveSession method
+    - The error was preventing signup sessions from being saved to Hive
+    - This affected the ability to resume signup process after interruption
+
+  - **Root Cause Analysis**:
+    - The SignupSession and SignupStep Hive adapters were defined but not properly registered before use
+    - The HiveManager was initializing adapters, but there might be a race condition where the SignupSessionService was used before HiveManager completed initialization
+    - The error occurred because Hive couldn't serialize the SignupSession object without a registered adapter
+    - The initial approach of directly using the generated adapter classes didn't work because they are part of the generated code and not directly accessible
+
+  - **Working Solution**:
+    - Created a dedicated SignupSessionAdapterHelper class:
+      - Implemented custom adapter classes that match the generated ones
+      - Added a static registerAdapters method to handle registration in one place
+      - Made the helper class handle all adapter registration logic
+    - Updated SignupSessionService to use the helper class:
+      - Replaced direct adapter registration with calls to SignupSessionAdapterHelper
+      - Simplified all methods to use the same adapter registration approach
+      - Added more detailed error logging to capture HiveError details
+      - Improved error handling with proper fallbacks
+    - This approach ensures that even if HiveManager hasn't completed initialization, the SignupSessionService can still function by registering the adapters itself
+
+  - **Benefits**:
+    - Fixed the "unknown type: SignupSession" error
+    - Created a reusable pattern for adapter registration that can be applied to other models
+    - Improved error handling and recovery
+    - Enhanced logging for better debugging
+    - Made the service more robust against initialization timing issues
+    - Ensured signup sessions can be properly saved and retrieved
+
+  - **Lessons Learned**:
+    - Generated Hive adapter classes can't be directly accessed from other files
+    - Create dedicated helper classes for adapter registration when needed
+    - Add proper error handling for Hive operations
+    - Use detailed logging for database operations
+    - Consider initialization order and potential race conditions
+    - Implement defensive programming to handle cases where dependencies might not be fully initialized
+
 - Integrated Third-Party Job Portal App and Updated Roadmap:
   - **Issue Description**:
     - Need to accelerate development by integrating an existing job portal app
