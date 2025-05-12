@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:next_gen/app/modules/search/models/search_filter.dart';
 
+// We're using custom adapters defined in hive_adapters.dart instead of generated ones
+// part 'saved_search_model.g.dart';
+
 /// Type ID for Hive
 const savedSearchModelTypeId = 5;
 

@@ -11,6 +11,7 @@ import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:next_gen/app/shared/widgets/empty_state.dart';
 import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
+import 'package:next_gen/core/theme/role_themes.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/job_management_shimmer.dart';
 
 /// Job posting management view for employers
@@ -43,17 +44,21 @@ class JobPostingView extends GetView<JobPostingController> {
       ),
       drawer: const CustomDrawer(),
       bottomNavigationBar: const RoleBasedBottomNav(),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showJobCreationForm(context),
-        backgroundColor: theme.colorScheme.primary,
-        child: const HeroIcon(
+        backgroundColor: RoleThemes.employerPrimary,
+        icon: const HeroIcon(
           HeroIcons.plus,
           style: HeroIconStyle.solid,
           color: Colors.white,
         ),
+        label: const Text('Post Job', style: TextStyle(color: Colors.white)),
       ),
       body: Column(
         children: [
+          // Metrics Dashboard
+          _buildMetricsDashboard(theme, isDarkMode),
+
           // Tab bar
           ColoredBox(
             color: isDarkMode ? AppTheme.darkSurface : AppTheme.lightSurface,
@@ -67,10 +72,10 @@ class JobPostingView extends GetView<JobPostingController> {
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
               ),
-              labelColor: theme.colorScheme.primary,
+              labelColor: RoleThemes.employerPrimary,
               unselectedLabelColor:
                   theme.colorScheme.onSurface.withAlpha(179), // 0.7 * 255 = 179
-              indicatorColor: theme.colorScheme.primary,
+              indicatorColor: RoleThemes.employerPrimary,
               tabs: [
                 _buildTab('All', null),
                 _buildTab('Active', JobStatus.active),
@@ -127,6 +132,10 @@ class JobPostingView extends GetView<JobPostingController> {
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: controller.refreshJobs,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: RoleThemes.employerPrimary,
+                            foregroundColor: Colors.white,
+                          ),
                           child: const Text('Try Again'),
                         ),
                       ],
@@ -189,8 +198,8 @@ class JobPostingView extends GetView<JobPostingController> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
               decoration: BoxDecoration(
-                color: Get.theme.colorScheme.primary
-                    .withAlpha(51), // 0.2 * 255 = 51
+                color:
+                    RoleThemes.employerPrimary.withAlpha(51), // 0.2 * 255 = 51
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Text(
@@ -235,6 +244,180 @@ class JobPostingView extends GetView<JobPostingController> {
         ),
       ),
       barrierDismissible: false,
+    );
+  }
+
+  /// Build metrics dashboard
+  Widget _buildMetricsDashboard(ThemeData theme, bool isDarkMode) {
+    // Define the employer-specific colors
+    const primaryColor = RoleThemes.employerPrimary;
+    const secondaryColor = Color(0xFFD97706); // Amber secondary color
+
+    return Obx(() {
+      if (controller.isLoading) {
+        return const SizedBox(height: 120);
+      }
+
+      // Calculate metrics
+      final totalJobs = controller.jobs.length;
+      final activeJobs = controller.statusCounts[JobStatus.active] ?? 0;
+      final pausedJobs = controller.statusCounts[JobStatus.paused] ?? 0;
+      final draftJobs = controller.statusCounts[JobStatus.draft] ?? 0;
+
+      // Calculate total applications and views
+      var totalApplications = 0;
+      var totalViews = 0;
+      for (final job in controller.jobs) {
+        totalApplications += job.applicationCount;
+        totalViews += job.viewCount;
+      }
+
+      // Calculate conversion rate (applications / views * 100)
+      final conversionRate = totalViews > 0
+          ? (totalApplications / totalViews * 100).toStringAsFixed(1)
+          : '0.0';
+
+      return Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: isDarkMode
+              ? primaryColor.withAlpha(38) // 0.15 * 255 ≈ 38
+              : primaryColor.withAlpha(20), // 0.08 * 255 ≈ 20
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(16.r),
+            bottomRight: Radius.circular(16.r),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Job Posting Metrics',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: primaryColor,
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Row(
+              children: [
+                _buildMetricItem(
+                  icon: HeroIcons.briefcase,
+                  label: 'Total Jobs',
+                  value: totalJobs.toString(),
+                  color: primaryColor,
+                  theme: theme,
+                ),
+                _buildMetricItem(
+                  icon: HeroIcons.check,
+                  label: 'Active Jobs',
+                  value: activeJobs.toString(),
+                  color: Colors.green,
+                  theme: theme,
+                ),
+                _buildMetricItem(
+                  icon: HeroIcons.pause,
+                  label: 'Paused Jobs',
+                  value: pausedJobs.toString(),
+                  color: Colors.orange,
+                  theme: theme,
+                ),
+                _buildMetricItem(
+                  icon: HeroIcons.documentText,
+                  label: 'Draft Jobs',
+                  value: draftJobs.toString(),
+                  color: Colors.grey,
+                  theme: theme,
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              children: [
+                _buildMetricItem(
+                  icon: HeroIcons.users,
+                  label: 'Applications',
+                  value: totalApplications.toString(),
+                  color: secondaryColor,
+                  theme: theme,
+                ),
+                _buildMetricItem(
+                  icon: HeroIcons.eye,
+                  label: 'Total Views',
+                  value: totalViews.toString(),
+                  color: Colors.blue,
+                  theme: theme,
+                ),
+                _buildMetricItem(
+                  icon: HeroIcons.chartBar,
+                  label: 'Conversion',
+                  value: '$conversionRate%',
+                  color: Colors.purple,
+                  theme: theme,
+                ),
+                _buildMetricItem(
+                  icon: HeroIcons.star,
+                  label: 'Featured',
+                  value: controller.jobs
+                      .where((job) => job.isFeatured)
+                      .length
+                      .toString(),
+                  color: Colors.amber,
+                  theme: theme,
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  /// Build a metric item
+  Widget _buildMetricItem({
+    required HeroIcons icon,
+    required String label,
+    required String value,
+    required Color color,
+    required ThemeData theme,
+  }) {
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 40.w,
+            height: 40.h,
+            decoration: BoxDecoration(
+              color: color.withAlpha(26), // 0.1 * 255 ≈ 26
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Center(
+              child: HeroIcon(
+                icon,
+                size: 20.r,
+                color: color,
+              ),
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.textTheme.bodyLarge?.color,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.textTheme.bodySmall?.color
+                  ?.withAlpha(179), // 0.7 * 255 ≈ 179
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

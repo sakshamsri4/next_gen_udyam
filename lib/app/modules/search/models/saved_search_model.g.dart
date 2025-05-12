@@ -1,41 +1,47 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'theme_settings.dart';
+part of 'saved_search_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class ThemeSettingsAdapter extends TypeAdapter<ThemeSettings> {
+class SavedSearchModelAdapter extends TypeAdapter<SavedSearchModel> {
   @override
-  final int typeId = 1;
+  final int typeId = 5;
 
   @override
-  ThemeSettings read(BinaryReader reader) {
+  SavedSearchModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return ThemeSettings(
-      isDarkMode: fields[0] as bool,
-      useMaterial3: fields[1] as bool,
-      useHighContrast: fields[2] as bool,
-      userRole: fields[3] as UserType?,
+    return SavedSearchModel(
+      id: fields[0] as String,
+      userId: fields[1] as String,
+      query: fields[2] as String,
+      filter: fields[3] as SearchFilter,
+      createdAt: fields[4] as DateTime,
+      lastUsedAt: fields[5] as DateTime?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, ThemeSettings obj) {
+  void write(BinaryWriter writer, SavedSearchModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(0)
-      ..write(obj.isDarkMode)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.useMaterial3)
+      ..write(obj.userId)
       ..writeByte(2)
-      ..write(obj.useHighContrast)
+      ..write(obj.query)
       ..writeByte(3)
-      ..write(obj.userRole);
+      ..write(obj.filter)
+      ..writeByte(4)
+      ..write(obj.createdAt)
+      ..writeByte(5)
+      ..write(obj.lastUsedAt);
   }
 
   @override
@@ -44,7 +50,7 @@ class ThemeSettingsAdapter extends TypeAdapter<ThemeSettings> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ThemeSettingsAdapter &&
+      other is SavedSearchModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

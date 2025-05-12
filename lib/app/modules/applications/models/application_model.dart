@@ -5,31 +5,41 @@ part 'application_model.g.dart';
 
 /// Type ID for Hive
 const applicationModelTypeId = 10;
+const applicationStatusTypeId = 11;
 
 /// Status of a job application
+@HiveType(typeId: applicationStatusTypeId)
 enum ApplicationStatus {
   /// Application has been submitted but not reviewed
+  @HiveField(0)
   pending,
 
   /// Application has been reviewed
+  @HiveField(1)
   reviewed,
 
   /// Applicant has been shortlisted
+  @HiveField(2)
   shortlisted,
 
   /// Applicant has been invited for interview
+  @HiveField(3)
   interview,
 
   /// Applicant has been offered the job
+  @HiveField(4)
   offered,
 
   /// Applicant has been hired
+  @HiveField(5)
   hired,
 
   /// Application has been rejected
+  @HiveField(6)
   rejected,
 
   /// Application has been withdrawn by the candidate
+  @HiveField(7)
   withdrawn,
 }
 

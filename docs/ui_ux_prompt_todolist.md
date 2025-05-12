@@ -125,7 +125,7 @@ This document provides a structured, phased approach to implementing the UI/UX i
 
 ### 3.1 Job Posting Management (High Priority)
 
-- [ ] **Job Management Screen**
+- [x] **Job Management Screen**
   - Create `JobPostingView` with status filters
   - Implement job posting cards with metrics
   - Add quick actions (edit, pause, duplicate, delete)
@@ -134,7 +134,7 @@ This document provides a structured, phased approach to implementing the UI/UX i
 
 ### 3.2 Applicant Review System (High Priority)
 
-- [ ] **Applicant Management**
+- [x] **Applicant Management**
   - Create `ApplicantReviewView` with filtering and sorting
   - Implement applicant cards with summary information
   - Add comparison feature for shortlisting

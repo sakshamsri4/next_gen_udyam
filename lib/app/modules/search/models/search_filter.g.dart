@@ -29,13 +29,15 @@ class SearchFilterAdapter extends TypeAdapter<SearchFilter> {
       isRemote: fields[9] as bool,
       sortBy: fields[10] as SortOption,
       sortOrder: fields[11] as SortOrder,
+      page: fields[12] as int,
+      limit: fields[13] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, SearchFilter obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.query)
       ..writeByte(1)
@@ -59,7 +61,11 @@ class SearchFilterAdapter extends TypeAdapter<SearchFilter> {
       ..writeByte(10)
       ..write(obj.sortBy)
       ..writeByte(11)
-      ..write(obj.sortOrder);
+      ..write(obj.sortOrder)
+      ..writeByte(12)
+      ..write(obj.page)
+      ..writeByte(13)
+      ..write(obj.limit);
   }
 
   @override
