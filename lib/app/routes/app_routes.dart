@@ -22,6 +22,11 @@ abstract class Routes {
   static const settings = _Paths.settings;
   static const support = _Paths.support;
   static const about = _Paths.about;
+  static const roleSelection = _Paths.roleSelection;
+  static const applications = _Paths.applications;
+  static const jobPosting = _Paths.jobPosting;
+  static const welcome = _Paths.welcome;
+  static const verificationSuccess = _Paths.verificationSuccess;
 }
 
 abstract class _Paths {
@@ -45,4 +50,9 @@ abstract class _Paths {
   static const settings = '/settings';
   static const support = '/support';
   static const about = '/about';
+  static const roleSelection = '/role-selection';
+  static const applications = '/applications';
+  static const jobPosting = '/job-posting';
+  static const welcome = '/welcome';
+  static const verificationSuccess = '/verification_success';
 }

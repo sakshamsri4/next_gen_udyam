@@ -5,7 +5,7 @@ import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/auth/views/widgets/edit_profile_dialog.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
-import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
 class ProfileView extends StatefulWidget {
@@ -31,9 +31,14 @@ class _ProfileViewState extends State<ProfileView> {
     } else {
       navigationController = Get.put(NavigationController(), permanent: true);
     }
+  }
 
-    // Set the selected index to the Profile tab (index 3)
-    navigationController.selectedIndex.value = 3;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update the navigation index after dependencies are resolved
+    // This is safer than using initState with a post-frame callback
+    navigationController.selectedIndex.value = 4;
   }
 
   @override
@@ -51,7 +56,7 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ],
       ),
-      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+      bottomNavigationBar: const RoleBasedBottomNav(),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

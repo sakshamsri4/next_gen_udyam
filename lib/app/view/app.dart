@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
+import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/services/logger_service.dart';
+import 'package:next_gen/core/storage/hive_manager.dart';
+import 'package:next_gen/core/storage/storage_service.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
 import 'package:next_gen/core/utils/global_error_handler.dart';
@@ -48,6 +52,24 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     final logger = Get.find<LoggerService>()..i('Building App widget');
 
+    // Ensure HiveManager is registered first
+    try {
+      Get.find<HiveManager>();
+      logger.d('HiveManager already registered');
+    } catch (e) {
+      logger.i('Pre-registering HiveManager');
+      Get.put(serviceLocator<HiveManager>(), permanent: true);
+    }
+
+    // Ensure StorageService is registered after HiveManager
+    try {
+      Get.find<StorageService>();
+      logger.d('StorageService already registered');
+    } catch (e) {
+      logger.i('Pre-registering StorageService');
+      Get.put(serviceLocator<StorageService>(), permanent: true);
+    }
+
     // Try to get the theme controller that was initialized in bootstrap.dart
     // If it's not available, initialize it here
     ThemeController themeController;
@@ -69,24 +91,40 @@ class _AppState extends State<App> {
       Get.put(AuthController(), permanent: true);
     }
 
-    return GetMaterialApp(
-      title: 'Next Gen Job Portal',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeController.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      initialRoute: AppPages.initial,
-      getPages: AppPages.routes,
-      defaultTransition: Transition.fadeIn,
-      transitionDuration: const Duration(milliseconds: 300),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      // Use our dedicated navigator key
-      navigatorKey: _navigatorKey,
-      // Ensure proper navigation history management
-      navigatorObservers: [GetObserver()],
-      // Prevent nested navigators from using the same key
-      useInheritedMediaQuery: true,
+    // We'll use a single ScreenUtilInit to properly initialize ScreenUtil
+    // This prevents LateInitializationError in the _splitScreenMode field
+    // The init method is called automatically by ScreenUtilInit
+
+    return ScreenUtilInit(
+      // Design size based on standard mobile device dimensions
+      designSize: const Size(375, 812),
+      // Ensure ScreenUtil works properly in split screen mode
+      splitScreenMode: true,
+      // Use minimal text scaling to maintain design integrity
+      minTextAdapt: true,
+      // Initialize ScreenUtil before building the app
+      builder: (context, child) {
+        return GetMaterialApp(
+          title: 'Next Gen Job Portal',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode:
+              themeController.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          initialRoute: AppPages.initial,
+          getPages: AppPages.routes,
+          defaultTransition: Transition.fadeIn,
+          transitionDuration: const Duration(milliseconds: 300),
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          // Use our dedicated navigator key
+          navigatorKey: _navigatorKey,
+          // Ensure proper navigation history management
+          navigatorObservers: [GetObserver()],
+          // Prevent nested navigators from using the same key
+          useInheritedMediaQuery: true,
+        );
+      },
     );
   }
 }

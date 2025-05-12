@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
+import 'package:next_gen/app/modules/auth/models/signup_session.dart';
+import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
+import 'package:next_gen/app/modules/auth/services/signup_session_service.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
@@ -34,8 +38,13 @@ class AuthController extends GetxController {
   final isLoading = false.obs;
   final isResetLoading = false.obs;
   final isSignOutLoading = false.obs;
+  final isVerificationLoading = false.obs;
   final isPasswordVisible = false.obs;
   final isConfirmPasswordVisible = false.obs;
+
+  // Email verification state
+  final isVerificationBannerVisible = true.obs;
+  final verificationSent = false.obs;
 
   // Button state
   final isLoginButtonEnabled = false.obs;
@@ -45,6 +54,16 @@ class AuthController extends GetxController {
   // Flag to track if we're restoring a session
   final isRestoringSession = false.obs;
 
+  // Signup session state
+  final currentSignupStep = Rx<SignupStep>(SignupStep.initial);
+
+  // Role selection state - used for compatibility with existing code
+  // The actual role selection is now handled by RoleSelectionController
+  final Rx<UserType?> selectedRole = Rx<UserType?>(null);
+
+  // Services
+  late final SignupSessionService _signupSessionService;
+
   @override
   void onInit() {
     super.onInit();
@@ -53,6 +72,15 @@ class AuthController extends GetxController {
     isLoading.value = false;
     isResetLoading.value = false;
     isSignOutLoading.value = false;
+
+    // Initialize services
+    try {
+      _signupSessionService = Get.find<SignupSessionService>();
+      log.d('SignupSessionService found');
+    } catch (e) {
+      _signupSessionService = Get.put(SignupSessionService());
+      log.d('SignupSessionService registered');
+    }
 
     // Listen to auth state changes
     user.value = _auth.currentUser;
@@ -76,18 +104,61 @@ class AuthController extends GetxController {
         log.d(
           'User already logged in via Firebase, no need to restore from Hive',
         );
+
+        // Update the user value to ensure UI consistency
+        user.value = _auth.currentUser;
+
+        // Still need to check if we should navigate to dashboard
+        if (Get.currentRoute != Routes.dashboard &&
+            Get.currentRoute != Routes.roleSelection) {
+          // Check if user has a role before navigating to dashboard
+          try {
+            final authService = Get.find<AuthService>();
+            final userModel = await authService.getUserFromFirebase();
+
+            if (userModel?.userType == null) {
+              log.d('User has no role, navigating to role selection screen');
+              await Get.offAllNamed<dynamic>(Routes.roleSelection);
+            } else {
+              log.d(
+                'User has role: ${userModel?.userType}, navigating to dashboard',
+              );
+              await Get.offAllNamed<dynamic>(Routes.dashboard);
+            }
+          } catch (e) {
+            log.e('Error checking user role during persisted login', e);
+            // Default to dashboard if we can't check the role
+            await Get.offAllNamed<dynamic>(Routes.dashboard);
+          }
+        }
         return;
       }
 
-      // Try to get the auth service
+      // Try to get the auth service with retry mechanism
       AuthService? authService;
-      try {
-        authService = Get.find<AuthService>();
-        log.d('AuthService found, proceeding with session restoration');
-      } catch (e) {
-        // AuthService not registered yet
-        log.w('AuthService not found, skipping session restoration: $e');
-        return; // Exit early, we can't restore without AuthService
+      for (var attempt = 1; attempt <= 3; attempt++) {
+        try {
+          authService = Get.find<AuthService>();
+          log.d(
+            'AuthService found on attempt $attempt, proceeding with session restoration',
+          );
+          break;
+        } catch (e) {
+          log.w('AuthService not found on attempt $attempt: $e');
+          if (attempt < 3) {
+            // Wait before retrying
+            await Future<void>.delayed(Duration(milliseconds: 300 * attempt));
+          } else {
+            log.e('Failed to find AuthService after all attempts');
+            return; // Exit early, we can't restore without AuthService
+          }
+        }
+      }
+
+      // If we still couldn't find the AuthService, exit
+      if (authService == null) {
+        log.e('AuthService not available, cannot restore session');
+        return;
       }
 
       // Set flag to indicate we're attempting to restore a session
@@ -105,9 +176,21 @@ class AuthController extends GetxController {
         // Update the user value to trigger UI updates
         user.value = restoredUser;
 
-        // Navigate to dashboard if we're not already there
-        if (Get.currentRoute != Routes.dashboard) {
-          log.i('Restoring session, navigating to dashboard screen');
+        // Check if user has a role before navigating
+        final userModel = await authService.getUserFromFirebase();
+
+        // Reset the restoring session flag
+        isRestoringSession.value = false;
+
+        if (userModel?.userType == null) {
+          log.d(
+            'Restored user has no role, navigating to role selection screen',
+          );
+          await Get.offAllNamed<dynamic>(Routes.roleSelection);
+        } else {
+          log.d(
+            'Restored user has role: ${userModel?.userType}, navigating to dashboard',
+          );
           await Get.offAllNamed<dynamic>(Routes.dashboard);
         }
       } else {
@@ -254,6 +337,24 @@ class AuthController extends GetxController {
     isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
   }
 
+  // Role selection methods
+  /// Sets the selected role (legacy method for compatibility)
+  /// This method is used to change a property, but we're keeping it for compatibility
+  /// with existing code. In the future, consider using the selectedRole.value directly.
+  // ignore: use_setters_to_change_properties
+  void setRole(UserType role) {
+    selectedRole.value = role;
+  }
+
+  /// Toggles the role selection visibility
+  /// This method is deprecated and will be removed in a future update
+  /// Role selection is now handled by RoleSelectionController
+  @Deprecated('Use RoleSelectionController instead')
+  void toggleRoleSelection() {
+    // No-op - role selection is now handled by RoleSelectionController
+    log.d('toggleRoleSelection called - this method is deprecated');
+  }
+
   // Authentication methods
   Future<void> login() async {
     if (!isLoginButtonEnabled.value) {
@@ -290,15 +391,26 @@ class AuthController extends GetxController {
         passwordController.text,
       );
 
-      log.i('Login successful for user: ${userCredential.user?.uid}');
+      log
+        ..i('Login successful for user: ${userCredential.user?.uid}')
+        // Check if user has a role
+        ..d('Checking if user has a role');
+
+      final userModel = await authService.getUserFromFirebase();
+      log.d('User model from Firebase: ${userModel?.toMap()}');
 
       // Clear form
       emailController.clear();
       passwordController.clear();
 
-      // Navigate to dashboard
-      log.d('Navigating to dashboard screen');
-      await Get.offAllNamed<dynamic>(Routes.dashboard);
+      // Navigate based on role
+      if (userModel?.userType == null) {
+        log.d('User has no role, navigating to role selection screen');
+        await Get.offAllNamed<dynamic>(Routes.roleSelection);
+      } else {
+        log.d('User has role: ${userModel?.userType}, navigating to dashboard');
+        await Get.offAllNamed<dynamic>(Routes.dashboard);
+      }
     } on FirebaseAuthException catch (e) {
       log.e('Firebase Auth Exception during login', e, e.stackTrace);
       var errorMessage = 'An error occurred. Please try again.';
@@ -341,15 +453,149 @@ class AuthController extends GetxController {
     }
   }
 
+  /// Save the current signup session
+  Future<void> saveSignupSession({
+    SignupStep step = SignupStep.credentials,
+  }) async {
+    try {
+      log.d('Saving signup session with step: $step');
+
+      // Create a session object
+      final session = SignupSession(
+        email: emailController.text.trim(),
+        name: nameController.text.trim(),
+        step: step,
+      );
+
+      // Save the session
+      await _signupSessionService.saveSession(session);
+
+      // Update the current step
+      currentSignupStep.value = step;
+
+      log.d('Signup session saved successfully');
+    } catch (e, stackTrace) {
+      log.e('Error saving signup session', e, stackTrace);
+    }
+  }
+
+  /// Check for an existing signup session
+  Future<bool> checkForExistingSession(String email) async {
+    try {
+      log.d('Checking for existing signup session for email: $email');
+
+      // Check if a session exists
+      final hasSession = _signupSessionService.hasSession(email);
+
+      if (hasSession) {
+        // Get the session
+        final session = _signupSessionService.getSession(email);
+
+        if (session != null) {
+          log.d('Found existing signup session with step: ${session.step}');
+
+          // Update the current step
+          currentSignupStep.value = session.step;
+
+          // Populate form fields if needed
+          if (session.name != null && session.name!.isNotEmpty) {
+            nameController.text = session.name!;
+          }
+
+          emailController.text = session.email;
+
+          return true;
+        }
+      }
+
+      log.d('No existing signup session found');
+      return false;
+    } catch (e, stackTrace) {
+      log.e('Error checking for existing signup session', e, stackTrace);
+      return false;
+    }
+  }
+
+  /// Clear the current signup session
+  Future<void> clearSignupSession() async {
+    try {
+      log.d('Clearing signup session');
+
+      final email = emailController.text.trim();
+      if (email.isEmpty) {
+        log.w('Cannot clear signup session: email is empty');
+        return;
+      }
+
+      // Check if session exists before trying to delete it
+      if (_signupSessionService.hasSession(email)) {
+        // Delete the session
+        await _signupSessionService.deleteSession(email);
+        log.d('Signup session deleted successfully');
+      } else {
+        log.d('No signup session found to clear for email: $email');
+      }
+
+      // Reset the current step regardless of whether a session was found
+      currentSignupStep.value = SignupStep.initial;
+
+      log.d('Signup session cleared successfully');
+    } catch (e, stackTrace) {
+      log.e('Error clearing signup session', e, stackTrace);
+
+      // Try an alternative approach if the first one fails
+      try {
+        final email = emailController.text.trim();
+        if (email.isNotEmpty) {
+          // Try to use direct Hive access as a last resort
+          if (Hive.isBoxOpen(SignupSessionService.signupSessionBoxName)) {
+            final box = Hive.box<SignupSession>(
+              SignupSessionService.signupSessionBoxName,
+            );
+            await box.delete(email);
+            log.d('Signup session cleared via direct Hive access');
+          }
+        }
+
+        // Reset the current step
+        currentSignupStep.value = SignupStep.initial;
+      } catch (e2, stackTrace2) {
+        log.e(
+          'Error in fallback attempt to clear signup session',
+          e2,
+          stackTrace2,
+        );
+        // At this point, we've tried everything we can
+      }
+    }
+  }
+
   Future<void> signup() async {
     if (!isSignupButtonEnabled.value) {
       log.d('Signup button not enabled, returning');
       return;
     }
 
+    // Role selection is now handled by RoleSelectionController
+    // This check is no longer needed
+
     try {
       log.i('Attempting signup with email: ${emailController.text.trim()}');
       isLoading.value = true;
+
+      // Try to save the current signup session, but continue even if it fails
+      try {
+        await saveSignupSession();
+        log.d('Signup session saved successfully');
+      } catch (e, stackTrace) {
+        // Log the error but continue with signup
+        log.e(
+          'Error saving signup session, continuing with signup',
+          e,
+          stackTrace,
+        );
+        // Don't show an error to the user as this is not critical
+      }
 
       // Get the auth service to handle Hive persistence
       AuthService? authService;
@@ -387,23 +633,34 @@ class AuthController extends GetxController {
         displayName: nameController.text.trim(),
       );
 
+      // Try to update signup session to account created, but continue even if it fails
+      try {
+        await saveSignupSession(step: SignupStep.accountCreated);
+        log.d('Signup session updated to account created');
+      } catch (e, stackTrace) {
+        // Log the error but continue with signup
+        log.e(
+          'Error updating signup session to account created, continuing with signup',
+          e,
+          stackTrace,
+        );
+        // Don't show an error to the user as this is not critical
+      }
+
       // Clear form
       nameController.clear();
       emailController.clear();
       passwordController.clear();
       confirmPasswordController.clear();
 
-      // Navigate to dashboard
-      log.d('Navigating to dashboard screen');
-      await Get.offAllNamed<dynamic>(Routes.dashboard);
+      // Reset role selection
+      selectedRole.value = null;
 
-      Get.snackbar(
-        'Success',
-        'Account created successfully!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      // Always navigate to role selection screen after signup
+      log.d('Navigating to role selection screen after signup');
+      await Get.offAllNamed<dynamic>(Routes.roleSelection);
+
+      // No need for a snackbar here as the welcome screen will show a success message
     } on FirebaseAuthException catch (e) {
       log.e('Firebase Auth Exception during signup', e, e.stackTrace);
       var errorMessage = 'An error occurred. Please try again.';
@@ -549,9 +806,26 @@ class AuthController extends GetxController {
 
       log
         ..i('Google sign-in successful for user: ${userCredential.user?.uid}')
-        // Navigate to dashboard
-        ..d('Navigating to dashboard screen');
-      await Get.offAllNamed<dynamic>(Routes.dashboard);
+        // Check if user has a role
+        ..d('Checking if user has a role after Google sign-in');
+
+      final userModel = await authService.getUserFromFirebase();
+      log.d(
+        'User model from Firebase after Google sign-in: ${userModel?.toMap()}',
+      );
+
+      // Navigate based on role
+      if (userModel?.userType == null) {
+        log.d(
+          'User has no role after Google sign-in, navigating to role selection',
+        );
+        await Get.offAllNamed<dynamic>(Routes.roleSelection);
+      } else {
+        log.d(
+          'User has role after Google sign-in: ${userModel?.userType}, navigating to dashboard',
+        );
+        await Get.offAllNamed<dynamic>(Routes.dashboard);
+      }
     } on FirebaseAuthException catch (e, stackTrace) {
       log.e('Firebase Auth Exception during Google sign-in', e, stackTrace);
 
@@ -615,6 +889,22 @@ class AuthController extends GetxController {
         // Update the user value to trigger UI updates
         user.value = _auth.currentUser;
         log.d('User data refreshed successfully');
+
+        // Check if email is now verified
+        if (user.value?.emailVerified ?? false) {
+          log.i('Email is now verified');
+          // If we're on the verification success screen, no need to show a snackbar
+          if (Get.currentRoute != Routes.verificationSuccess) {
+            Get.snackbar(
+              'Email Verified',
+              'Your email has been successfully verified!',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 5),
+            );
+          }
+        }
       } else {
         log.w('Cannot refresh user data: No user is currently logged in');
       }
@@ -630,12 +920,167 @@ class AuthController extends GetxController {
     }
   }
 
+  /// Send email verification to current user
+  Future<void> sendEmailVerification() async {
+    try {
+      log.i('Attempting to send email verification');
+      isVerificationLoading.value = true;
+      verificationSent.value = false;
+
+      // No currently signed-in user? Bail out early.
+      final current = _auth.currentUser;
+      if (current == null) {
+        log.w('No authenticated user – cannot send verification email');
+        Get.snackbar(
+          'Verification Failed',
+          'You must be logged in to verify your email.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // Already verified? Bail out early.
+      if (current.emailVerified) {
+        log.i('Email already verified – skipping resend');
+        Get.snackbar(
+          'Already Verified',
+          'Your email address is already verified.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // Get the auth service
+      AuthService? authService;
+      try {
+        authService = Get.find<AuthService>();
+      } catch (e) {
+        log.e(
+          'AuthService not found, cannot proceed with email verification',
+          e,
+        );
+        Get.snackbar(
+          'Verification Failed',
+          'Internal error: Authentication service not available. '
+              'Please try again later.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // Send verification email
+      await authService.sendEmailVerification();
+
+      // Mark as sent
+      verificationSent.value = true;
+
+      // Update signup session if we're in the signup flow
+      if (currentSignupStep.value == SignupStep.accountCreated) {
+        await saveSignupSession(step: SignupStep.verificationSent);
+      }
+
+      log.i('Verification email sent successfully');
+      Get.snackbar(
+        'Email Sent',
+        'Verification email has been sent. Please check your inbox.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+      );
+    } catch (e, stackTrace) {
+      log.e('Error sending verification email', e, stackTrace);
+
+      var errorMessage = 'Failed to send verification email. Please try again.';
+
+      // Handle specific Firebase errors
+      if (e is FirebaseAuthException) {
+        if (e.code == 'too-many-requests') {
+          errorMessage = 'Too many requests. Please try again later.';
+        } else if (e.code == 'already-verified') {
+          // This is handled above, but just in case the service throws this
+          errorMessage = e.message ?? 'Your email address is already verified.';
+          Get.snackbar(
+            'Already Verified',
+            errorMessage,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+          return; // Return early to avoid showing error snackbar
+        }
+      }
+
+      Get.snackbar(
+        'Verification Failed',
+        errorMessage,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isVerificationLoading.value = false;
+    }
+  }
+
+  /// Check if email is verified and navigate to success screen if it is
+  Future<void> checkEmailVerification() async {
+    try {
+      log.i('Checking email verification status');
+
+      // Refresh user to get latest verification status
+      await refreshUser();
+
+      // Check if email is verified
+      if (user.value?.emailVerified ?? false) {
+        log.i('Email is verified, navigating to verification success screen');
+
+        // Update signup session if we're in the signup flow
+        if (currentSignupStep.value == SignupStep.verificationSent ||
+            currentSignupStep.value == SignupStep.accountCreated) {
+          await saveSignupSession(step: SignupStep.emailVerified);
+        }
+
+        await Get.offAllNamed<dynamic>(Routes.verificationSuccess);
+      } else {
+        log.i('Email is not verified yet');
+        Get.snackbar(
+          'Not Verified',
+          'Your email is not verified yet. Please check your inbox and click the verification link.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.amber,
+          colorText: Colors.black,
+          duration: const Duration(seconds: 5),
+        );
+      }
+    } catch (e, stackTrace) {
+      log.e('Error checking email verification', e, stackTrace);
+      Get.snackbar(
+        'Error',
+        'Failed to check verification status. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  /// Toggle verification banner visibility
+  void toggleVerificationBanner() {
+    isVerificationBannerVisible.value = !isVerificationBannerVisible.value;
+  }
+
   Future<void> signOut() async {
     try {
       log.i('Attempting to sign out user');
-      // Note: isSignOutLoading.value is now set in the UI
-      // before this method is called
-      // to prevent double-tap issues, so we don't set it again here
+      // Set loading state at the beginning
+      isSignOutLoading.value = true;
 
       // Get the auth service to handle Hive data clearing
       AuthService? authService;

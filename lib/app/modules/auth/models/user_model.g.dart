@@ -23,6 +23,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       photoUrl: fields[3] as String?,
       emailVerified: fields[4] as bool,
       phoneNumber: fields[5] as String?,
+      userType: fields[7] as UserType?,
       createdAt: fields[6] as DateTime?,
     );
   }
@@ -30,7 +31,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.uid)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(5)
       ..write(obj.phoneNumber)
       ..writeByte(6)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.userType);
   }
 
   @override
@@ -54,6 +57,50 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is UserModelAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class UserTypeAdapter extends TypeAdapter<UserType> {
+  @override
+  final int typeId = 20;
+
+  @override
+  UserType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return UserType.employee;
+      case 1:
+        return UserType.employer;
+      case 2:
+        return UserType.admin;
+      default:
+        return UserType.employee;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, UserType obj) {
+    switch (obj) {
+      case UserType.employee:
+        writer.writeByte(0);
+        break;
+      case UserType.employer:
+        writer.writeByte(1);
+        break;
+      case UserType.admin:
+        writer.writeByte(2);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

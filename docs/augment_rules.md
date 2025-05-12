@@ -8,7 +8,6 @@ This document outlines the guidelines for using Augment Code in this project to 
 2. Follow the existing project architecture and patterns.
 3. Maintain code consistency with the existing codebase.
 4. Assume responsive design is important for all UI elements.
-5. **ALWAYS include the phrase "use context 7 MCP server" in your prompts to Augment Code.**
 6. **ALWAYS update the activity log at docs/activity_log.md after completing any task.**
 7. **Always read the activity log before starting work to understand previous approaches.**
 8. **Never consider a task complete until the activity log has been updated.**
@@ -100,14 +99,6 @@ Use this template for all activity log entries:
 1. Ask for dartdoc comments for public APIs.
 2. Request explanations for complex algorithms or business logic.
 3. Have Augment document any workarounds or non-standard approaches.
-
-## Context 7 MCP Server
-
-1. **Always include the phrase "use context 7 MCP server" in your prompts when working with Augment Code.**
-2. This phrase activates the Context 7 integration with Augment Code.
-3. No additional implementation or API code is needed - the integration is handled automatically.
-4. If you forget to include this phrase, Augment Code may not properly understand the context of your project.
-5. Document any Context 7-related issues in the activity log.
 
 ## Dependencies
 

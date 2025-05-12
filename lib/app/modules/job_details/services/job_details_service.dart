@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
@@ -19,17 +21,50 @@ class JobDetailsService {
   Future<JobModel?> getJobDetails(String jobId) async {
     try {
       _logger.i('Fetching job details for job: $jobId');
-      final doc = await _firestore.collection('jobs').doc(jobId).get();
+
+      // Validate job ID
+      if (jobId.isEmpty) {
+        _logger.w('Empty job ID provided');
+        return null;
+      }
+
+      // Add a timeout to prevent hanging
+      final docFuture = _firestore.collection('jobs').doc(jobId).get();
+      final doc = await docFuture.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          _logger.w('Timeout fetching job: $jobId');
+          throw TimeoutException('Timeout fetching job details');
+        },
+      );
 
       if (!doc.exists) {
         _logger.w('Job not found: $jobId');
         return null;
       }
 
-      return JobModel.fromFirestore(doc);
-    } catch (e) {
-      _logger.e('Error fetching job details', e);
-      rethrow;
+      // Add proper null check for doc.data()
+      final data = doc.data();
+      if (data == null) {
+        _logger.w('Job document data is null: $jobId');
+        return null;
+      }
+
+      if (!data.containsKey('title')) {
+        _logger.w('Invalid job document structure: $jobId');
+        return null;
+      }
+
+      final jobModel = JobModel.fromFirestore(doc);
+      _logger.i('Job details fetched successfully: ${jobModel.title}');
+      return jobModel;
+    } on TimeoutException catch (e) {
+      _logger.e('Timeout fetching job details', e);
+      return null;
+    } catch (e, stackTrace) {
+      _logger.e('Error fetching job details', e, stackTrace);
+      // Return null instead of rethrowing to prevent app crashes
+      return null;
     }
   }
 
@@ -37,21 +72,54 @@ class JobDetailsService {
   Future<Map<String, dynamic>?> getCompanyDetails(String companyName) async {
     try {
       _logger.i('Fetching company details for: $companyName');
-      final snapshot = await _firestore
+
+      // Validate company name
+      if (companyName.isEmpty) {
+        _logger.w('Empty company name provided');
+        return {'name': 'Unknown Company'};
+      }
+
+      // Add a timeout to prevent hanging
+      final queryFuture = _firestore
           .collection('companies')
           .where('name', isEqualTo: companyName)
           .limit(1)
           .get();
 
+      final snapshot = await queryFuture.timeout(
+        const Duration(seconds: 8),
+        onTimeout: () {
+          _logger.w('Timeout fetching company: $companyName');
+          throw TimeoutException('Timeout fetching company details');
+        },
+      );
+
       if (snapshot.docs.isEmpty) {
         _logger.w('Company not found: $companyName');
-        return null;
+        // Return a fallback company object instead of null
+        return {
+          'name': companyName,
+          'description': 'No additional information available',
+        };
       }
 
-      return snapshot.docs.first.data();
-    } catch (e) {
-      _logger.e('Error fetching company details', e);
-      rethrow;
+      final companyData = snapshot.docs.first.data();
+      _logger.i('Company details fetched successfully for: $companyName');
+      return companyData;
+    } on TimeoutException catch (e) {
+      _logger.e('Timeout fetching company details', e);
+      // Return a fallback company object
+      return {
+        'name': companyName,
+        'description': 'Unable to load company details (timeout)',
+      };
+    } catch (e, stackTrace) {
+      _logger.e('Error fetching company details', e, stackTrace);
+      // Return a fallback company object instead of rethrowing
+      return {
+        'name': companyName,
+        'description': 'Unable to load company details',
+      };
     }
   }
 
@@ -63,22 +131,96 @@ class JobDetailsService {
   }) async {
     try {
       _logger.i('Fetching similar jobs for job: $currentJobId');
-      final snapshot = await _firestore
-          .collection('jobs')
-          .where('jobType', isEqualTo: jobType)
-          .where('industry', isEqualTo: industry)
-          .where('isActive', isEqualTo: true)
-          .limit(5)
-          .get();
 
-      // Filter out the current job
-      return snapshot.docs
-          .map(JobModel.fromFirestore)
-          .where((job) => job.id != currentJobId)
-          .toList();
-    } catch (e) {
-      _logger.e('Error fetching similar jobs', e);
-      rethrow;
+      // Validate parameters
+      if (currentJobId.isEmpty || jobType.isEmpty || industry.isEmpty) {
+        _logger.w('Invalid parameters for similar jobs query');
+        return [];
+      }
+
+      // Try to get jobs with both jobType and industry
+      try {
+        final queryFuture = _firestore
+            .collection('jobs')
+            .where('jobType', isEqualTo: jobType)
+            .where('industry', isEqualTo: industry)
+            .where('isActive', isEqualTo: true)
+            .limit(5)
+            .get();
+
+        final snapshot = await queryFuture.timeout(
+          const Duration(seconds: 8),
+          onTimeout: () {
+            _logger.w('Timeout fetching similar jobs with combined query');
+            throw TimeoutException('Timeout fetching similar jobs');
+          },
+        );
+
+        // Filter out the current job
+        final jobs = snapshot.docs
+            .map(JobModel.fromFirestore)
+            .where((job) => job.id != currentJobId)
+            .toList();
+
+        if (jobs.isNotEmpty) {
+          _logger.i('Found ${jobs.length} similar jobs');
+          return jobs;
+        }
+      } on TimeoutException catch (e) {
+        _logger.w(
+          'Timeout with combined query, falling back to simpler query',
+          e,
+        );
+        // Continue to fallback query
+      } catch (e) {
+        _logger.w(
+          'Error with combined query, falling back to simpler query',
+          e,
+        );
+        // Continue to fallback query
+      }
+
+      // Fallback: Try to get jobs with just jobType
+      try {
+        final fallbackFuture = _firestore
+            .collection('jobs')
+            .where('jobType', isEqualTo: jobType)
+            .where('isActive', isEqualTo: true)
+            .limit(5)
+            .get();
+
+        final fallbackSnapshot = await fallbackFuture.timeout(
+          const Duration(seconds: 5),
+          onTimeout: () {
+            _logger.w('Timeout fetching similar jobs with fallback query');
+            throw TimeoutException(
+              'Timeout fetching similar jobs with fallback query',
+            );
+          },
+        );
+
+        final fallbackJobs = fallbackSnapshot.docs
+            .map(JobModel.fromFirestore)
+            .where((job) => job.id != currentJobId)
+            .toList();
+
+        _logger.i('Found ${fallbackJobs.length} jobs with fallback query');
+        return fallbackJobs;
+      } on TimeoutException catch (e) {
+        _logger.e('Timeout fetching similar jobs with fallback query', e);
+        return [];
+      } catch (e, stackTrace) {
+        _logger.e(
+          'Error fetching similar jobs with fallback query',
+          e,
+          stackTrace,
+        );
+        return [];
+      }
+    } catch (e, stackTrace) {
+      _logger.e('Error fetching similar jobs', e, stackTrace);
+      // Return empty list instead of rethrowing
+      return [];
     }
   }
 

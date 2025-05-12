@@ -116,6 +116,15 @@ class GlobalErrorHandler {
       return 'Network error. Please check your internet connection.';
     } else if (error.toString().contains('permission')) {
       return 'Permission denied. Please check your app permissions.';
+    } else if (error.toString().contains('improper use of a GetX') ||
+        error.toString().contains('Obx')) {
+      // Handle GetX reactive UI errors
+      // This happens when observable variables are accessed directly inside Obx widgets
+      // or when observable variables are modified during widget initialization or build
+      return 'UI update error. Please report this issue to the development team.';
+    } else if (error.toString().contains('RenderFlex overflowed')) {
+      // Handle layout overflow errors
+      return 'Layout error. Please report this issue to the development team.';
     } else {
       return 'Something went wrong. Please try again later.';
     }

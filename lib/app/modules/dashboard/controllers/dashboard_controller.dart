@@ -16,6 +16,14 @@ class DashboardController extends GetxController {
   final RxList<JobStatistic> jobStatistics = <JobStatistic>[].obs;
   final RxList<ActivityItem> recentActivity = <ActivityItem>[].obs;
 
+  // Employer dashboard data
+  final RxString companyName = ''.obs;
+  final RxInt activeJobsCount = 0.obs;
+  final RxInt totalApplicantsCount = 0.obs;
+  final RxInt jobViewsCount = 0.obs;
+  final RxDouble conversionRate = 0.0.obs;
+  final RxList<InterviewItem> upcomingInterviews = <InterviewItem>[].obs;
+
   // User information
   Rx<User?> get user => _authController.user;
 
@@ -34,6 +42,23 @@ class DashboardController extends GetxController {
 
     // Load initial data
     _loadDashboardData();
+    _loadCompanyName();
+    _loadEmployerDashboardData();
+  }
+
+  /// Load company name from auth controller
+  void _loadCompanyName() {
+    try {
+      final user = _authController.user.value;
+      if (user != null && user.displayName != null) {
+        companyName.value = user.displayName!;
+      } else {
+        companyName.value = 'Company';
+      }
+    } catch (e) {
+      _logger.e('Error loading company name', e);
+      companyName.value = 'Company';
+    }
   }
 
   /// Load dashboard data including automobile sector job statistics
@@ -127,10 +152,61 @@ class DashboardController extends GetxController {
     }
   }
 
+  /// Load employer dashboard data
+  Future<void> _loadEmployerDashboardData() async {
+    _logger.i('Loading employer dashboard data');
+    isLoading.value = true;
+    update(); // Notify GetBuilder to update UI
+
+    try {
+      // Simulate network delay
+      await Future<void>.delayed(const Duration(seconds: 1));
+
+      // Load mock employer dashboard data
+      activeJobsCount.value = 12;
+      totalApplicantsCount.value = 48;
+      jobViewsCount.value = 256;
+      conversionRate.value = 18.75; // (48 / 256) * 100
+
+      // Load mock upcoming interviews
+      upcomingInterviews.value = [
+        InterviewItem(
+          id: '1',
+          candidateName: 'Jane Smith',
+          jobTitle: 'UX Designer',
+          date: 'Tomorrow',
+          time: '10:00 AM',
+        ),
+        InterviewItem(
+          id: '2',
+          candidateName: 'Michael Johnson',
+          jobTitle: 'Frontend Developer',
+          date: 'May 15, 2023',
+          time: '2:30 PM',
+        ),
+        InterviewItem(
+          id: '3',
+          candidateName: 'Sarah Williams',
+          jobTitle: 'Product Manager',
+          date: 'May 17, 2023',
+          time: '11:00 AM',
+        ),
+      ];
+
+      _logger.i('Employer dashboard data loaded successfully');
+    } catch (e, s) {
+      _logger.e('Error loading employer dashboard data', e, s);
+    } finally {
+      isLoading.value = false;
+      update(); // Notify GetBuilder to update UI
+    }
+  }
+
   /// Refresh dashboard data
   Future<void> refreshDashboard() async {
     _logger.i('Refreshing dashboard data');
     await _loadDashboardData();
+    await _loadEmployerDashboardData();
   }
 
   /// Sign out the current user
@@ -185,4 +261,31 @@ class ActivityItem {
   final DateTime time;
   final IconData icon;
   final Color color;
+}
+
+/// Model class for interview items
+class InterviewItem {
+  /// Constructor
+  InterviewItem({
+    required this.id,
+    required this.candidateName,
+    required this.jobTitle,
+    required this.date,
+    required this.time,
+  });
+
+  /// Interview ID
+  final String id;
+
+  /// Candidate name
+  final String candidateName;
+
+  /// Job title
+  final String jobTitle;
+
+  /// Interview date
+  final String date;
+
+  /// Interview time
+  final String time;
 }

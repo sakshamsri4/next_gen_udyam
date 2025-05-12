@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +38,24 @@ class AuthService {
     // Analytics service commented out for now, will be implemented later
     // _analyticsService = serviceLocator<AnalyticsService>();
 
+    // Initialize Firebase Auth safely
+    try {
+      // We don't need to initialize Firebase here as it's already done in bootstrap.dart
+      // Just get the FirebaseAuth instance directly
+      _logger.d('Getting FirebaseAuth instance');
+
+      // Get FirebaseAuth instance
+      _auth = FirebaseAuth.instance;
+      _logger.d('FirebaseAuth instance initialized successfully');
+    } catch (e, st) {
+      _logger.e(
+        'Error initializing FirebaseAuth instance – aborting AuthService construction',
+        e,
+        st,
+      );
+      rethrow; // bubble up so bootstrap can halt or retry initialization
+    }
+
     // Initialize GoogleSignIn with appropriate configuration
     if (kIsWeb) {
       // For web, we'll disable Google Sign-In for now
@@ -64,7 +83,7 @@ class AuthService {
   static final AuthService _instance = AuthService._internal();
 
   // Changed from final to late so it can be mocked in tests
-  late FirebaseAuth _auth = FirebaseAuth.instance;
+  late FirebaseAuth _auth;
   late GoogleSignIn _googleSignIn;
   late final LoggerService _logger;
   late final StorageService _storageService;
@@ -104,10 +123,17 @@ class AuthService {
       await credential.user?.sendEmailVerification();
       _logger.i('Verification email sent to: $email');
 
-      // Save user to storage
+      // Save user to storage and Firestore
       if (credential.user != null) {
-        await _saveUserToHive(UserModel.fromFirebaseUser(credential.user!));
+        final userModel = UserModel.fromFirebaseUser(credential.user!);
+
+        // Save to Hive
+        await _saveUserToHive(userModel);
         _logger.d('User data saved to local storage');
+
+        // Save to Firestore
+        await updateUserInFirestore(userModel);
+        _logger.d('User data saved to Firestore');
       }
 
       return credential;
@@ -289,19 +315,31 @@ class AuthService {
   Future<void> sendEmailVerification() async {
     _logger.i('Attempting to send email verification');
     try {
+      // No currently signed-in user? Bail out early.
       final user = _auth.currentUser;
-      if (user != null) {
-        await user.sendEmailVerification();
-        _logger.i('Verification email sent successfully to: ${user.email}');
-
-        // Analytics service commented out for now, will be implemented later
-        // await _analyticsService.logEvent(
-        //   name: 'email_verification_sent',
-        //   parameters: {'email': user.email},
-        // );
-      } else {
+      if (user == null) {
+        _logger.w('No authenticated user – cannot send verification email');
         throw Exception('No user logged in');
       }
+
+      // Already verified? Bail out early.
+      if (user.emailVerified) {
+        _logger.i('Email already verified – skipping resend');
+        throw FirebaseAuthException(
+          code: 'already-verified',
+          message: 'Your email address is already verified.',
+        );
+      }
+
+      // Send verification email
+      await user.sendEmailVerification();
+      _logger.i('Verification email sent successfully to: ${user.email}');
+
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.logEvent(
+      //   name: 'email_verification_sent',
+      //   parameters: {'email': user.email},
+      // );
     } catch (e, stackTrace) {
       _logger.e('Failed to send verification email', e, stackTrace);
       rethrow;
@@ -361,7 +399,55 @@ class AuthService {
     _logger.d('Getting current user from Firebase');
     final user = _auth.currentUser;
     if (user != null) {
-      return UserModel.fromFirebaseUser(user);
+      // First create a basic model from Firebase user
+      final basicModel = UserModel.fromFirebaseUser(user);
+
+      // Try to get additional data from Firestore
+      try {
+        _logger.d('Attempting to get user data from Firestore');
+        final docSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (docSnapshot.exists) {
+          _logger.d('User document exists in Firestore');
+          final data = docSnapshot.data();
+
+          // Extract user type from Firestore data
+          UserType? userType;
+          if (data != null && data['userType'] is String) {
+            final userTypeString = data['userType'] as String;
+            userType = UserType.values.firstWhere(
+              (e) => e.toString().split('.').last == userTypeString,
+              orElse: () {
+                _logger.w(
+                  'Unknown userType "$userTypeString" found in Firestore – falling back to employee',
+                );
+                return UserType.employee;
+              },
+            );
+            _logger.d('Found user type in Firestore: $userType');
+          }
+
+          // Create a new model with the user type
+          final enhancedModel = basicModel.copyWith(
+            userType: userType,
+          );
+
+          // Save to Hive for future use
+          await _saveUserToHive(enhancedModel);
+
+          return enhancedModel;
+        } else {
+          _logger.d('User document does not exist in Firestore');
+        }
+      } catch (e) {
+        _logger.e('Error getting user data from Firestore', e);
+      }
+
+      // Return basic model if Firestore retrieval fails
+      return basicModel;
     }
     return null;
   }
@@ -438,6 +524,26 @@ class AuthService {
     } catch (e, stackTrace) {
       _logger.e('Error retrieving user from local storage', e, stackTrace);
       return null;
+    }
+  }
+
+  // Update user in Firestore
+  Future<void> updateUserInFirestore(UserModel user) async {
+    _logger.i('Updating user in Firestore: ${user.uid}');
+    try {
+      // Save to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set(user.toMap(), SetOptions(merge: true));
+
+      // Update local storage
+      await _saveUserToHive(user);
+
+      _logger.i('User updated in Firestore successfully');
+    } catch (e, stackTrace) {
+      _logger.e('Error updating user in Firestore', e, stackTrace);
+      rethrow;
     }
   }
 

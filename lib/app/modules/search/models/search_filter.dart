@@ -22,6 +22,8 @@ class SearchFilter {
     this.isRemote = false,
     this.sortBy = SortOption.relevance,
     this.sortOrder = SortOrder.descending,
+    this.page = 1,
+    this.limit = 10,
   });
 
   /// Factory constructor from JSON
@@ -39,6 +41,8 @@ class SearchFilter {
       isRemote: json['isRemote'] as bool? ?? false,
       sortBy: _parseSortOption(json['sortBy'] as String?),
       sortOrder: _parseSortOrder(json['sortOrder'] as String?),
+      page: json['page'] as int? ?? 1,
+      limit: json['limit'] as int? ?? 10,
     );
   }
 
@@ -90,6 +94,14 @@ class SearchFilter {
   @HiveField(11)
   final SortOrder sortOrder;
 
+  /// Page number for pagination (1-based)
+  @HiveField(12)
+  final int page;
+
+  /// Number of results per page
+  @HiveField(13)
+  final int limit;
+
   /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -105,6 +117,8 @@ class SearchFilter {
       'isRemote': isRemote,
       'sortBy': sortBy.toString(),
       'sortOrder': sortOrder.toString(),
+      'page': page,
+      'limit': limit,
     };
   }
 
@@ -140,6 +154,8 @@ class SearchFilter {
     bool? isRemote,
     SortOption? sortBy,
     SortOrder? sortOrder,
+    int? page,
+    int? limit,
   }) {
     return SearchFilter(
       query: query ?? this.query,
@@ -154,6 +170,8 @@ class SearchFilter {
       isRemote: isRemote ?? this.isRemote,
       sortBy: sortBy ?? this.sortBy,
       sortOrder: sortOrder ?? this.sortOrder,
+      page: page ?? this.page,
+      limit: limit ?? this.limit,
     );
   }
 

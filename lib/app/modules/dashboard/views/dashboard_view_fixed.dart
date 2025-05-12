@@ -8,7 +8,7 @@ import 'package:next_gen/app/modules/dashboard/controllers/dashboard_controller.
 import 'package:next_gen/app/modules/dashboard/widgets/dashboard_widgets.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
-import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -30,7 +30,13 @@ class _DashboardViewState extends State<DashboardView> {
     // Get the controllers
     controller = Get.find<DashboardController>();
     navigationController = Get.find<NavigationController>();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     // Set the selected index to the Dashboard tab (index 0)
+    // This is safer than using initState with a direct value assignment
     navigationController.selectedIndex.value = 0;
   }
 
@@ -39,7 +45,7 @@ class _DashboardViewState extends State<DashboardView> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+      bottomNavigationBar: const RoleBasedBottomNav(),
       appBar: AppBar(
         title: const Text('Automotive Jobs Dashboard'),
         centerTitle: true,

@@ -3,6 +3,22 @@ import 'package:hive/hive.dart';
 
 part 'user_model.g.dart';
 
+/// Enum representing user types in the application
+@HiveType(typeId: 20)
+enum UserType {
+  /// Employee/job seeker user type
+  @HiveField(0)
+  employee,
+
+  /// Employer/company user type
+  @HiveField(1)
+  employer,
+
+  /// Admin user type
+  @HiveField(2)
+  admin,
+}
+
 @HiveType(typeId: 0)
 class UserModel {
   // Constructor
@@ -13,11 +29,12 @@ class UserModel {
     this.photoUrl,
     this.emailVerified = false,
     this.phoneNumber,
+    this.userType,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
   // Factory constructors
-  factory UserModel.fromFirebaseUser(firebase.User user) {
+  factory UserModel.fromFirebaseUser(firebase.User user, {UserType? userType}) {
     return UserModel(
       uid: user.uid,
       email: user.email ?? '',
@@ -25,10 +42,20 @@ class UserModel {
       photoUrl: user.photoURL,
       emailVerified: user.emailVerified,
       phoneNumber: user.phoneNumber,
+      userType: userType,
     );
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
+    UserType? userType;
+    if (map['userType'] is String) {
+      final userTypeString = map['userType'] as String;
+      userType = UserType.values.firstWhere(
+        (e) => e.toString().split('.').last == userTypeString,
+        orElse: () => UserType.employee,
+      );
+    }
+
     return UserModel(
       uid: map['uid'] as String,
       email: map['email'] as String,
@@ -36,6 +63,7 @@ class UserModel {
       photoUrl: map['photoUrl'] as String?,
       emailVerified: map['emailVerified'] as bool,
       phoneNumber: map['phoneNumber'] as String?,
+      userType: userType,
       createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }
@@ -62,6 +90,10 @@ class UserModel {
   @HiveField(6)
   final DateTime createdAt;
 
+  /// The type of user (employee or employer)
+  @HiveField(7)
+  final UserType? userType;
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -70,6 +102,7 @@ class UserModel {
       'photoUrl': photoUrl,
       'emailVerified': emailVerified,
       'phoneNumber': phoneNumber,
+      'userType': userType?.toString().split('.').last,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -81,6 +114,7 @@ class UserModel {
     String? photoUrl,
     bool? emailVerified,
     String? phoneNumber,
+    UserType? userType,
     DateTime? createdAt,
   }) {
     return UserModel(
@@ -90,6 +124,7 @@ class UserModel {
       photoUrl: photoUrl ?? this.photoUrl,
       emailVerified: emailVerified ?? this.emailVerified,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      userType: userType ?? this.userType,
       createdAt: createdAt ?? this.createdAt,
     );
   }

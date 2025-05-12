@@ -222,8 +222,9 @@ class SignupView extends GetView<AuthController> {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ), // Reduced padding
                               child: Text(
                                 'OR',
                                 style: TextStyle(
@@ -231,6 +232,7 @@ class SignupView extends GetView<AuthController> {
                                       ? AppTheme.slateGray
                                       : AppTheme.slateGray,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 12, // Smaller font size
                                 ),
                               ),
                             ),
@@ -266,6 +268,8 @@ class SignupView extends GetView<AuthController> {
                                   : Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Prevent row from taking full width
                                       children: [
                                         const FaIcon(
                                           FontAwesomeIcons.google,
@@ -273,14 +277,19 @@ class SignupView extends GetView<AuthController> {
                                           color: Colors.red,
                                         ),
                                         const SizedBox(width: 12),
-                                        Text(
-                                          'Sign up with Google',
-                                          style: TextStyle(
-                                            color: isDarkMode
-                                                ? AppTheme.offWhite
-                                                : Colors.black87,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16,
+                                        Flexible(
+                                          // Make text flexible to prevent overflow
+                                          child: Text(
+                                            'Sign up with Google',
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? AppTheme.offWhite
+                                                  : Colors.black87,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 16,
+                                            ),
+                                            overflow: TextOverflow
+                                                .ellipsis, // Add ellipsis if text overflows
                                           ),
                                         ),
                                       ],
@@ -292,8 +301,10 @@ class SignupView extends GetView<AuthController> {
                         const SizedBox(height: 32),
 
                         // Sign In Link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          // Use Wrap instead of Row to handle overflow
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
                               'Already have an account?',

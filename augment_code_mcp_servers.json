@@ -1,0 +1,948 @@
+{
+  "mcpServers": [
+    {
+      "name": "flutterfire-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/firebase/flutterfire"
+      ]
+    },
+    {
+      "name": "flex_color_scheme-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/rydmike/flex_color_scheme"
+      ]
+    },
+    {
+      "name": "flutter_packages-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/packages"
+      ]
+    },
+    {
+      "name": "mockito-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/mockito"
+      ]
+    },
+    {
+      "name": "very_good_cli-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/VeryGoodOpenSource/very_good_cli"
+      ]
+    },
+    {
+      "name": "hive-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/hivedb/hive"
+      ]
+    },
+    {
+      "name": "context7-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/upstash/context7"
+      ]
+    },
+    {
+      "name": "clean_architecture-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/ResoCoder/flutter-tdd-clean-architecture-course"
+      ]
+    },
+    {
+      "name": "architecture_samples-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/brianegan/flutter_architecture_samples"
+      ]
+    },
+    {
+      "name": "linter-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/linter"
+      ]
+    },
+    {
+      "name": "material_design-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/material-foundation/material-design-kit"
+      ]
+    },
+    {
+      "name": "flutter_gallery-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/gallery"
+      ]
+    },
+    {
+      "name": "plus_plugins-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/fluttercommunity/plus_plugins"
+      ]
+    },
+    {
+      "name": "rive-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/rive-app/rive-flutter"
+      ]
+    },
+    {
+      "name": "staggered_animations-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/letsar/flutter_staggered_animations"
+      ]
+    },
+    {
+      "name": "devtools-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/devtools"
+      ]
+    },
+    {
+      "name": "golden_toolkit-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/golden-toolkit/golden-toolkit"
+      ]
+    },
+    {
+      "name": "riverpod-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/rrousselGit/riverpod"
+      ]
+    },
+    {
+      "name": "mobx-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/mobxjs/mobx.dart"
+      ]
+    },
+    {
+      "name": "intl-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/intl"
+      ]
+    },
+    {
+      "name": "a11y-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/packages/tree/main/packages/a11y"
+      ]
+    },
+    {
+      "name": "flame-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flame-engine/flame"
+      ]
+    },
+    {
+      "name": "flutter_svg-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dnfield/flutter_svg"
+      ]
+    },
+    {
+      "name": "build-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/build"
+      ]
+    },
+    {
+      "name": "cocoon-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/cocoon"
+      ]
+    },
+    {
+      "name": "melos-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/invertase/melos"
+      ]
+    },
+    {
+      "name": "fluentui-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/microsoft/fluentui"
+      ]
+    },
+    {
+      "name": "flutter_desktop-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/google/flutter-desktop-embedding"
+      ]
+    },
+    {
+      "name": "flutter_rust_bridge-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/fzyzcjy/flutter_rust_bridge"
+      ]
+    },
+    {
+      "name": "flutter_samples-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/samples"
+      ]
+    },
+    {
+      "name": "wonderous_app-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/gskinnerTeam/flutter-wonderous-app"
+      ]
+    },
+    {
+      "name": "adaptive_scaffold-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter_adaptive_scaffold"
+      ]
+    },
+    {
+      "name": "mason-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/mason"
+      ]
+    },
+    {
+      "name": "material_components-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/material-components/material-components-flutter"
+      ]
+    },
+    {
+      "name": "design_patterns-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter_design_patterns"
+      ]
+    },
+    {
+      "name": "cupertino-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/cupertino_icons"
+      ]
+    },
+    {
+      "name": "staggered_grid-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter_staggered_grid_view"
+      ]
+    },
+    {
+      "name": "flutter_animate-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter_animate"
+      ]
+    },
+    {
+      "name": "flutter_markdown-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter_markdown"
+      ]
+    },
+    {
+      "name": "go_router-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/go_router"
+      ]
+    },
+    {
+      "name": "flutter_engine-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/engine"
+      ]
+    },
+    {
+      "name": "skia-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/google/skia"
+      ]
+    },
+    {
+      "name": "flutter_web-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter_web"
+      ]
+    },
+    {
+      "name": "flutter_plugins-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/plugins"
+      ]
+    },
+    {
+      "name": "tflite-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/tensorflow/flutter-tflite"
+      ]
+    },
+    {
+      "name": "flutter_map-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter_map"
+      ]
+    },
+    {
+      "name": "dart_pad-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/dart-pad"
+      ]
+    },
+    {
+      "name": "flutter_tools-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter_tools"
+      ]
+    },
+    {
+      "name": "secure_storage-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutternetwork/flutter_secure_storage"
+      ]
+    },
+    {
+      "name": "built_value-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/google/built_value.dart"
+      ]
+    },
+    {
+      "name": "coderabbit_docs-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/coderabbitai/coderabbit-docs"
+      ]
+    },
+    {
+      "name": "ast_grep_essentials-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/coderabbitai/ast-grep-essentials"
+      ]
+    },
+    {
+      "name": "ai_pr_reviewer-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/coderabbitai/ai-pr-reviewer"
+      ]
+    },
+    {
+      "name": "awesome_coderabbit-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/coderabbitai/awesome-coderabbit"
+      ]
+    },
+    {
+      "name": "ast_grep-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/coderabbitai/ast-grep"
+      ]
+    },
+    {
+      "name": "flutter_hooks-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/rrousselGit/flutter_hooks"
+      ]
+    },
+    {
+      "name": "freezed-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/rrousselGit/freezed"
+      ]
+    },
+    {
+      "name": "dio-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutterchina/dio"
+      ]
+    },
+    {
+      "name": "flutter_slidable-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/letsar/flutter_slidable"
+      ]
+    },
+    {
+      "name": "flutter_form_builder-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/danvick/flutter_form_builder"
+      ]
+    },
+    {
+      "name": "flutter_local_notifications-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/MaikuB/flutter_local_notifications"
+      ]
+    },
+    {
+      "name": "flutter_stripe-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter-stripe/flutter_stripe"
+      ]
+    },
+    {
+      "name": "flutter_inappwebview-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/pichillilorenzo/flutter_inappwebview"
+      ]
+    },
+    {
+      "name": "flutter_native_splash-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/jonbhanson/flutter_native_splash"
+      ]
+    },
+    {
+      "name": "flutter_launcher_icons-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/fluttercommunity/flutter_launcher_icons"
+      ]
+    },
+    {
+      "name": "flutter_dotenv-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/java-james/flutter_dotenv"
+      ]
+    },
+    {
+      "name": "flutter_screenutil-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/OpenFlutter/flutter_screenutil"
+      ]
+    },
+    {
+      "name": "flutter_easyloading-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/huangjianke/flutter_easyloading"
+      ]
+    },
+    {
+      "name": "flutter_staggered_grid_view-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/letsar/flutter_staggered_grid_view"
+      ]
+    },
+    {
+      "name": "flutter_cache_manager-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/Baseflow/flutter_cache_manager"
+      ]
+    },
+    {
+      "name": "flutter_keyboard_visibility-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/MisterJimson/flutter_keyboard_visibility"
+      ]
+    },
+    {
+      "name": "flutter_image_compress-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/OpenFlutter/flutter_image_compress"
+      ]
+    },
+    {
+      "name": "flutter_secure_storage-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/mogol/flutter_secure_storage"
+      ]
+    },
+    {
+      "name": "flutter_bloc_patterns-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/bloc_pattern"
+      ]
+    },
+    {
+      "name": "flutter_clean_architecture-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/Flutterando/Clean-Dart"
+      ]
+    },
+    {
+      "name": "flutter_performance-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter/tree/master/dev/benchmarks"
+      ]
+    },
+    {
+      "name": "flutter_accessibility-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter/tree/master/dev/a11y"
+      ]
+    },
+    {
+      "name": "flutter_internationalization-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter/tree/master/dev/integration_tests/flutter_localization_example"
+      ]
+    },
+    {
+      "name": "flutter_testing_patterns-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/flutter/tree/master/dev/integration_tests"
+      ]
+    },
+    {
+      "name": "flutter_state_management-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/brianegan/flutter_architecture_samples"
+      ]
+    },
+    {
+      "name": "flutter_animations-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/samples/tree/master/animations"
+      ]
+    },
+    {
+      "name": "flutter_responsive-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/flutter/samples/tree/master/experimental/web_dashboard"
+      ]
+    },
+    {
+      "name": "equatable-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/equatable"
+      ]
+    },
+    {
+      "name": "flow_builder-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/flow_builder"
+      ]
+    },
+    {
+      "name": "mocktail-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/mocktail"
+      ]
+    },
+    {
+      "name": "fresh-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/fresh"
+      ]
+    },
+    {
+      "name": "data_class-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/data_class"
+      ]
+    },
+    {
+      "name": "broadcast_bloc-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/broadcast_bloc"
+      ]
+    },
+    {
+      "name": "inherited_stream-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/inherited_stream"
+      ]
+    },
+    {
+      "name": "web_socket_client-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/web_socket_client"
+      ]
+    },
+    {
+      "name": "flutter_and_friends-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/flutter_and_friends"
+      ]
+    },
+    {
+      "name": "bloc_js-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/felangel/bloc.js"
+      ]
+    },
+    {
+      "name": "dart_sdk-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/sdk"
+      ]
+    },
+    {
+      "name": "dart_core-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/core"
+      ]
+    },
+    {
+      "name": "dart_ai-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/ai"
+      ]
+    },
+    {
+      "name": "dart_site-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/site-www"
+      ]
+    },
+    {
+      "name": "dart_language-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/language"
+      ]
+    },
+    {
+      "name": "dart_native-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/native"
+      ]
+    },
+    {
+      "name": "dart_http-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/http"
+      ]
+    },
+    {
+      "name": "dart_test-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/test"
+      ]
+    },
+    {
+      "name": "dart_co19-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/co19"
+      ]
+    },
+    {
+      "name": "dart_webdev-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/webdev"
+      ]
+    },
+    {
+      "name": "dart_labs-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/labs"
+      ]
+    },
+    {
+      "name": "dart_build-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/build"
+      ]
+    },
+    {
+      "name": "dart_i18n-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/i18n"
+      ]
+    },
+    {
+      "name": "dart_source_gen-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/source_gen"
+      ]
+    },
+    {
+      "name": "dart_leak_tracker-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/leak_tracker"
+      ]
+    },
+    {
+      "name": "dart_tools-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/tools"
+      ]
+    },
+    {
+      "name": "dart_dartdoc-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/dartdoc"
+      ]
+    },
+    {
+      "name": "dart_ci-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/dart_ci"
+      ]
+    },
+    {
+      "name": "dart_mockito-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/mockito"
+      ]
+    },
+    {
+      "name": "dart_ecosystem-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/ecosystem"
+      ]
+    },
+    {
+      "name": "dart_web-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/web"
+      ]
+    },
+    {
+      "name": "dart_pub-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/pub"
+      ]
+    },
+    {
+      "name": "dart_style-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/dart_style"
+      ]
+    },
+    {
+      "name": "dart_samples-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/samples"
+      ]
+    },
+    {
+      "name": "dart_pana-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/dart-lang/pana"
+      ]
+    },
+    {
+      "name": "git-mcp-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/idosal/git-mcp"
+      ]
+    }
+  ]
+}

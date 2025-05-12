@@ -102,11 +102,6 @@
     - Ensured 100% test coverage for new components
     - Fixed all linting issues and trailing commas
 
-- Added Context 7 prompt requirement:
-  - Updated augment_rules.md with the requirement to include "use context 7 MCP server" in prompts
-  - Added dedicated section for Context 7 in augment_rules.md
-  - Established requirement to always include the Context 7 phrase in prompts to Augment Code
-
 - Implemented comprehensive development workflow automation:
   - Created feature branch `feature/workflow-automation` for these changes
   - Created scripts directory with utility scripts:
@@ -810,13 +805,261 @@
     - The error was preventing the login screen from loading
     - Stack trace showed the error happening during the AuthBinding.dependencies method
 
+## [2025-05-12]
+- Fixed Role Selection Functionality:
+  - **Issue Description**:
+    - Users were unable to select employer and admin roles in the role selection screen
+    - The role selection functionality was only working for the employee role
+    - This prevented users from accessing employer and admin features
+    - The role selection UI showed all options but only employee role was functional
+
+  - **Root Cause Analysis**:
+    - The `setRole()` method in `RoleSelectionController` wasn't properly updating the selected role
+    - The role selection UI was not providing proper visual feedback when a role was selected
+    - The role persistence mechanism wasn't properly saving the selected role to Firestore and local storage
+    - The theme controller wasn't being updated with the new role, causing UI inconsistencies
+
+  - **Working Solution**:
+    - Enhanced `RoleSelectionController.setRole()` method to properly handle all role types
+    - Improved role selection UI with better visual feedback (scaling animation, color changes)
+    - Added proper role persistence to both Firestore and local storage with retry mechanism
+    - Implemented theme updates based on selected role for consistent UI experience
+    - Added default role (employee) with ability to change to other roles
+    - Improved error handling and logging throughout the role selection process
+
+  - **Benefits**:
+    - Users can now select any role (employee, employer, admin) during account setup
+    - Role-specific UI and navigation is properly applied based on selected role
+    - Improved user experience with visual feedback during role selection
+    - Enhanced error recovery with retry mechanism for Firestore updates
+    - Better logging for debugging role selection issues
+
+  - **Lessons Learned**:
+    - Always test all user roles and paths in role-based applications
+    - Implement proper visual feedback for user selections
+    - Use retry mechanisms for critical operations like role updates
+    - Ensure proper synchronization between local storage and remote database
+    - Document role-specific features and navigation in project documentation
+
 ## [2024-07-28]
+- Fixed Hive Adapter Registration Issue for SignupSession:
+  - **Issue Description**:
+    - App was crashing with error: "HiveError: Cannot write, unknown type: SignupSession. Did you forget to register an adapter?"
+    - Error occurred in SignupSessionService.saveSession method
+    - The error was preventing signup sessions from being saved to Hive
+    - This affected the ability to resume signup process after interruption
+
+  - **Root Cause Analysis**:
+    - The SignupSession and SignupStep Hive adapters were defined but not properly registered before use
+    - There was a race condition where the SignupSessionService was used before HiveManager completed initialization
+    - The error occurred because Hive couldn't serialize the SignupSession object without a registered adapter
+    - Two different adapter implementations existed: generated adapters in signup_session.g.dart and custom adapters in signup_session_adapter_helper.dart
+
+  - **Working Solution**:
+    - Updated SignupSessionAdapterHelper to use the generated adapters:
+      - Removed custom adapter implementations that duplicated the generated ones
+      - Added constants for type IDs to improve code readability
+      - Improved error handling and logging
+    - Enhanced SignupSessionService with proper initialization:
+      - Added _adaptersRegistered flag to track registration status
+      - Implemented onInit method to register adapters during initialization
+      - Created _ensureAdaptersRegistered method for centralized adapter registration
+      - Updated all methods to use the new _ensureAdaptersRegistered method
+      - Improved error handling throughout the service
+
+  - **Benefits**:
+    - Fixed the "Cannot write, unknown type: SignupSession" error
+    - Improved adapter registration reliability
+    - Eliminated duplicate adapter implementations
+    - Enhanced error handling and logging
+    - Made the code more maintainable with centralized adapter registration
+
+  - **Lessons Learned**:
+    - Always register Hive adapters before using them
+    - Use a single approach for adapter registration to avoid conflicts
+    - Implement proper initialization in service classes
+    - Use flags to track initialization status
+    - Add comprehensive error handling for database operations
+
+- Fixed setState() Called During Build Error in RoleBasedBottomNav:
+  - **Issue Description**:
+    - App was showing error: "setState() or markNeedsBuild() called during build"
+    - The error occurred in the RoleBasedBottomNav widget
+    - The issue was caused by the DashboardView directly modifying NavigationController.selectedIndex.value in didChangeDependencies
+    - This was triggering a setState() call in the RoleBasedBottomNav widget during the build phase
+
+  - **Root Cause Analysis**:
+    - The RoleBasedBottomNav widget was using ever() listeners that called setState() when observable values changed
+    - These listeners were being triggered during the build phase when DashboardView updated selectedIndex.value
+    - Flutter doesn't allow calling setState() during the build phase as it can cause infinite rebuild loops
+    - The issue was exacerbated by multiple views updating the selectedIndex in their didChangeDependencies methods
+
+  - **Working Solution**:
+    - Completely refactored the RoleBasedBottomNav widget to use a more robust approach:
+      - Removed the ever() listeners that were calling setState() directly
+      - Added a didChangeDependencies method that uses Future.microtask to schedule setState() calls after the build phase
+      - Converted the widget to use Obx for reactive UI updates instead of relying on local state
+      - Made _buildNavItem use Obx to reactively respond to selectedIndex changes
+    - This approach ensures that:
+      - The widget still responds to changes in the NavigationController
+      - setState() is never called during the build phase
+      - The UI updates properly when the selected index or user role changes
+
+  - **Benefits**:
+    - Fixed the "setState() called during build" error
+    - Made the bottom navigation bar more robust against state changes
+    - Improved the widget's reactivity using GetX's Obx
+    - Prevented potential infinite rebuild loops
+    - Enhanced the overall stability of the navigation system
+
+  - **Lessons Learned**:
+    - Avoid using ever() listeners that call setState() directly
+    - Use Future.microtask to schedule setState() calls after the build phase
+    - Prefer Obx for reactive UI updates when using GetX
+    - Be careful when updating observable values in lifecycle methods like didChangeDependencies
+    - Test widgets with different state update patterns to ensure they handle all cases properly
+- Fixed Layout Overflow in Signup View:
+  - **Issue Description**:
+    - App was showing error: "A RenderFlex overflowed by 34 pixels on the right"
+    - This layout overflow was occurring in the signup view
+    - The error was affecting the UI appearance and causing error messages in the console
+    - This is a common Flutter UI issue where a widget is trying to render content that doesn't fit within its constraints
+
+  - **Root Cause Analysis**:
+    - Multiple UI components in the signup view were not handling overflow properly:
+      - The role selection section was using a Wrap widget but needed better alignment
+      - The Google Sign Up button had a Row that could overflow on smaller screens
+      - The "Already have an account?" section was using a Row that could overflow
+      - The "OR" divider had horizontal padding that was too large
+
+  - **Working Solution**:
+    - Updated the Google Sign Up button:
+      - Added `mainAxisSize: MainAxisSize.min` to prevent the Row from taking full width
+      - Wrapped the text in a Flexible widget to allow it to shrink if needed
+      - Added `overflow: TextOverflow.ellipsis` to handle text overflow gracefully
+    - Replaced the "Already have an account?" Row with a Wrap widget:
+      - Used `alignment: WrapAlignment.center` to center the content
+      - Used `crossAxisAlignment: WrapCrossAlignment.center` to align items vertically
+    - Improved the "OR" divider:
+      - Reduced horizontal padding from 16 to 8
+      - Reduced the font size to 12
+      - Added flex parameters to ensure equal sizing of dividers
+
+  - **Benefits**:
+    - Fixed the layout overflow error
+    - Improved UI appearance on smaller screens
+    - Prevented error messages in the console
+    - Made the signup view more responsive
+    - Enhanced user experience by ensuring all content is visible
+
+  - **Lessons Learned**:
+    - Use Wrap widgets instead of Row widgets when content might overflow
+    - Add Flexible widgets to allow text to shrink when needed
+    - Use TextOverflow.ellipsis to handle text overflow gracefully
+    - Reduce padding and font sizes on smaller screens
+    - Test UI on different screen sizes to catch overflow issues early
+- Fixed Hive Adapter Registration Issue for SignupSession:
+  - **Issue Description**:
+    - App was crashing with error: "HiveError: Cannot write, unknown type: SignupSession. Did you forget to register an adapter?"
+    - Error occurred in SignupSessionService.saveSession method
+    - The error was preventing signup sessions from being saved to Hive
+    - This affected the ability to resume signup process after interruption
+
+  - **Root Cause Analysis**:
+    - The SignupSession and SignupStep Hive adapters were defined but not properly registered before use
+    - The HiveManager was initializing adapters, but there might be a race condition where the SignupSessionService was used before HiveManager completed initialization
+    - The error occurred because Hive couldn't serialize the SignupSession object without a registered adapter
+    - The initial approach of directly using the generated adapter classes didn't work because they are part of the generated code and not directly accessible
+
+  - **Working Solution**:
+    - Created a dedicated SignupSessionAdapterHelper class:
+      - Implemented custom adapter classes that match the generated ones
+      - Added a static registerAdapters method to handle registration in one place
+      - Made the helper class handle all adapter registration logic
+    - Updated SignupSessionService to use the helper class:
+      - Replaced direct adapter registration with calls to SignupSessionAdapterHelper
+      - Simplified all methods to use the same adapter registration approach
+      - Added more detailed error logging to capture HiveError details
+      - Improved error handling with proper fallbacks
+    - This approach ensures that even if HiveManager hasn't completed initialization, the SignupSessionService can still function by registering the adapters itself
+
+  - **Benefits**:
+    - Fixed the "unknown type: SignupSession" error
+    - Created a reusable pattern for adapter registration that can be applied to other models
+    - Improved error handling and recovery
+    - Enhanced logging for better debugging
+    - Made the service more robust against initialization timing issues
+    - Ensured signup sessions can be properly saved and retrieved
+
+  - **Lessons Learned**:
+    - Generated Hive adapter classes can't be directly accessed from other files
+    - Create dedicated helper classes for adapter registration when needed
+    - Add proper error handling for Hive operations
+    - Use detailed logging for database operations
+    - Consider initialization order and potential race conditions
+    - Implement defensive programming to handle cases where dependencies might not be fully initialized
+
 - Integrated Third-Party Job Portal App and Updated Roadmap:
   - **Issue Description**:
     - Need to accelerate development by integrating an existing job portal app
     - Need to support both employee and employer functionality from day one
     - Need to update the project roadmap to reflect the new approach
     - The third-party app (JobsFlutterApp) has been cloned and dependencies upgraded
+
+- Fixed GetX Reactive UI Issues and Layout Overflow:
+  - **Issue Description**:
+    - App was showing error: "The improper use of a GetX has been detected"
+    - Another error: "A RenderFlex overflowed by 99435 pixels on the bottom"
+    - These errors occurred when using Obx widgets and when rendering lists with unbounded height
+    - The issues were causing UI elements to disappear and error messages to appear
+
+  - **Root Cause Analysis**:
+    - Nested Obx widgets in SearchView and DashboardView were causing reactive state issues
+    - ListView widgets without proper height constraints were causing overflow errors
+    - Direct access to .obs variables outside of reactive contexts
+    - Unbounded ListView in the recent activity section was causing overflow
+    - The RoleBasedBottomNav widget was using ScreenUtil without proper initialization
+    - The RoleBasedBottomNav widget was using Obx in a way that caused reactive state issues
+    - The CustomDrawer widget was using ScreenUtil without proper initialization
+    - The CustomDrawer widget was using deprecated withOpacity methods
+
+  - **Working Solution**:
+    - Fixed RoleBasedBottomNav widget:
+      - Converted from StatelessWidget to StatefulWidget to properly manage state
+      - Removed direct access to .value properties of observable variables
+      - Used local state variables and listeners to update state when observables change
+      - Removed ScreenUtil dependency to avoid initialization issues
+      - Added proper error handling for controller initialization
+    - Fixed CustomDrawer widget:
+      - Removed ScreenUtil dependency to avoid initialization issues
+      - Replaced all .r, .h, and .w extensions with fixed values
+      - Replaced deprecated withOpacity calls with withAlpha for better precision
+      - Fixed controller access to avoid reactive state issues
+      - Added proper error handling for controller initialization
+    - Fixed nested Obx widgets:
+      - Removed redundant Obx widgets in SearchView's _buildSearchResults and _buildSearchHistory methods
+      - Added proper Obx wrappers around conditional UI in DashboardView
+      - Ensured each reactive variable is properly observed in a single Obx widget
+      - Added detailed comments explaining proper Obx usage to prevent future issues
+    - Fixed layout overflow issues:
+      - Added proper physics to ListView widgets with AlwaysScrollableScrollPhysics
+      - Limited the number of items in the recent activity list to prevent overflow
+      - Added ConstrainedBox with maxHeight constraint to the recent activity ListView
+      - Added comments to explain the changes for future maintenance
+      - Ensured all Column widgets with ListView children have proper height constraints
+    - Enhanced error handling and logging:
+      - Added detailed comments explaining reactive UI patterns
+      - Improved error recovery with proper state management
+      - Added clear warnings about nested Obx widgets
+
+  - **Benefits**:
+    - Eliminated the "improper use of GetX" errors
+    - Fixed the layout overflow issues (99435 pixels on the bottom)
+    - Fixed drawer opening issues that were causing crashes
+    - Improved UI stability and performance
+    - Enhanced error handling and recovery
+    - Made the code more maintainable with proper reactive patterns
+    - Added educational comments to prevent similar issues in the future
 
   - **Implementation Details**:
     - Analyzed the third-party JobsFlutterApp structure and functionality:
@@ -952,6 +1195,191 @@
     - Stack trace showed the error happening during app startup in the App widget build method
 
 ## [2024-07-29] - Navigation Module
+
+- Fixed Firebase Initialization Error Handling:
+  - **Issue Description**:
+    - The catch block in AuthService was masking Firebase initialization issues
+    - It was assigning _auth = FirebaseAuth.instance again, which is the same call that already threw an exception
+    - This could lead to a partially-initialized AuthService propagating through the app
+    - CodeRabbit AI identified this as a potential issue that needed to be fixed
+
+  - **Root Cause Analysis**:
+    - The error handling was designed to create a fallback instance, but this approach was flawed
+    - If Firebase hasn't been correctly initialized, the second call would throw again
+    - The real root cause would be swallowed, making debugging difficult
+    - This could lead to hard-to-diagnose runtime errors later in the application
+
+  - **Working Solution**:
+    - Modified the catch block to rethrow the exception instead of masking it
+    - Added stack trace capture to provide more detailed error information
+    - Improved error logging with a clearer message indicating that service construction is aborting
+    - This allows the bootstrap process to handle the error appropriately
+
+  - **Benefits**:
+    - Fails fast instead of propagating a partially initialized service
+    - Provides clearer error messages for debugging
+    - Preserves the original stack trace for better error diagnosis
+    - Prevents cascading failures from an improperly initialized service
+    - Makes initialization issues immediately apparent rather than causing subtle bugs
+
+  - **Lessons Learned**:
+    - Don't mask initialization errors with fallback instances that will also fail
+    - Capture and preserve stack traces for better debugging
+    - Fail fast when critical services cannot be properly initialized
+    - Provide clear error messages that indicate the severity of the issue
+    - Allow higher-level components to handle initialization failures appropriately
+
+- Improved UserType Parsing with Defensive Default & Future-Proofing:
+  - **Issue Description**:
+    - UserType parsing was using an if/else chain that silently left the field null for unexpected values
+    - Future enum values (e.g., "moderator") would not map, degrading the user experience
+    - A null userType could later break RoleMiddleware logic that expects a non-null enum
+    - CodeRabbit AI identified this as a potential issue that needed to be fixed
+
+  - **Root Cause Analysis**:
+    - The parsing logic was not future-proof and didn't handle unexpected values gracefully
+    - The code was duplicated in multiple places (AuthService and UserModel)
+    - There was no fallback to a default value when an unknown userType was encountered
+    - This could lead to inconsistent behavior and potential null reference exceptions
+
+  - **Working Solution**:
+    - Replaced the if/else chain with a more robust approach using firstWhere with orElse
+    - Added a type check (data['userType'] is String) to prevent casting errors
+    - Set employee as the default user type when an unknown value is encountered
+    - Added warning logs when falling back to the default value
+    - Updated both AuthService and UserModel for consistency
+
+  - **Benefits**:
+    - Preserves forward compatibility with future enum values
+    - Ensures a safe default (employee) instead of null
+    - Provides warning logs when unexpected values are encountered
+    - Reduces code duplication with a more concise approach
+    - Prevents potential null reference exceptions in role-based logic
+
+  - **Lessons Learned**:
+    - Use firstWhere with orElse for robust enum parsing
+    - Always provide a sensible default for critical values
+    - Add type checks before casting to prevent runtime errors
+    - Log warnings when falling back to default values
+    - Keep parsing logic consistent across the codebase
+
+- Improved Email Verification Process:
+  - **Issue Description**:
+    - The sendEmailVerification method was always firing, even when the user's email was already verified
+    - This resulted in redundant requests to Firebase and possible "too many requests" errors
+    - The method also didn't properly guard against null users, potentially causing NPEs
+    - CodeRabbit AI identified this as a potential issue that needed to be fixed
+
+  - **Root Cause Analysis**:
+    - The method lacked proper checks for null users and already verified emails at the controller level
+    - The service layer threw exceptions for these cases, but they were caught and handled generically
+    - This led to unnecessary network requests and potential rate limiting from Firebase
+    - The error handling didn't distinguish between different types of verification failures
+
+  - **Working Solution**:
+    - Added early guards in both AuthController and AuthService:
+      - Check if there's a currently signed-in user and bail out early if not
+      - Check if the user's email is already verified and bail out early if it is
+      - Added user-friendly snackbar messages for both cases
+      - Improved error handling to distinguish between different error types
+    - In AuthService:
+      - Added explicit checks for null user and already verified email
+      - Throw specific exceptions with appropriate error codes
+    - In AuthController:
+      - Added early return statements to prevent unnecessary service calls
+      - Added specific error handling for the 'already-verified' error code
+      - Ensured loading state is always reset in the finally block
+
+  - **Benefits**:
+    - Reduced unnecessary network usage and Firebase API calls
+    - Prevented users from hitting Firebase's resend throttle limits
+    - Improved user experience with clear, specific feedback messages
+    - Enhanced code robustness by preventing null pointer exceptions
+    - Made the verification process more efficient and reliable
+
+  - **Lessons Learned**:
+    - Always check preconditions before making external API calls
+    - Use early returns to prevent unnecessary processing
+    - Provide specific, user-friendly error messages for different error cases
+    - Reset loading states in finally blocks to ensure they're always reset
+    - Add proper null checks to prevent runtime exceptions
+
+- Added Missing Filter Chips for Reviewed and Hired Statuses:
+  - **Issue Description**:
+    - The applications view was missing filter chips for "Reviewed" and "Hired" statuses
+    - The model and badge builder supported these states, but users couldn't filter to them
+    - This created an inconsistent user experience where some valid statuses couldn't be filtered
+    - CodeRabbit AI identified this as a potential issue that needed to be fixed
+
+  - **Root Cause Analysis**:
+    - The filter chips were implemented for most application statuses but not all of them
+    - "Reviewed" and "Hired" statuses were missing from the filter tabs section
+    - The ApplicationStatus enum included these statuses and they were properly displayed in the UI
+    - The status counts were being tracked for these statuses but users couldn't filter by them
+
+  - **Working Solution**:
+    - Added a filter chip for "Reviewed" status after the "Pending" status:
+      - Used the same _buildFilterChip method for consistency
+      - Added proper count tracking using controller.statusCounts[ApplicationStatus.reviewed]
+      - Implemented proper selection handling with controller.setStatusFilter
+    - Added a filter chip for "Hired" status after the "Offered" status:
+      - Followed the same pattern as other status filter chips
+      - Placed it in a logical position in the workflow (after "Offered")
+      - Ensured proper spacing with SizedBox widgets
+
+  - **Benefits**:
+    - Users can now filter applications by all available statuses
+    - Improved consistency in the user interface
+    - Enhanced user experience by providing complete filtering capabilities
+    - Made the UI more intuitive by showing all possible application states
+    - Ensured the filter tabs match the actual application status model
+
+  - **Lessons Learned**:
+    - Ensure UI elements are consistent with the underlying data model
+    - Implement UI controls for all valid states in an enum
+    - Place filter options in a logical order that matches the workflow
+    - Test filtering functionality for all possible states
+    - Document UI changes in the activity log for future reference
+
+- Fixed Side-Effects Inside Build Method in ApplicationDetailsView:
+  - **Issue Description**:
+    - ApplicationDetailsView was calling controller.loadApplicationDetails() directly in the build method
+    - This caused infinite fetch loops when the view rebuilt due to theme changes or other state updates
+    - The issue was causing excessive Firestore calls, potentially leading to quota limits and performance issues
+    - CodeRabbit AI identified this as a potential issue that needed to be fixed
+
+  - **Root Cause Analysis**:
+    - The build method contained side-effect code that triggered Firestore calls on every rebuild
+    - The condition `if (controller.selectedApplication?.id != applicationId)` was not sufficient to prevent repeated calls
+    - The view was implemented as a StatelessWidget, which doesn't have lifecycle methods for proper initialization
+    - This pattern violates Flutter's best practices by performing side effects during the build phase
+
+  - **Working Solution**:
+    - Converted ApplicationDetailsView from GetView<ApplicationsController> to StatefulWidget:
+      - Created a _ApplicationDetailsViewState class to manage state
+      - Added a _currentApplicationId field to track the current application ID
+      - Implemented initState to perform initial data loading
+      - Added didChangeDependencies to handle route parameter changes
+      - Created a dedicated _loadApplicationDetails method for centralized loading logic
+    - This approach ensures that:
+      - Data is loaded only once during initialization
+      - Data is reloaded only when the application ID changes
+      - No side effects occur during the build method
+      - The view properly responds to route parameter changes
+
+  - **Benefits**:
+    - Eliminated infinite fetch loops and excessive Firestore calls
+    - Improved application performance and responsiveness
+    - Reduced the risk of hitting Firestore quota limits
+    - Made the code follow Flutter's best practices for side effects
+    - Enhanced code maintainability with proper separation of concerns
+
+  - **Lessons Learned**:
+    - Never perform side effects (API calls, database operations) directly in the build method
+    - Use StatefulWidget with proper lifecycle methods for initialization and updates
+    - Track state changes to prevent unnecessary operations
+    - Implement didChangeDependencies to handle route parameter changes
+    - Create dedicated methods for data loading operations
 - Fixed Bottom Navigation Tab Views:
   - **Issue Description**:
     - Bottom navigation bar was not properly displaying the correct views when tabs were selected
@@ -1201,6 +1629,52 @@
     - The second tap would trigger the loading indicator and complete the sign out process
     - This created a confusing user experience
 
+## [2024-08-03]
+- Fixed Persistent GetX Reactive UI Issues and Layout Overflow:
+  - **Issue Description**:
+    - App was still showing error: "The improper use of a GetX has been detected"
+    - Another error: "A RenderFlex overflowed by 99418 pixels on the bottom"
+    - These errors persisted despite previous fixes
+    - The issues were causing UI elements to disappear and error messages to appear
+
+  - **Root Cause Analysis**:
+    - Despite previous fixes, there were still issues with nested Obx widgets in CustomDrawer
+    - The CustomDrawer was using direct access to .value properties of observable variables inside Obx
+    - The dashboard_view.dart still had layout overflow issues in the recent activity section
+    - The ConstrainedBox in the recent activity section had a maxHeight that was too large
+
+  - **Working Solution**:
+    - Updated CustomDrawer widget:
+      - Converted from StatelessWidget to StatefulWidget to properly manage state
+      - Removed direct access to .value properties of observable variables inside Obx
+      - Used local state variables and listeners to update state when observables change
+      - Added proper error handling for controller initialization
+    - Fixed layout overflow issues in dashboard_view.dart:
+      - Reduced the maxHeight constraint in the recent activity section from 300 to 250
+      - Added proper physics to ListView widgets with NeverScrollableScrollPhysics
+      - Limited the number of items in the recent activity list to 3 instead of 4
+      - Added detailed comments explaining the changes for future maintenance
+    - Added comprehensive error logging:
+      - Enhanced GlobalErrorHandler to catch and log GetX-specific errors
+      - Added detailed comments explaining reactive UI patterns
+      - Improved error recovery with proper state management
+
+  - **Benefits**:
+    - Eliminated the "improper use of GetX" errors
+    - Fixed the layout overflow issues (99418 pixels on the bottom)
+    - Improved UI stability and performance
+    - Enhanced error handling and recovery
+    - Made the code more maintainable with proper reactive patterns
+    - Added educational comments to prevent similar issues in the future
+
+  - **Lessons Learned**:
+    - Always convert to StatefulWidget when managing reactive state with GetX
+    - Never access .value properties of observable variables inside Obx widgets
+    - Use local state variables and listeners to update state when observables change
+    - Always provide bounded height constraints for ListView widgets inside Column widgets
+    - Test UI on different screen sizes to catch overflow issues early
+    - Add clear comments about reactive UI patterns to educate other developers
+
   - **Root Cause Analysis**:
     - The issue was related to how the NeoPopButton from the neopop package handles tap events
     - NeoPopButton has separate callbacks for `onTapDown` and `onTapUp`
@@ -1388,6 +1862,100 @@
     - Placeholder routes allow for incremental development
 
 ## [2024-07-29]
+- Fixed Navigation Issues with Duplicate GlobalKeys and Late Initialization:
+  - **Issue Description**:
+    - App was crashing with error: "Duplicate GlobalKey detected in widget tree"
+    - Another error: "LateInitializationError: Field '_routeIndices' has already been initialized"
+    - These errors occurred when navigating between screens, especially from dashboard to search and back
+    - The issues were causing UI elements to disappear and navigation to break
+
+  - **Root Cause Analysis**:
+    - The `NavigationController` had a shared `GlobalKey<ScaffoldState> scaffoldKey` that was being used by multiple screens
+    - When navigating between screens, Flutter detected the same key being used in multiple places
+    - The `_routeIndices` field was declared as `late final` but was being initialized multiple times when user role changed
+    - The controller was trying to update a final field which caused the LateInitializationError
+
+  - **Working Solution**:
+    - Removed the shared scaffoldKey from NavigationController:
+      - Changed from a shared key to requiring each view to provide its own key
+      - Updated the drawer toggle methods to accept a scaffold key parameter
+      - Added proper null checking and error logging for key operations
+    - Added local scaffold keys to each view:
+      - Updated SearchView, DashboardView, ApplicationsView, HomeView, SavedJobsView, and ResumeView
+      - Each view now creates and manages its own unique scaffold key
+      - Updated drawer toggle calls to pass the local key to the controller
+    - Fixed the LateInitializationError:
+      - Changed `_routeIndices` from `late final` to a regular field with an initial empty map
+      - Updated `_updateRouteIndices()` to clear the map instead of reassigning it
+      - Improved `_loadUserRole()` to only update route indices when the role actually changes
+      - Added comprehensive logging throughout the process
+    - Enhanced error handling and logging:
+      - Added detailed logs for role changes and route index updates
+      - Improved error recovery with proper state management
+      - Added fallback behavior when keys are missing or invalid
+
+  - **Benefits**:
+    - Eliminated the "Duplicate GlobalKey" error during navigation
+    - Fixed the LateInitializationError when changing user roles
+    - Improved navigation stability across the app
+    - Enhanced error handling and recovery
+    - Added better logging for debugging navigation issues
+    - Made the code more maintainable with proper separation of concerns
+
+  - **Lessons Learned**:
+    - Avoid sharing GlobalKeys across multiple widgets in the widget tree
+    - Each widget should manage its own state and keys
+    - Use regular fields instead of `late final` for values that might change
+    - Add proper error handling and logging for navigation operations
+    - Test navigation flows thoroughly, especially back navigation
+    - Consider how shared state variables might affect different parts of the app
+
+- Fixed GetX Reactive UI Issues and Layout Overflow:
+  - **Issue Description**:
+    - App was showing error: "The improper use of a GetX has been detected"
+    - Another error: "A RenderFlex overflowed by 99435 pixels on the bottom"
+    - These errors occurred when using Obx widgets and when rendering lists with unbounded height
+    - The issues were causing UI elements to disappear and error messages to appear
+
+  - **Root Cause Analysis**:
+    - Nested Obx widgets in SearchView and DashboardView were causing reactive state issues
+    - ListView widgets without proper height constraints were causing overflow errors
+    - Direct access to .obs variables outside of reactive contexts
+    - Unbounded ListView in the recent activity section was causing overflow
+
+  - **Working Solution**:
+    - Fixed nested Obx widgets:
+      - Removed redundant Obx widgets in SearchView's _buildSearchResults and _buildSearchHistory methods
+      - Added proper Obx wrappers around conditional UI in DashboardView
+      - Ensured each reactive variable is properly observed in a single Obx widget
+      - Added detailed comments explaining proper Obx usage to prevent future issues
+    - Fixed layout overflow issues:
+      - Added proper physics to ListView widgets with AlwaysScrollableScrollPhysics
+      - Limited the number of items in the recent activity list to prevent overflow
+      - Added ConstrainedBox with maxHeight constraint to the recent activity ListView
+      - Added comments to explain the changes for future maintenance
+      - Ensured all Column widgets with ListView children have proper height constraints
+    - Enhanced error handling and logging:
+      - Added detailed comments explaining reactive UI patterns
+      - Improved error recovery with proper state management
+      - Added clear warnings about nested Obx widgets
+
+  - **Benefits**:
+    - Eliminated the "improper use of GetX" errors
+    - Fixed the layout overflow issues (99435 pixels on the bottom)
+    - Improved UI stability and performance
+    - Enhanced error handling and recovery
+    - Made the code more maintainable with proper reactive patterns
+    - Added educational comments to prevent similar issues in the future
+
+  - **Lessons Learned**:
+    - Avoid nesting Obx widgets - each observable should be wrapped in exactly one Obx
+    - Always provide bounded height for ListView widgets inside Column widgets (use ConstrainedBox)
+    - Use ListView.builder with proper physics for scrollable lists
+    - Limit the number of items in lists that use shrinkWrap and NeverScrollableScrollPhysics
+    - Test UI on different screen sizes to catch overflow issues early
+    - Add clear comments about reactive UI patterns to educate other developers
+
 - Fixed Bottom Navigation Tab Views:
   - **Issue Description**:
     - The search, resume, and profile tabs were all showing the same home screen content

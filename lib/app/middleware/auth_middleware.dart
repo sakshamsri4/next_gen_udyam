@@ -24,7 +24,14 @@ class AuthMiddleware extends GetMiddleware {
     _logger.d('AuthMiddleware.redirect called for route: $route');
 
     // Skip auth check for these routes
-    final publicRoutes = [Routes.onboarding];
+    final publicRoutes = [
+      Routes.onboarding,
+      Routes.login,
+      Routes.signup,
+      Routes.forgotPassword,
+      Routes.auth,
+    ];
+
     if (publicRoutes.contains(route)) {
       _logger.d('Route $route is public, skipping auth check');
       return null;
@@ -56,6 +63,10 @@ class AuthMiddleware extends GetMiddleware {
         Routes.customerProfile,
         Routes.companyProfile,
         Routes.search,
+        Routes.applications,
+        Routes.savedJobs,
+        Routes.roleSelection,
+        Routes.settings,
       ];
 
       // If the route is a protected route, allow access
@@ -83,6 +94,10 @@ class AuthMiddleware extends GetMiddleware {
       Routes.customerProfile,
       Routes.companyProfile,
       Routes.search,
+      Routes.applications,
+      Routes.savedJobs,
+      Routes.roleSelection,
+      Routes.settings,
     ];
 
     if (protectedRoutes.contains(route)) {

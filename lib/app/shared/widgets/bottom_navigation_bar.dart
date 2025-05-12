@@ -47,8 +47,8 @@ class CustomAnimatedBottomNavBar extends GetView<NavigationController> {
             ),
             _buildNavItem(
               context,
-              icon: FontAwesomeIcons.fileLines,
-              label: 'Resume',
+              icon: FontAwesomeIcons.fileCircleCheck,
+              label: 'Applied',
               index: 3,
             ),
             _buildNavItem(

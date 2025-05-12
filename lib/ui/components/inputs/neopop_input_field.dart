@@ -15,12 +15,14 @@ class NeoPopInputField extends StatelessWidget {
   /// [onChanged] is called when the text changes
   /// [enabled] is whether the field is enabled
   /// [suffixIcon] is the icon to display at the end of the field
+  /// [helperText] is the helper text to display below the field
   const NeoPopInputField({
     required this.controller,
     required this.labelText,
     required this.hintText,
     this.prefixIcon,
     this.errorText,
+    this.helperText,
     this.keyboardType,
     this.obscureText = false,
     this.onChanged,
@@ -43,6 +45,9 @@ class NeoPopInputField extends StatelessWidget {
 
   /// The error text to display below the field
   final String? errorText;
+
+  /// The helper text to display below the field
+  final String? helperText;
 
   /// The keyboard type to use
   final TextInputType? keyboardType;
@@ -101,6 +106,11 @@ class NeoPopInputField extends StatelessWidget {
             errorText: errorText,
             errorStyle: TextStyle(
               color: theme.colorScheme.error,
+              fontSize: 12,
+            ),
+            helperText: helperText,
+            helperStyle: TextStyle(
+              color: theme.colorScheme.onSurface.withAlpha(150),
               fontSize: 12,
             ),
             prefixIcon: prefixIcon,

@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:next_gen/app/modules/auth/models/user_model.dart';
 
 part 'theme_settings.g.dart';
 
@@ -16,6 +17,7 @@ class ThemeSettings extends HiveObject {
     this.isDarkMode = true,
     this.useMaterial3 = true,
     this.useHighContrast = false,
+    this.userRole,
   });
 
   /// Whether the app is in dark mode
@@ -30,16 +32,22 @@ class ThemeSettings extends HiveObject {
   @HiveField(2)
   bool useHighContrast;
 
+  /// The user role for role-specific theming
+  @HiveField(3)
+  UserType? userRole;
+
   /// Creates a copy of this ThemeSettings with specified attributes replaced
   ThemeSettings copyWith({
     bool? isDarkMode,
     bool? useMaterial3,
     bool? useHighContrast,
+    UserType? userRole,
   }) {
     return ThemeSettings(
       isDarkMode: isDarkMode ?? this.isDarkMode,
       useMaterial3: useMaterial3 ?? this.useMaterial3,
       useHighContrast: useHighContrast ?? this.useHighContrast,
+      userRole: userRole ?? this.userRole,
     );
   }
 
@@ -47,6 +55,7 @@ class ThemeSettings extends HiveObject {
   String toString() {
     return 'ThemeSettings(isDarkMode: $isDarkMode, '
         'useMaterial3: $useMaterial3, '
-        'useHighContrast: $useHighContrast)';
+        'useHighContrast: $useHighContrast, '
+        'userRole: $userRole)';
   }
 }

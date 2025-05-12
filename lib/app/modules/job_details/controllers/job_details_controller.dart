@@ -42,16 +42,50 @@ class JobDetailsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _logger.d('JobDetailsController: onInit');
+    _logger.d('JobDetailsController: onInit with arguments: ${Get.arguments}');
 
-    // Get job ID from route arguments
-    final jobId = Get.arguments as String?;
-    if (jobId != null) {
+    // Get job ID from route arguments - handle different types
+    String? jobId;
+
+    if (Get.arguments is String) {
+      // If a string is passed, use it as the job ID
+      jobId = Get.arguments as String;
+      _logger.d('Job ID received as String: $jobId');
+    } else if (Get.arguments is JobModel) {
+      // If a JobModel is passed, extract the ID and set the job directly
+      final jobModel = Get.arguments as JobModel;
+      jobId = jobModel.id;
+      job.value = jobModel;
+      _logger.d('Job received as JobModel: ${jobModel.title}');
+    } else if (Get.arguments is Map<String, dynamic>) {
+      // If a Map is passed, try to extract the ID
+      final argsMap = Get.arguments as Map<String, dynamic>;
+      if (argsMap.containsKey('id')) {
+        jobId = argsMap['id'] as String;
+        _logger.d('Job ID received from Map: $jobId');
+      } else {
+        _logger.e('Map arguments do not contain an ID key');
+      }
+    } else {
+      _logger.e('Invalid arguments type: ${Get.arguments?.runtimeType}');
+    }
+
+    if (jobId != null && jobId.isNotEmpty) {
+      _logger.d('Loading job details for ID: $jobId');
       loadJobDetails(jobId);
     } else {
       isLoading.value = false;
       errorMessage.value = 'Job ID not provided';
-      _logger.e('Job ID not provided');
+      _logger.e('Job ID not provided or empty');
+
+      // Show a snackbar to inform the user
+      Get.snackbar(
+        'Error',
+        'Job ID not provided. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
 
     // Pre-fill form fields if user is logged in
@@ -77,51 +111,144 @@ class JobDetailsController extends GetxController {
   /// Load job details by ID
   Future<void> loadJobDetails(String jobId) async {
     try {
+      // Log debugging information
+      _logger.d('''
+===== DEBUG INFO =====
+Loading job details for ID: $jobId
+Current loading state: ${isLoading.value}
+Current job value: ${job.value?.title ?? 'null'}
+=====================
+''');
+
+      // Reset state
       isLoading.value = true;
       errorMessage.value = '';
 
+      // Create a timeout for the entire operation
+      var operationTimedOut = false;
+      Future.delayed(const Duration(seconds: 10), () {
+        if (isLoading.value) {
+          _logger.w('Operation timed out after 10 seconds');
+          operationTimedOut = true;
+          isLoading.value = false;
+          errorMessage.value = 'Operation timed out. Please try again.';
+        }
+      });
+
       // Get job details
+      _logger.d('Fetching job data from service for ID: $jobId');
       final jobData = await _jobDetailsService.getJobDetails(jobId);
-      if (jobData == null) {
-        errorMessage.value = 'Job not found';
+
+      // Check if operation was cancelled due to timeout
+      if (operationTimedOut) {
+        _logger.w('Operation was already cancelled due to timeout');
         return;
       }
 
+      if (jobData == null) {
+        _logger.w('Job not found with ID: $jobId');
+        errorMessage.value = 'Job not found';
+        isLoading.value = false;
+        return;
+      }
+
+      _logger.d('Job data received: ${jobData.title}');
       job.value = jobData;
 
-      // Get company details
-      final company =
-          await _jobDetailsService.getCompanyDetails(jobData.company);
-      companyDetails.value = company;
+      // Get company details - with error handling
+      try {
+        _logger.d('Fetching company details for: ${jobData.company}');
+        final company =
+            await _jobDetailsService.getCompanyDetails(jobData.company);
+        companyDetails.value = company;
+        _logger
+            .d('Company details received: ${company != null ? 'yes' : 'no'}');
+      } catch (e) {
+        _logger.e('Error fetching company details', e);
+        // Continue with default company details
+        companyDetails.value = {
+          'name': jobData.company,
+          'description': 'Company information unavailable',
+        };
+      }
 
-      // Get similar jobs
-      final similar = await _jobDetailsService.getSimilarJobs(
-        currentJobId: jobId,
-        jobType: jobData.jobType,
-        industry: jobData.industry,
-      );
-      similarJobs.value = similar;
+      // Get similar jobs - with error handling
+      try {
+        _logger.d('Fetching similar jobs');
+        final similar = await _jobDetailsService.getSimilarJobs(
+          currentJobId: jobId,
+          jobType: jobData.jobType,
+          industry: jobData.industry,
+        );
+        similarJobs.value = similar;
+        _logger.d('Similar jobs received: ${similar.length}');
+      } catch (e) {
+        _logger.e('Error fetching similar jobs', e);
+        // Continue with empty similar jobs
+        similarJobs.value = [];
+      }
 
       // Check if user has applied and if job is saved
       if (_authController.isLoggedIn) {
         final userId = _authController.user.value?.uid;
         if (userId != null) {
-          // Check if user has applied for the job
-          hasUserApplied.value = await _jobDetailsService.hasApplied(
-            userId: userId,
-            jobId: jobId,
-          );
+          try {
+            _logger.d('Checking if user $userId has applied for job $jobId');
+            // Check if user has applied for the job
+            hasUserApplied.value = await _jobDetailsService.hasApplied(
+              userId: userId,
+              jobId: jobId,
+            );
+            _logger.d('User has applied: ${hasUserApplied.value}');
+          } catch (e) {
+            _logger.e('Error checking application status', e);
+            // Default to not applied
+            hasUserApplied.value = false;
+          }
 
           // Check if job is saved
-          final jobService = Get.find<JobService>();
-          final savedJobs = await jobService.getSavedJobs(userId);
-          isJobSaved.value = savedJobs.contains(jobId);
+          try {
+            _logger.d('Checking if job is saved');
+            final jobService = Get.find<JobService>();
+            final savedJobs = await jobService.getSavedJobs();
+            isJobSaved.value = savedJobs.any((job) => job.id == jobId);
+            _logger.d('Job is saved: ${isJobSaved.value}');
+          } catch (e) {
+            _logger.e('Error checking saved status', e);
+            // Default to not saved
+            isJobSaved.value = false;
+          }
         }
       }
+
+      _logger.i('Job details loading completed successfully');
+
+      // Force UI update by setting isLoading to false
+      isLoading.value = false;
     } catch (e) {
-      _logger.e('Error loading job details', e);
-      errorMessage.value = 'Failed to load job details';
+      _logger.e('ERROR LOADING JOB DETAILS', e);
+      // Create a dummy job for testing if needed
+      if (Get.isRegistered<JobModel>()) {
+        try {
+          _logger.d('Creating fallback job model');
+          job.value = JobModel(
+            id: jobId,
+            title: 'Sample Job (Error Loading)',
+            company: 'Unknown Company',
+            location: 'Unknown Location',
+            description:
+                'There was an error loading the job details. Please try again later.',
+            salary: 0,
+            postedDate: DateTime.now(),
+          );
+        } catch (modelError) {
+          _logger.e('Error creating fallback model', modelError);
+        }
+      }
+
+      errorMessage.value = 'Failed to load job details: $e';
     } finally {
+      _logger.d('Setting isLoading to false in finally block');
       isLoading.value = false;
     }
   }
