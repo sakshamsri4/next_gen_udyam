@@ -245,6 +245,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
             },
             isSelected: selectedIndex == 4,
           ),
+          const Divider(),
+          _buildNavItem(
+            context: context,
+            icon: FontAwesomeIcons.chartBar,
+            title: 'Analytics',
+            onTap: () => _navigateAndClose(Routes.employerAnalytics),
+          ),
+          _buildNavItem(
+            context: context,
+            icon: FontAwesomeIcons.calendarCheck,
+            title: 'Interviews',
+            onTap: () => _navigateAndClose(Routes.interviewManagement),
+          ),
         ],
       );
     } else if (userRole == UserType.admin) {

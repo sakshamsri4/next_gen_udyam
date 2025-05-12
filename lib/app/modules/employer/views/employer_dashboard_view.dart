@@ -531,8 +531,10 @@ class EmployerDashboardView extends GetView<EmployerDashboardController> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          Wrap(
+            alignment: WrapAlignment.spaceAround,
+            spacing: 16,
+            runSpacing: 16,
             children: [
               _buildQuickActionItem(
                 context,
@@ -560,7 +562,14 @@ class EmployerDashboardView extends GetView<EmployerDashboardController> {
                 icon: HeroIcons.chartBar,
                 label: 'Analytics',
                 color: Colors.purple,
-                onTap: () => Get.toNamed<dynamic>('/analytics'),
+                onTap: () => Get.toNamed<dynamic>('/employer-analytics'),
+              ),
+              _buildQuickActionItem(
+                context,
+                icon: HeroIcons.calendar,
+                label: 'Interviews',
+                color: Colors.teal,
+                onTap: () => Get.toNamed<dynamic>('/interview-management'),
               ),
             ],
           ),
