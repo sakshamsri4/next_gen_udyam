@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/home/services/job_service.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
-import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
 /// Controller for the Jobs view

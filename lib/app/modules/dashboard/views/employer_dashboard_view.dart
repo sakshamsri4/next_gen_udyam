@@ -9,11 +9,17 @@ import 'package:next_gen/ui/components/buttons/role_adaptive_button.dart';
 import 'package:next_gen/widgets/neopop_card.dart';
 
 /// Dashboard screen for employer users
+///
+/// Note: This view uses DashboardController which contains employer-specific properties
+/// like companyName, activeJobsCount, etc. In the future, this should be refactored to use
+/// a dedicated EmployerDashboardController with these properties properly defined.
 class EmployerDashboardView extends GetView<DashboardController> {
   /// Creates an employer dashboard view
   const EmployerDashboardView({super.key});
 
   /// Extension getter for recentActivities to fix naming inconsistency
+  /// This getter exists to maintain consistent naming conventions in the UI
+  /// while the controller uses the singular form 'recentActivity'
   RxList<ActivityItem> get recentActivities => controller.recentActivity;
 
   @override

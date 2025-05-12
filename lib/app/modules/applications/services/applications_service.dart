@@ -99,9 +99,9 @@ class ApplicationsService {
         return false;
       }
 
-      // Update the application status to withdrawn (we'll use rejected for now)
+      // Update the application status to withdrawn
       await _firestore.collection('applications').doc(applicationId).update({
-        'status': ApplicationStatus.rejected.toString().split('.').last,
+        'status': ApplicationStatus.withdrawn.toString().split('.').last,
         'lastUpdated': FieldValue.serverTimestamp(),
         'feedback': 'Application withdrawn by candidate',
       });

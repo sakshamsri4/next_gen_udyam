@@ -364,25 +364,28 @@ class JobCreationForm extends GetView<JobPostingController> {
         SizedBox(height: 16.h),
 
         // Application Deadline
-        GestureDetector(
-          onTap: () => _selectDate(Get.context!),
-          child: AbsorbPointer(
-            child: TextField(
-              controller: TextEditingController(
-                text: controller.applicationDeadline != null
-                    ? DateFormat('yyyy-MM-dd')
-                        .format(controller.applicationDeadline!)
-                    : '',
-              ),
-              decoration: const InputDecoration(
+        Obx(() {
+          // Format the date if available
+          final displayText = controller.applicationDeadline != null
+              ? DateFormat('yyyy-MM-dd').format(controller.applicationDeadline!)
+              : '';
+
+          return GestureDetector(
+            onTap: () => _selectDate(Get.context!),
+            child: InputDecorator(
+              decoration: InputDecoration(
                 labelText: 'Application Deadline',
-                hintText: 'Select a deadline',
-                border: OutlineInputBorder(),
-                suffixIcon: HeroIcon(HeroIcons.calendar),
+                hintText: displayText.isEmpty ? 'Select a deadline' : null,
+                border: const OutlineInputBorder(),
+                suffixIcon: const HeroIcon(HeroIcons.calendar),
+              ),
+              child: Text(
+                displayText.isEmpty ? '' : displayText,
+                style: Theme.of(Get.context!).textTheme.bodyMedium,
               ),
             ),
-          ),
-        ),
+          );
+        }),
         SizedBox(height: 16.h),
 
         // Featured Job
@@ -420,8 +423,20 @@ class JobCreationForm extends GetView<JobPostingController> {
             controller.jobTypeController.text.isNotEmpty &&
             controller.locationController.text.isNotEmpty;
       case 1:
-        return controller.salaryController.text.isNotEmpty &&
-            controller.experienceController.text.isNotEmpty &&
+        // Validate salary as a number
+        final salary = int.tryParse(controller.salaryController.text);
+        if (salary == null || salary <= 0) {
+          Get.snackbar(
+            'Validation Error',
+            'Please enter a valid salary amount (numeric value greater than 0)',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+          return false;
+        }
+
+        return controller.experienceController.text.isNotEmpty &&
             controller.educationController.text.isNotEmpty &&
             controller.industryController.text.isNotEmpty;
       case 2:

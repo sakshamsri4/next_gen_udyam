@@ -47,10 +47,13 @@ class AuthService {
       // Get FirebaseAuth instance
       _auth = FirebaseAuth.instance;
       _logger.d('FirebaseAuth instance initialized successfully');
-    } catch (e) {
-      _logger.e('Error initializing FirebaseAuth instance', e);
-      // Create a fallback instance that will be replaced when Firebase is properly initialized
-      _auth = FirebaseAuth.instance;
+    } catch (e, st) {
+      _logger.e(
+        'Error initializing FirebaseAuth instance – aborting AuthService construction',
+        e,
+        st,
+      );
+      rethrow; // bubble up so bootstrap can halt or retry initialization
     }
 
     // Initialize GoogleSignIn with appropriate configuration
@@ -312,19 +315,31 @@ class AuthService {
   Future<void> sendEmailVerification() async {
     _logger.i('Attempting to send email verification');
     try {
+      // No currently signed-in user? Bail out early.
       final user = _auth.currentUser;
-      if (user != null) {
-        await user.sendEmailVerification();
-        _logger.i('Verification email sent successfully to: ${user.email}');
-
-        // Analytics service commented out for now, will be implemented later
-        // await _analyticsService.logEvent(
-        //   name: 'email_verification_sent',
-        //   parameters: {'email': user.email},
-        // );
-      } else {
+      if (user == null) {
+        _logger.w('No authenticated user – cannot send verification email');
         throw Exception('No user logged in');
       }
+
+      // Already verified? Bail out early.
+      if (user.emailVerified) {
+        _logger.i('Email already verified – skipping resend');
+        throw FirebaseAuthException(
+          code: 'already-verified',
+          message: 'Your email address is already verified.',
+        );
+      }
+
+      // Send verification email
+      await user.sendEmailVerification();
+      _logger.i('Verification email sent successfully to: ${user.email}');
+
+      // Analytics service commented out for now, will be implemented later
+      // await _analyticsService.logEvent(
+      //   name: 'email_verification_sent',
+      //   parameters: {'email': user.email},
+      // );
     } catch (e, stackTrace) {
       _logger.e('Failed to send verification email', e, stackTrace);
       rethrow;
@@ -401,15 +416,17 @@ class AuthService {
 
           // Extract user type from Firestore data
           UserType? userType;
-          if (data != null && data['userType'] != null) {
+          if (data != null && data['userType'] is String) {
             final userTypeString = data['userType'] as String;
-            if (userTypeString == 'employee') {
-              userType = UserType.employee;
-            } else if (userTypeString == 'employer') {
-              userType = UserType.employer;
-            } else if (userTypeString == 'admin') {
-              userType = UserType.admin;
-            }
+            userType = UserType.values.firstWhere(
+              (e) => e.toString().split('.').last == userTypeString,
+              orElse: () {
+                _logger.w(
+                  'Unknown userType "$userTypeString" found in Firestore – falling back to employee',
+                );
+                return UserType.employee;
+              },
+            );
             _logger.d('Found user type in Firestore: $userType');
           }
 

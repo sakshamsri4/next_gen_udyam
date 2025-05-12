@@ -61,10 +61,9 @@ class AdminController extends GetxController {
 
       // Load mock data
       _loadMockData();
-
-      isLoading.value = false;
     } catch (e) {
       _logger.e('Error loading dashboard data', e);
+    } finally {
       isLoading.value = false;
     }
   }

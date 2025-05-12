@@ -29,6 +29,7 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   late final DashboardController controller;
   late final NavigationController navigationController;
+  late final AuthController authController;
 
   // Create a unique scaffold key for this view
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -46,17 +47,21 @@ class _DashboardViewState extends State<DashboardView> {
       navigationController = Get.put(NavigationController(), permanent: true);
     }
 
-    // Refresh user data to check email verification status and load role
+    // Safely get or register AuthController
     if (Get.isRegistered<AuthController>()) {
-      Get.find<AuthController>().refreshUser();
+      authController = Get.find<AuthController>();
+      authController.refreshUser();
+    } else {
+      // Register AuthController if not already registered
+      authController = Get.put(AuthController(), permanent: true);
+    }
 
-      // Force reload user role in navigation controller
-      if (Get.isRegistered<NavigationController>()) {
-        // Use Future.delayed to ensure this runs after the current frame
-        Future.delayed(Duration.zero, () {
-          Get.find<NavigationController>().reloadUserRole();
-        });
-      }
+    // Force reload user role in navigation controller
+    if (Get.isRegistered<NavigationController>()) {
+      // Use Future.delayed to ensure this runs after the current frame
+      Future.delayed(Duration.zero, () {
+        navigationController.reloadUserRole();
+      });
     }
   }
 
@@ -89,8 +94,8 @@ class _DashboardViewState extends State<DashboardView> {
           return const EmployerDashboardView();
         }
 
-        // Make sure AuthController is registered
-        Get.find<AuthController>();
+        // AuthController is already safely registered in initState
+        // No need to call Get.find<AuthController>() here
 
         // Otherwise, show the default dashboard view
         return Scaffold(

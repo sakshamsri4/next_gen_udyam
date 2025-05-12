@@ -11,20 +11,50 @@ import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
 /// Application details view
-class ApplicationDetailsView extends GetView<ApplicationsController> {
+class ApplicationDetailsView extends StatefulWidget {
   /// Constructor
   const ApplicationDetailsView({super.key});
+
+  @override
+  State<ApplicationDetailsView> createState() => _ApplicationDetailsViewState();
+}
+
+class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
+  late final ApplicationsController controller;
+  String? _currentApplicationId;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.find<ApplicationsController>();
+
+    // Load application details once when the view is initialized
+    _loadApplicationDetails();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Check if the application ID has changed (e.g., due to navigation)
+    final applicationId = Get.parameters['id'] ?? '';
+    if (_currentApplicationId != applicationId) {
+      _currentApplicationId = applicationId;
+      _loadApplicationDetails();
+    }
+  }
+
+  void _loadApplicationDetails() {
+    final applicationId = Get.parameters['id'] ?? '';
+    if (applicationId.isNotEmpty &&
+        controller.selectedApplication?.id != applicationId) {
+      controller.loadApplicationDetails(applicationId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final applicationId = Get.parameters['id'] ?? '';
-
-    // Load application details
-    if (controller.selectedApplication?.id != applicationId) {
-      controller.loadApplicationDetails(applicationId);
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -162,6 +192,10 @@ class ApplicationDetailsView extends GetView<ApplicationsController> {
         statusText = 'Application Rejected';
         description =
             'We regret to inform you that your application was not selected for this position.';
+      case ApplicationStatus.withdrawn:
+        color = Colors.grey;
+        statusText = 'Application Withdrawn';
+        description = 'You have withdrawn your application for this position.';
     }
 
     return Card(
@@ -641,6 +675,8 @@ class ApplicationDetailsView extends GetView<ApplicationsController> {
         return Icons.celebration;
       case ApplicationStatus.rejected:
         return Icons.cancel;
+      case ApplicationStatus.withdrawn:
+        return Icons.undo;
     }
   }
 }

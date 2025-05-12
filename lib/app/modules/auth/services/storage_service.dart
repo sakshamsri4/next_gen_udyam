@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
+import 'package:mime/mime.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
 /// A service for handling file storage operations
@@ -22,12 +23,22 @@ class StorageService extends GetxService {
     try {
       _logger.i('Uploading profile image for user: $userId');
 
-      // Validate file type
+      // Validate file type by extension
       final extension = file.path.split('.').last.toLowerCase();
       final validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
       if (!validExtensions.contains(extension)) {
         throw Exception(
           'Invalid file type. Only ${validExtensions.join(", ")} are allowed.',
+        );
+      }
+
+      // Additional MIME type validation (magic-byte inspection)
+      final bytes =
+          await file.readAsBytes().then((value) => value.take(4096).toList());
+      final mimeType = lookupMimeType(file.path, headerBytes: bytes);
+      if (mimeType == null || !mimeType.startsWith('image/')) {
+        throw Exception(
+          'Invalid file type. Only image MIME types are allowed.',
         );
       }
 
@@ -72,6 +83,13 @@ class StorageService extends GetxService {
       final ref = _storage.ref().child('profile_images/$userId');
       final result = await ref.listAll();
 
+      // Log warning if there are unusually many files
+      if (result.items.length > 10) {
+        _logger.w(
+          'Found ${result.items.length} profile images for user $userId. Consider investigating.',
+        );
+      }
+
       final deletionFutures = result.items.map((item) => item.delete());
       await Future.wait(deletionFutures);
 
@@ -91,9 +109,11 @@ class StorageService extends GetxService {
     try {
       _logger.i('Deleting file: $url');
 
-      // Basic URL validation
-      if (url.isEmpty ||
-          !url.startsWith('https://firebasestorage.googleapis.com')) {
+      // Enhanced URL validation with RegExp pattern
+      final validUrlPattern = RegExp(
+        r'^https://firebasestorage\.googleapis\.com/v\d/b/[^/]+/o/.+$',
+      );
+      if (url.isEmpty || !validUrlPattern.hasMatch(url)) {
         throw Exception('Invalid Firebase Storage URL');
       }
 

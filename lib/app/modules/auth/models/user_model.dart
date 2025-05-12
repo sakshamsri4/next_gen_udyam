@@ -48,15 +48,12 @@ class UserModel {
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     UserType? userType;
-    if (map['userType'] != null) {
+    if (map['userType'] is String) {
       final userTypeString = map['userType'] as String;
-      if (userTypeString == 'employee') {
-        userType = UserType.employee;
-      } else if (userTypeString == 'employer') {
-        userType = UserType.employer;
-      } else if (userTypeString == 'admin') {
-        userType = UserType.admin;
-      }
+      userType = UserType.values.firstWhere(
+        (e) => e.toString().split('.').last == userTypeString,
+        orElse: () => UserType.employee,
+      );
     }
 
     return UserModel(

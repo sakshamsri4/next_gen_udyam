@@ -1,3 +1,5 @@
+import 'dart:math' show min;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
@@ -37,19 +39,32 @@ class DiscoverView extends GetView<EmployeeHomeController> {
               const SizedBox(height: 24),
 
               // Job recommendations
-              _buildSectionHeader(context, 'Recommended for You'),
+              _buildSectionHeader(
+                context,
+                'Recommended for You',
+                onSeeAllPressed: () => Get.toNamed<dynamic>(Routes.search),
+              ),
               const SizedBox(height: 16),
               _buildJobRecommendations(context),
               const SizedBox(height: 24),
 
               // Recently viewed jobs
-              _buildSectionHeader(context, 'Recently Viewed'),
+              _buildSectionHeader(
+                context,
+                'Recently Viewed',
+                onSeeAllPressed: () => Get.toNamed<dynamic>(Routes.search),
+              ),
               const SizedBox(height: 16),
               _buildRecentlyViewedJobs(context),
               const SizedBox(height: 24),
 
               // Activity feed
-              _buildSectionHeader(context, 'Activity Feed'),
+              _buildSectionHeader(
+                context,
+                'Activity Feed',
+                onSeeAllPressed: () =>
+                    Get.toNamed<dynamic>(Routes.applications),
+              ),
               const SizedBox(height: 16),
               _buildActivityFeed(context),
               const SizedBox(height: 24),
@@ -132,7 +147,15 @@ class DiscoverView extends GetView<EmployeeHomeController> {
   }
 
   /// Build section header with optional "See All" button
-  Widget _buildSectionHeader(BuildContext context, String title) {
+  ///
+  /// @param title The display title for the section
+  /// @param onSeeAllPressed Callback function to execute when "See All" is pressed
+  /// If null, the "See All" button will not be shown
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title, {
+    VoidCallback? onSeeAllPressed,
+  }) {
     final theme = Theme.of(context);
 
     return Row(
@@ -144,23 +167,17 @@ class DiscoverView extends GetView<EmployeeHomeController> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        TextButton(
-          onPressed: () {
-            // Navigate to appropriate section based on title
-            if (title == 'Recommended for You' || title == 'Recently Viewed') {
-              Get.toNamed<dynamic>(Routes.search);
-            } else if (title == 'Activity Feed') {
-              Get.toNamed<dynamic>(Routes.applications);
-            }
-          },
-          child: const Text(
-            'See All',
-            style: TextStyle(
-              color: RoleThemes.employeePrimary,
-              fontWeight: FontWeight.bold,
+        if (onSeeAllPressed != null)
+          TextButton(
+            onPressed: onSeeAllPressed,
+            child: const Text(
+              'See All',
+              style: TextStyle(
+                color: RoleThemes.employeePrimary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -179,7 +196,7 @@ class DiscoverView extends GetView<EmployeeHomeController> {
       return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: controller.recommendedJobs.length.clamp(0, 3),
+        itemCount: min(controller.recommendedJobs.length, 3),
         itemBuilder: (context, index) {
           final job = controller.recommendedJobs[index];
           return Padding(
@@ -223,7 +240,7 @@ class DiscoverView extends GetView<EmployeeHomeController> {
       return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: controller.recentlyViewedJobs.length.clamp(0, 3),
+        itemCount: min(controller.recentlyViewedJobs.length, 3),
         itemBuilder: (context, index) {
           final job = controller.recentlyViewedJobs[index];
           return Padding(
@@ -269,7 +286,7 @@ class DiscoverView extends GetView<EmployeeHomeController> {
       return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: controller.applications.length.clamp(0, 3),
+        itemCount: min(controller.applications.length, 3),
         itemBuilder: (context, index) {
           final application = controller.applications[index];
           return Card(

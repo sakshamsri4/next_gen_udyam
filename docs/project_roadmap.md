@@ -5,10 +5,12 @@ This roadmap outlines the step-by-step implementation plan for the Next Gen Job 
 
 ## Updated Approach (2024-07-28)
 We've integrated a third-party job portal app (JobsFlutterApp) to accelerate development. The updated approach focuses on:
-- **Functionality First**: Implement core functionality from the third-party app before enhancing UI
+- **Functionality First with Baseline Design**: Implement core functionality from the third-party app with a baseline CRED-inspired structure, then enhance UI details in subsequent iterations
 - **Dual User Roles**: Support both employee and employer functionality from day one
-- **CRED Design From Start**: Apply CRED design principles from the beginning using our `docs/cred_design_guide.md`
+- **Progressive CRED Design Implementation**: Apply fundamental CRED design principles (color system, typography, spacing) from the beginning, then progressively enhance with advanced elements (animations, micro-interactions, complex components)
 - **Firebase Backend**: Use our Firebase backend instead of the third-party API
+
+This approach prioritizes getting functional features working first while establishing a consistent design foundation that can be enhanced over time, avoiding duplicated effort and excessive context switching.
 
 ## Development Approach
 - **Rapid Development**: Focus on building features quickly with minimal testing overhead
@@ -632,11 +634,44 @@ dependencies:
 - **Follow the CRED Design Guide**: Refer to `docs/cred_design_guide.md` for comprehensive design principles
 - **Core Design Philosophy**: Implement "Beauty as the Central Goal" with balance of form and function
 - **NeoPOP Design System**: Apply the current CRED design system with bold, colorful, and physical elements
-- **Typography**: Use the specified font system with clear hierarchy and weight contrast
-- **Color System**: Apply the defined color palette with high contrast and purposeful usage
-- **Component Design**: Implement buttons, cards, navigation, and forms according to CRED specifications
-- **Motion and Animation**: Follow animation principles for purpose-driven, natural, and subtle movements
-- **Illustrations and Icons**: Use the defined style for bold, colorful, and consistent visual elements
+
+#### Measurable Acceptance Criteria
+
+1. **Typography**:
+   - Use system font for body text with specific size scale: 12 (captions), 14 (body), 16 (subheadings), 20+ (headings) logical pixels
+   - Maintain minimum contrast ratio of 4.5:1 for all text (WCAG AA compliance)
+   - Implement consistent line heights: 1.2 for headings, 1.5 for body text
+   - Apply font weights consistently: 400 (regular), 500 (medium), 700 (bold)
+   - Extend the existing text styles defined in `lib/core/theme/app_theme.dart`
+
+2. **Color System**:
+   - Use the existing color tokens defined in `lib/core/theme/app_theme.dart` and `lib/core/theme/role_themes.dart`
+   - Leverage the `RoleThemes.getThemeForRole()` method to apply role-specific themes
+   - Ensure all color pairs meet WCAG AA contrast ratio of 4.5:1 for normal text, 3:1 for large text
+   - Use a maximum of 3 accent colors per screen with consistent application
+   - Apply primary colors only to interactive elements and key information
+   - Validate color usage with automated contrast checker in CI pipeline
+
+3. **Component Design**:
+   - Use NeoPopButton for all primary actions with consistent elevation (depth: 5-10)
+   - Implement cards with standardized padding (16 horizontal, 12 vertical logical pixels)
+   - Maintain touch target size minimum of 44×44 logical pixels for all interactive elements
+   - Use consistent border radius across components (8 for cards, 4 for buttons logical pixels)
+   - Apply elevation consistently: 0-2 for cards, 3-5 for dialogs, 8-10 for modals
+   - Extend the existing component themes defined in `lib/core/theme/app_theme.dart`
+
+4. **Motion and Animation**:
+   - Standardize animation durations: 150ms (micro-interactions), 300ms (transitions), 500ms (emphasis)
+   - Use cubic-bezier(0.4, 0.0, 0.2, 1) for standard easing
+   - Implement haptic feedback for all button interactions
+   - Ensure animations run at 60fps on target devices
+
+5. **Layout and Spacing**:
+   - Follow 8-point grid system for all spacing and sizing (multiples of 8 logical pixels)
+   - Maintain consistent content padding (16 horizontal, 24 vertical logical pixels)
+   - Implement standardized spacing between elements (8, 16, 24, 32 logical pixels)
+   - Use responsive breakpoints at 600 and 1200 logical pixels for layout changes
+   - Leverage the existing theme's padding and margin definitions
 
 ### Responsive UI Guidelines
 - Use responsive_builder for adaptive layouts

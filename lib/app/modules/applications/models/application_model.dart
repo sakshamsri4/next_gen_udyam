@@ -28,6 +28,9 @@ enum ApplicationStatus {
 
   /// Application has been rejected
   rejected,
+
+  /// Application has been withdrawn by the candidate
+  withdrawn,
 }
 
 /// Model class for job application data
@@ -89,8 +92,8 @@ class ApplicationModel {
 
     return ApplicationModel(
       id: doc.id,
-      userId: data['userId'] as String,
-      jobId: data['jobId'] as String,
+      userId: data['userId'] as String? ?? 'unknown',
+      jobId: data['jobId'] as String? ?? 'unknown',
       jobTitle: data['jobTitle'] as String? ?? 'Unknown Job',
       company: data['company'] as String? ?? 'Unknown Company',
       appliedAt: appliedAtTimestamp?.toDate() ?? DateTime.now(),

@@ -37,11 +37,11 @@ This document outlines the tasks needed to ensure all features are properly impl
 - [x] Fix any issues with job application submission
 - [x] Implement application tracking for employees
 - [ ] Add notifications for application status changes using Firebase Cloud Messaging (FCM)
-  - [ ] Set up FCM in the project (add firebase_messaging package)
-  - [ ] Create notification service to handle FCM messages
-  - [ ] Implement notification permission requests
-  - [ ] Create cloud functions to trigger notifications on application status changes
-  - [ ] Add notification history screen to view past notifications
+- [ ] Set up FCM in the project (add firebase_messaging package)
+- [ ] Create notification service to handle FCM messages
+- [ ] Implement notification permission requests
+- [ ] Create cloud functions to trigger notifications on application status changes
+- [ ] Add notification history screen to view past notifications
 
 ### Employee Profile
 - [x] Complete employee profile editing functionality
@@ -66,97 +66,97 @@ This document outlines the tasks needed to ensure all features are properly impl
 
 ### Company Profile
 - [x] Complete company profile creation and editing
-  - [x] Create CompanyModel class with fields for name, description, industry, size, location, website, etc.
-  - [x] Implement CompanyController with CRUD operations for company profiles
-  - [x] Create company profile form with validation for all fields
-  - [x] Add company profile to employer's user data in Firestore
-  - [x] Implement company profile screen with edit functionality
-  - [x] Add company social media links section
+- [x] Create CompanyModel class with fields for name, description, industry, size, location, website, etc.
+- [x] Implement CompanyController with CRUD operations for company profiles
+- [x] Create company profile form with validation for all fields
+- [x] Add company profile to employer's user data in Firestore
+- [x] Implement company profile screen with edit functionality
+- [x] Add company social media links section
 
 - [x] Implement company logo upload and management
-  - [x] Create UI for logo upload with image cropping
-  - [x] Implement Firebase Storage integration for logo storage
-  - [x] Add image compression to reduce storage usage
-  - [x] Create placeholder logo for companies without logos
-  - [x] Implement logo change functionality with old logo cleanup
+- [x] Create UI for logo upload with image cropping
+- [x] Implement Firebase Storage integration for logo storage
+- [x] Add image compression to reduce storage usage
+- [x] Create placeholder logo for companies without logos
+- [x] Implement logo change functionality with old logo cleanup
 
 - [x] Add company verification process
-  - [x] Create verification request form with required documents
-  - [x] Implement admin dashboard for verification requests (optional)
-  - [x] Add verification status to company model
-  - [x] Create UI indicators for verified companies
-  - [x] Implement email notifications for verification status changes
+- [x] Create verification request form with required documents
+- [x] Implement admin dashboard for verification requests (optional)
+- [x] Add verification status to company model
+- [x] Create UI indicators for verified companies
+- [x] Implement email notifications for verification status changes
 
 - [x] Create company profile preview as seen by job seekers
-  - [x] Implement public company profile view
-  - [x] Add company job listings to profile view
-  - [x] Create company rating and review system (optional)
-  - [x] Add follow company functionality for job seekers
-  - [x] Implement share company profile functionality
+- [x] Implement public company profile view
+- [x] Add company job listings to profile view
+- [x] Create company rating and review system (optional)
+- [x] Add follow company functionality for job seekers
+- [x] Implement share company profile functionality
 
 ### Job Posting
 - [x] Implement job creation form with validation
-  - [x] Create JobPostModel with fields for title, description, requirements, salary, location, etc.
-  - [x] Implement JobPostController with CRUD operations
-  - [x] Create multi-step job creation form with validation
-  - [x] Add rich text editor for job description
-  - [x] Implement location selection with map integration
-  - [x] Add salary range selector with currency options
-  - [x] Create skills and requirements tags input
-  - [x] Implement job type selection (full-time, part-time, contract, etc.)
-  - [x] Add job category selection from predefined categories
+- [x] Create JobPostModel with fields for title, description, requirements, salary, location, etc.
+- [x] Implement JobPostController with CRUD operations
+- [x] Create multi-step job creation form with validation
+- [x] Add rich text editor for job description
+- [x] Implement location selection with map integration
+- [x] Add salary range selector with currency options
+- [x] Create skills and requirements tags input
+- [x] Implement job type selection (full-time, part-time, contract, etc.)
+- [x] Add job category selection from predefined categories
 
 - [x] Add job editing and deletion functionality
-  - [x] Create job management screen for employers
-  - [x] Implement edit job functionality with form pre-filling
-  - [x] Add job deletion with confirmation dialog
-  - [x] Implement job duplication for similar postings
-  - [x] Add batch operations for multiple job posts
+- [x] Create job management screen for employers
+- [x] Implement edit job functionality with form pre-filling
+- [x] Add job deletion with confirmation dialog
+- [x] Implement job duplication for similar postings
+- [x] Add batch operations for multiple job posts
 
 - [x] Create job post preview before publishing
-  - [x] Implement preview screen showing job as it will appear to job seekers
-  - [x] Add preview mode toggle in job creation/editing form
-  - [x] Create shareable preview links for team review
-  - [x] Implement feedback collection on preview (optional)
+- [x] Implement preview screen showing job as it will appear to job seekers
+- [x] Add preview mode toggle in job creation/editing form
+- [x] Create shareable preview links for team review
+- [x] Implement feedback collection on preview (optional)
 
 - [x] Implement job status management (active, paused, closed)
-  - [x] Add status field to JobPostModel
-  - [x] Create UI for changing job status
-  - [x] Implement automatic job expiration after set period
-  - [x] Add job renewal functionality for expired jobs
-  - [x] Create status indicators in job management screen
-  - [x] Implement filtering by status in job management
+- [x] Add status field to JobPostModel
+- [x] Create UI for changing job status
+- [x] Implement automatic job expiration after set period
+- [x] Add job renewal functionality for expired jobs
+- [x] Create status indicators in job management screen
+- [x] Implement filtering by status in job management
 
 ### Applicant Tracking
 - [x] Create applicant list view for each job posting
-  - [x] Implement ApplicationModel to track applications
-  - [x] Create applicant list UI with key information
-  - [x] Add pagination for large applicant lists
-  - [x] Implement search functionality for applicants
-  - [x] Create application count and statistics display
+- [x] Implement ApplicationModel to track applications
+- [x] Create applicant list UI with key information
+- [x] Add pagination for large applicant lists
+- [x] Implement search functionality for applicants
+- [x] Create application count and statistics display
 
 - [x] Implement applicant filtering and sorting
-  - [x] Add filters for experience, education, skills, etc.
-  - [x] Implement sorting by application date, relevance, etc.
-  - [x] Create saved filter presets for frequent use
-  - [x] Add batch selection for multiple applicants
-  - [x] Implement export functionality for applicant data
+- [x] Add filters for experience, education, skills, etc.
+- [x] Implement sorting by application date, relevance, etc.
+- [x] Create saved filter presets for frequent use
+- [x] Add batch selection for multiple applicants
+- [x] Implement export functionality for applicant data
 
 - [x] Add applicant status management (reviewed, shortlisted, rejected)
-  - [x] Add status field to ApplicationModel
-  - [x] Create UI for changing applicant status
-  - [x] Implement batch status updates
-  - [x] Add automated emails for status changes
-  - [x] Create kanban board view for applicant management
-  - [x] Implement notes and feedback system for applicants
+- [x] Add status field to ApplicationModel
+- [x] Create UI for changing applicant status
+- [x] Implement batch status updates
+- [x] Add automated emails for status changes
+- [x] Create kanban board view for applicant management
+- [x] Implement notes and feedback system for applicants
 
 - [x] Create applicant profile view with resume download
-  - [x] Implement detailed applicant profile view
-  - [x] Add resume preview and download functionality
-  - [x] Create direct contact options (email, call)
-  - [x] Implement interview scheduling functionality
-  - [x] Add applicant comparison feature for shortlisted candidates
-  - [x] Create applicant rating system for internal use
+- [x] Implement detailed applicant profile view
+- [x] Add resume preview and download functionality
+- [x] Create direct contact options (email, call)
+- [x] Implement interview scheduling functionality
+- [x] Add applicant comparison feature for shortlisted candidates
+- [x] Create applicant rating system for internal use
 
 ### Code Quality Checks
 - [x] Run `flutter analyze` to identify code issues

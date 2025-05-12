@@ -3,7 +3,8 @@ import 'package:next_gen/app/modules/onboarding/models/onboarding_status.dart'
     as onboarding;
 import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/services/logger_service.dart';
-import 'package:next_gen/core/storage/hive_manager.dart';
+import 'package:next_gen/core/storage/hive_manager.dart'
+    show HiveManager, userBoxName;
 import 'package:next_gen/core/storage/theme_settings.dart' as theme;
 
 /// Service for handling storage operations using Hive

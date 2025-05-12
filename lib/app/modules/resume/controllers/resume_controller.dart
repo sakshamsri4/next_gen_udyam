@@ -6,6 +6,7 @@ import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/resume/models/resume_model.dart';
 import 'package:next_gen/app/modules/resume/services/resume_service.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
+import 'package:next_gen/app/utils/list_extensions.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -76,8 +77,7 @@ class ResumeController extends GetxController {
 
       // Set the default resume as selected
       final defaultResume = resumes.firstWhereOrNull((r) => r.isDefault);
-      _selectedResume.value =
-          defaultResume ?? (resumes.isNotEmpty ? resumes.first : null);
+      _selectedResume.value = defaultResume ?? resumes.safeFirst;
 
       _logger.i('Loaded ${resumes.length} resumes');
     } catch (e) {
@@ -238,7 +238,7 @@ class ResumeController extends GetxController {
 
         // If the deleted resume was selected, select another one
         if (_selectedResume.value?.id == resumeId) {
-          _selectedResume.value = _resumes.isNotEmpty ? _resumes.first : null;
+          _selectedResume.value = _resumes.safeFirst;
         }
 
         Get.snackbar(

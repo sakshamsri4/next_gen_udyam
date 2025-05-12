@@ -18,14 +18,14 @@ For each module, we'll follow this process:
 ### 1. UI Components and Assets
 
 - [ ] Extract and adapt core UI components with CRED design principles:
-  - [ ] Copy custom button styles and widgets and apply CRED button design (elevated, pill-shaped)
-  - [ ] Extract text field designs and input widgets and apply CRED typography guidelines
-  - [ ] Copy card designs and layouts and apply CRED card design (physical appearance, elevation)
-  - [ ] Extract avatar and image components and apply CRED styling
-  - [ ] Copy loading animations and shimmer effects and adapt to CRED motion principles
-  - [ ] Replace color schemes with CRED color system from the design guide
-  - [ ] Apply CRED typography guidelines to all text elements
-  - [ ] Copy icons and vector assets and adapt to CRED icon style
+- [ ] Copy custom button styles and widgets and apply CRED button design (elevated, pill-shaped)
+- [ ] Extract text field designs and input widgets and apply CRED typography guidelines
+- [ ] Copy card designs and layouts and apply CRED card design (physical appearance, elevation)
+- [ ] Extract avatar and image components and apply CRED styling
+- [ ] Copy loading animations and shimmer effects and adapt to CRED motion principles
+- [ ] Replace color schemes with CRED color system from the design guide
+- [ ] Apply CRED typography guidelines to all text elements
+- [ ] Copy icons and vector assets and adapt to CRED icon style
 - [ ] Create our own component library with these CRED-styled components
 - [ ] Connect components to our theme system based on CRED design guide
 - [ ] Implement animations following CRED motion guidelines

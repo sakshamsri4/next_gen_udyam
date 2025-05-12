@@ -7,8 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:next_gen/app/modules/applications/controllers/applications_controller.dart';
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/ui/components/loaders/custom_lottie.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/applications_shimmer.dart';
@@ -193,6 +193,17 @@ class ApplicationsView extends GetView<ApplicationsController> {
                   controller.setStatusFilter(ApplicationStatus.pending),
             ),
             const SizedBox(width: 8),
+            // Reviewed tab
+            _buildFilterChip(
+              theme,
+              label: 'Reviewed',
+              count: controller.statusCounts[ApplicationStatus.reviewed] ?? 0,
+              isSelected:
+                  controller.selectedStatusFilter == ApplicationStatus.reviewed,
+              onTap: () =>
+                  controller.setStatusFilter(ApplicationStatus.reviewed),
+            ),
+            const SizedBox(width: 8),
             // Shortlisted tab
             _buildFilterChip(
               theme,
@@ -227,6 +238,16 @@ class ApplicationsView extends GetView<ApplicationsController> {
                   controller.setStatusFilter(ApplicationStatus.offered),
             ),
             const SizedBox(width: 8),
+            // Hired tab
+            _buildFilterChip(
+              theme,
+              label: 'Hired',
+              count: controller.statusCounts[ApplicationStatus.hired] ?? 0,
+              isSelected:
+                  controller.selectedStatusFilter == ApplicationStatus.hired,
+              onTap: () => controller.setStatusFilter(ApplicationStatus.hired),
+            ),
+            const SizedBox(width: 8),
             // Rejected tab
             _buildFilterChip(
               theme,
@@ -236,6 +257,17 @@ class ApplicationsView extends GetView<ApplicationsController> {
                   controller.selectedStatusFilter == ApplicationStatus.rejected,
               onTap: () =>
                   controller.setStatusFilter(ApplicationStatus.rejected),
+            ),
+            const SizedBox(width: 8),
+            // Withdrawn tab
+            _buildFilterChip(
+              theme,
+              label: 'Withdrawn',
+              count: controller.statusCounts[ApplicationStatus.withdrawn] ?? 0,
+              isSelected: controller.selectedStatusFilter ==
+                  ApplicationStatus.withdrawn,
+              onTap: () =>
+                  controller.setStatusFilter(ApplicationStatus.withdrawn),
             ),
             const SizedBox(width: 16),
           ],
@@ -461,6 +493,9 @@ class ApplicationsView extends GetView<ApplicationsController> {
       case ApplicationStatus.rejected:
         color = Colors.red;
         label = 'Rejected';
+      case ApplicationStatus.withdrawn:
+        color = Colors.grey;
+        label = 'Withdrawn';
     }
 
     return Container(

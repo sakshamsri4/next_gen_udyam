@@ -58,17 +58,18 @@ This document tracks the progress of integrating UI components from the third-pa
 - **Notes**: Implemented drawer menu, enhanced bottom navigation, and added page transitions.
 
 ## Overall Progress
-- **UI Components**: 50% complete
-- **Firebase Integration**: 70% complete
-- **Supabase Integration**: 30% complete
-- **CRED Design Application**: 60% complete
+- **UI Components**: 50% complete (Target: 2025-05-30)
+- **Firebase Integration**: 70% complete (Target: 2025-05-25)
+- **Supabase Integration**: 30% complete (Target: 2025-06-15)
+- **CRED Design Application**: 60% complete (Target: 2025-06-10)
 
 ## Next Steps
-1. Complete the remaining UI components with CRED design principles
-2. Finish implementing the Search Screen functionality
-3. Refine navigation and user flow
-4. Comprehensive testing across all screens
-5. Implement Home Screen Elements (Phase 2)
+1. Complete the remaining UI components with CRED design principles (Phase 1)
+2. Implement Home Screen Elements (Phase 2)
+3. Complete Job Details Screen (Phase 3)
+4. Finish implementing the Search Screen functionality (Phase 4)
+5. Refine navigation and user flow
+6. Comprehensive testing across all screens
 
 ## Issues and Challenges
 - Need to improve error handling for Firebase operations

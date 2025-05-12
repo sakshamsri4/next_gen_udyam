@@ -106,14 +106,15 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Phone Field (disabled for now)
+// Phone Field (disabled for now)
                 NeoPopInputField(
                   controller: _phoneController,
-                  labelText: 'Phone Number (Coming Soon)',
+                  labelText: 'Phone Number',
                   hintText: 'Enter your phone number',
                   prefixIcon: const Icon(Icons.phone_outlined),
                   keyboardType: TextInputType.phone,
                   enabled: false,
+                  helperText: 'Phone number updates coming in the next release',
                 ),
                 const SizedBox(height: 32),
 
@@ -201,6 +202,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
 
       // Upload image if selected
       String? photoURL;
+      var uploadSuccessful = false;
       if (_selectedImage != null) {
         try {
           logger.i('Uploading profile image');
@@ -208,6 +210,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             _selectedImage!,
             widget.user.uid,
           );
+          uploadSuccessful = true;
           logger.i('Profile image uploaded: $photoURL');
         } catch (e) {
           logger.e('Error uploading profile image', e);
@@ -223,10 +226,18 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
       }
 
       // Update profile
-      await authService.updateUserProfile(
-        displayName: _nameController.text.trim(),
-        photoURL: photoURL,
-      );
+      if (_selectedImage != null && !uploadSuccessful) {
+        // Don't change photoURL if upload failed
+        await authService.updateUserProfile(
+          displayName: _nameController.text.trim(),
+        );
+      } else {
+        // Pass photoURL only if no new image was selected or if upload was successful
+        await authService.updateUserProfile(
+          displayName: _nameController.text.trim(),
+          photoURL: photoURL,
+        );
+      }
 
       // Refresh user data
       await authController.refreshUser();

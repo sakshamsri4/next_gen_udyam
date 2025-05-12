@@ -179,8 +179,8 @@ class AdminDashboardController extends GetxController {
     }
   }
 
-  /// Approve a moderation item
-  Future<void> approveModerationItem(String id) async {
+  /// Update the status of a moderation item
+  Future<void> _updateModerationStatus(String id, String newStatus) async {
     try {
       // TODO(developer): Replace with actual API call
       await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -189,48 +189,23 @@ class AdminDashboardController extends GetxController {
       final index = moderationQueue.indexWhere((item) => item.id == id);
       if (index != -1) {
         final item = moderationQueue[index];
-        moderationQueue[index] = ModerationItem(
-          id: item.id,
-          type: item.type,
-          title: item.title,
-          submittedBy: item.submittedBy,
-          submittedAt: item.submittedAt,
-          status: 'Approved',
-          priority: item.priority,
-        );
+        moderationQueue[index] = item.copyWith(status: newStatus);
       }
 
-      _logger.d('Moderation item approved: $id');
+      _logger.d('Moderation item $newStatus: $id');
     } catch (e) {
-      _logger.e('Error approving moderation item', e);
+      _logger.e('Error updating moderation item status', e);
     }
+  }
+
+  /// Approve a moderation item
+  Future<void> approveModerationItem(String id) async {
+    await _updateModerationStatus(id, 'Approved');
   }
 
   /// Reject a moderation item
   Future<void> rejectModerationItem(String id) async {
-    try {
-      // TODO(developer): Replace with actual API call
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-
-      // Update the local state
-      final index = moderationQueue.indexWhere((item) => item.id == id);
-      if (index != -1) {
-        final item = moderationQueue[index];
-        moderationQueue[index] = ModerationItem(
-          id: item.id,
-          type: item.type,
-          title: item.title,
-          submittedBy: item.submittedBy,
-          submittedAt: item.submittedAt,
-          status: 'Rejected',
-          priority: item.priority,
-        );
-      }
-
-      _logger.d('Moderation item rejected: $id');
-    } catch (e) {
-      _logger.e('Error rejecting moderation item', e);
-    }
+    await _updateModerationStatus(id, 'Rejected');
   }
 }
 
@@ -267,6 +242,27 @@ class ModerationItem {
 
   /// The priority of the moderation item (High, Medium, Low)
   final String priority;
+
+  /// Create a copy of this moderation item with the given fields replaced
+  ModerationItem copyWith({
+    String? id,
+    String? type,
+    String? title,
+    String? submittedBy,
+    DateTime? submittedAt,
+    String? status,
+    String? priority,
+  }) {
+    return ModerationItem(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      title: title ?? this.title,
+      submittedBy: submittedBy ?? this.submittedBy,
+      submittedAt: submittedAt ?? this.submittedAt,
+      status: status ?? this.status,
+      priority: priority ?? this.priority,
+    );
+  }
 }
 
 /// Model class for user activity

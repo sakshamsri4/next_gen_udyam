@@ -927,6 +927,33 @@ class AuthController extends GetxController {
       isVerificationLoading.value = true;
       verificationSent.value = false;
 
+      // No currently signed-in user? Bail out early.
+      final current = _auth.currentUser;
+      if (current == null) {
+        log.w('No authenticated user – cannot send verification email');
+        Get.snackbar(
+          'Verification Failed',
+          'You must be logged in to verify your email.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // Already verified? Bail out early.
+      if (current.emailVerified) {
+        log.i('Email already verified – skipping resend');
+        Get.snackbar(
+          'Already Verified',
+          'Your email address is already verified.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
       // Get the auth service
       AuthService? authService;
       try {
@@ -944,7 +971,6 @@ class AuthController extends GetxController {
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
-        isVerificationLoading.value = false;
         return;
       }
 
@@ -977,6 +1003,17 @@ class AuthController extends GetxController {
       if (e is FirebaseAuthException) {
         if (e.code == 'too-many-requests') {
           errorMessage = 'Too many requests. Please try again later.';
+        } else if (e.code == 'already-verified') {
+          // This is handled above, but just in case the service throws this
+          errorMessage = e.message ?? 'Your email address is already verified.';
+          Get.snackbar(
+            'Already Verified',
+            errorMessage,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+          return; // Return early to avoid showing error snackbar
         }
       }
 
