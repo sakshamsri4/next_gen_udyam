@@ -5,7 +5,17 @@ import 'package:flutter/foundation.dart';
 import 'package:next_gen/firebase_options.dart';
 
 /// Mock Firebase App for testing
+@immutable
 class MockFirebaseApp implements FirebaseApp {
+  /// Factory constructor to return the singleton instance
+  factory MockFirebaseApp() => _instance;
+
+  /// Private constructor for singleton pattern
+  const MockFirebaseApp._internal();
+
+  /// Singleton instance to ensure we always return the same instance
+  static const MockFirebaseApp _instance = MockFirebaseApp._internal();
+
   @override
   String get name => 'mock-app';
 
@@ -28,6 +38,15 @@ class MockFirebaseApp implements FirebaseApp {
 
   @override
   Future<void> setAutomaticResourceManagementEnabled(bool enabled) async {}
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is MockFirebaseApp && other.name == name;
+  }
+
+  @override
+  int get hashCode => name.hashCode;
 }
 
 /// Result of Firebase initialization
@@ -115,7 +134,7 @@ class FirebaseInitializer {
     if (mockSuccessForTesting) {
       debugPrint('Mocking successful Firebase initialization for testing');
       return FirebaseInitResult.success(
-        MockFirebaseApp() as FirebaseApp,
+        MockFirebaseApp(),
       );
     }
 

@@ -11,8 +11,8 @@ void main() {
 
   group('FirebaseInitializer', () {
     test('should initialize Firebase only once', () async {
-      // Create a new instance of FirebaseInitializer
-      final initializer = FirebaseInitializer();
+      // Create a new instance of FirebaseInitializer with mock success for testing
+      final initializer = FirebaseInitializer(mockSuccessForTesting: true);
 
       // First initialization should succeed
       final result1 = await initializer.initialize();
