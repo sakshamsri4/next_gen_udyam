@@ -2137,3 +2137,42 @@
     - Maintain consistent styling across related screens for a cohesive experience
     - Integrate navigation elements consistently across all screens
     - Document implementation details for future reference
+
+## [2024-06-10]
+- Fixed ThemeSettings Test Failure:
+  - **Issue Description**:
+    - CI pipeline was failing with the error: "ThemeSettingsAdapter write should serialize ThemeSettings correctly (failed)"
+    - The test expected ThemeSettings to have 3 fields, but the actual implementation had 4 fields
+    - This mismatch was causing the test to fail and blocking the PR
+
+  - **Root Cause Analysis**:
+    - The ThemeSettings class was updated to include a userRole field (UserType?) for role-specific theming
+    - The test was written before this field was added and expected only 3 fields (isDarkMode, useMaterial3, useHighContrast)
+    - The generated ThemeSettingsAdapter.write() method was writing 4 fields, but the test expected 3
+    - The test was checking both the number of fields and the specific field indices
+
+  - **Working Solution**:
+    - Updated the test to expect 4 fields instead of 3:
+      - Changed `expect(mockWriter.byteData[0], 3);` to `expect(mockWriter.byteData[0], 4);`
+      - Updated `expect(mockWriter.byteData.length, 4);` to `expect(mockWriter.byteData.length, 5);`
+      - Added expectations for the userRole field:
+        - `expect(mockWriter.byteData[4], 3);` for the field index
+        - `expect(mockWriter.data[3], null);` for the default null value
+    - Also updated the read test to match:
+      - Changed byteData array to include the userRole field index
+      - Added null to the data array for the userRole value
+      - Added an expectation to verify the userRole is null
+    - Fixed formatting issues in the test file to comply with linting rules
+    - Added the issue to the Resolved Issues section in docs/known_issues.md
+
+  - **Benefits**:
+    - Fixed the failing test in the CI pipeline
+    - Ensured the test accurately reflects the current implementation
+    - Improved test coverage for the userRole field
+    - Documented the issue and solution for future reference
+
+  - **Lessons Learned**:
+    - When adding new fields to a model class, always update the corresponding tests
+    - Pay attention to generated code (like Hive adapters) when making model changes
+    - Use the test failure message to identify the specific mismatch
+    - Document resolved issues to help track progress and prevent regression

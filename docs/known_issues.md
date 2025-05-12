@@ -23,7 +23,8 @@ Issues are categorized by type and include detailed descriptions and potential s
 8. [Navigation and Routing Issues](#navigation-and-routing-issues)
 9. [Testing and Quality Assurance Issues](#testing-and-quality-assurance-issues)
 10. [Documentation Issues](#documentation-issues)
-11. [Conclusion and Next Steps](#conclusion-and-next-steps)
+11. [Resolved Issues](#resolved-issues)
+12. [Conclusion and Next Steps](#conclusion-and-next-steps)
 
 ## Initialization Issues
 
@@ -332,6 +333,21 @@ Issues are categorized by type and include detailed descriptions and potential s
   - Update screenshots and examples
   - Add detailed troubleshooting guides
 
+## Resolved Issues
+
+This section lists issues that have been resolved, along with the solution implemented and the date of resolution.
+
+### 1. ThemeSettings Test Failure
+- **Issue**: The test for ThemeSettingsAdapter's write method was failing because it expected 3 fields but the actual implementation had 4 fields.
+- **Details**:
+  - The ThemeSettings class was updated to include a userRole field, but the test wasn't updated to reflect this change.
+  - This caused the CI pipeline to fail with the error: "ThemeSettingsAdapter write should serialize ThemeSettings correctly (failed)".
+- **Solution**:
+  - Updated the test to expect 4 fields instead of 3.
+  - Added expectations for the userRole field in the test.
+  - Fixed formatting issues in the test file.
+- **Date Resolved**: June 2023
+
 ## Conclusion and Next Steps
 
 This document has outlined the known issues in the Next Gen Udyam codebase. Addressing these issues will improve the stability, performance, and maintainability of the application. Here are the recommended next steps:
@@ -342,4 +358,4 @@ This document has outlined the known issues in the Next Gen Udyam codebase. Addr
 4. **Implement Solutions**: Implement the suggested solutions with proper testing
 5. **Update Documentation**: Update this document as issues are resolved and new issues are discovered
 
-Regular reviews of this document should be conducted to ensure that it remains up-to-date and that progress is being made on addressing the identified issues. As issues are resolved, they should be moved to a "Resolved Issues" section with details on the implemented solution and the date of resolution.
+Regular reviews of this document should be conducted to ensure that it remains up-to-date and that progress is being made on addressing the identified issues. As issues are resolved, they should be moved to the "Resolved Issues" section with details on the implemented solution and the date of resolution.
