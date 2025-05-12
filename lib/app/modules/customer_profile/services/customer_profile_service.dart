@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:next_gen/app/modules/auth/services/storage_service.dart';
+import 'package:next_gen/app/modules/auth/services/firebase_storage_service.dart';
 import 'package:next_gen/app/modules/customer_profile/models/customer_profile_model.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
@@ -16,7 +16,8 @@ class CustomerProfileService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// The storage service for uploading profile images
-  final StorageService _storageService = Get.find<StorageService>();
+  final FirebaseStorageService _storageService =
+      Get.find<FirebaseStorageService>();
 
   /// The logger service
   final LoggerService _logger = Get.find<LoggerService>();

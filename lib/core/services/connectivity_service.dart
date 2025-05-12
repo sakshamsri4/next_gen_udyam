@@ -114,6 +114,12 @@ class ConnectivityService extends GetxService {
     _connectivitySubscription?.cancel();
     _connectivityStreamController.close();
   }
+
+  @override
+  void onClose() {
+    dispose();
+    super.onClose();
+  }
 }
 
 /// Connectivity status enum

@@ -251,7 +251,7 @@ class AppPages {
     // Applications list page
     GetPage<dynamic>(
       name: _Paths.applications,
-      page: () => const ApplicationsView(),
+      page: ApplicationsView.new,
       bindings: [ApplicationsBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],

@@ -112,21 +112,10 @@ class _RoleBasedLayoutState extends State<RoleBasedLayout> {
       );
     }
 
-    // For admin, show menu icon to open drawer
-    if (userRole == UserType.admin) {
-      return IconButton(
-        icon: const HeroIcon(HeroIcons.bars3),
-        onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-      );
-    }
-
-    // For other roles, show menu icon or custom icon
+    // For all roles, show menu icon to open drawer
     return IconButton(
       icon: const HeroIcon(HeroIcons.bars3),
-      onPressed: () {
-        // TODO(developer): Implement role-specific drawer or menu
-        _scaffoldKey.currentState?.openDrawer();
-      },
+      onPressed: () => _scaffoldKey.currentState?.openDrawer(),
     );
   }
 

@@ -38,7 +38,7 @@ class EmployerRoutes {
           name: Routes.jobPosting,
           page: () => const JobPostingView(),
           binding: JobPostingBinding(),
-          bindings: [NavigationBinding()],
+          bindings: [NavigationBinding(), CompanyProfileBinding()],
           transition: Transition.fadeIn,
         ),
 

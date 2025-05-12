@@ -14,7 +14,7 @@ import 'package:next_gen/app/modules/dashboard/widgets/dashboard_widgets.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -37,31 +37,61 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   void initState() {
     super.initState();
-    // Get the controllers
-    controller = Get.find<DashboardController>();
 
-    // Get or register NavigationController
-    if (Get.isRegistered<NavigationController>()) {
-      navigationController = Get.find<NavigationController>();
-    } else {
-      navigationController = Get.put(NavigationController(), permanent: true);
-    }
+    try {
+      // Get the controllers in a safe way with try-catch blocks
 
-    // Safely get or register AuthController
-    if (Get.isRegistered<AuthController>()) {
-      authController = Get.find<AuthController>();
-      authController.refreshUser();
-    } else {
-      // Register AuthController if not already registered
-      authController = Get.put(AuthController(), permanent: true);
-    }
+      // 1. First get or register AuthController
+      try {
+        if (Get.isRegistered<AuthController>()) {
+          authController = Get.find<AuthController>();
+        } else {
+          // Register AuthController if not already registered
+          authController = Get.put(AuthController(), permanent: true);
+        }
+        // Refresh user data
+        authController.refreshUser();
+      } catch (e) {
+        debugPrint('Error initializing AuthController: $e');
+        // Create a new instance as fallback
+        authController = Get.put(AuthController(), permanent: true);
+      }
 
-    // Force reload user role in navigation controller
-    if (Get.isRegistered<NavigationController>()) {
-      // Use Future.delayed to ensure this runs after the current frame
-      Future.delayed(Duration.zero, () {
-        navigationController.reloadUserRole();
+      // 2. Then get or register NavigationController
+      try {
+        if (Get.isRegistered<NavigationController>()) {
+          navigationController = Get.find<NavigationController>();
+        } else {
+          navigationController =
+              Get.put(NavigationController(), permanent: true);
+        }
+      } catch (e) {
+        debugPrint('Error initializing NavigationController: $e');
+        // Create a new instance as fallback
+        navigationController = Get.put(NavigationController(), permanent: true);
+      }
+
+      // 3. Finally get the DashboardController
+      try {
+        controller = Get.find<DashboardController>();
+      } catch (e) {
+        debugPrint('Error finding DashboardController: $e');
+        // Create a new instance as fallback
+        controller = Get.put(DashboardController());
+      }
+
+      // Force reload user role in navigation controller
+      // Use addPostFrameCallback instead of Future.delayed for better reliability
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          navigationController.reloadUserRole();
+        } catch (e) {
+          debugPrint('Error reloading user role: $e');
+        }
       });
+    } catch (e, stack) {
+      debugPrint('Error in DashboardView.initState: $e');
+      debugPrint('Stack trace: $stack');
     }
   }
 
@@ -69,14 +99,22 @@ class _DashboardViewState extends State<DashboardView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Instead of directly modifying the observable value, use a method
-    // that handles the update properly
-    if (navigationController.selectedIndex.value != 0) {
-      // Use Future.microtask to ensure this happens after the current build phase
-      Future.microtask(() {
-        // Use updateIndexFromRoute instead of directly modifying the value
-        navigationController.updateIndexFromRoute(Routes.dashboard);
+    try {
+      // Safely update the navigation index
+      // Use addPostFrameCallback instead of Future.microtask for better reliability
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          // First check if the controller is still valid and the widget is mounted
+          if (mounted && Get.isRegistered<NavigationController>()) {
+            // Use updateIndexFromRoute instead of directly modifying the value
+            navigationController.updateIndexFromRoute(Routes.dashboard);
+          }
+        } catch (e) {
+          debugPrint('Error updating navigation index: $e');
+        }
       });
+    } catch (e) {
+      debugPrint('Error in didChangeDependencies: $e');
     }
   }
 
@@ -101,7 +139,7 @@ class _DashboardViewState extends State<DashboardView> {
         return Scaffold(
           key: _scaffoldKey,
           drawer: const CustomDrawer(),
-          bottomNavigationBar: const RoleBasedBottomNav(),
+          bottomNavigationBar: const UnifiedBottomNav(),
           appBar: AppBar(
             title: const Text('Automotive Jobs Dashboard'),
             centerTitle: true,
@@ -194,13 +232,7 @@ class _DashboardViewState extends State<DashboardView> {
                                       ),
                                       SizedBox(height: isMobile ? 16.0 : 24.0),
 
-                                      // Sign out button
-                                      _buildSignOutButton(
-                                        theme,
-                                        isMobile,
-                                        controller,
-                                      ),
-                                      SizedBox(height: isMobile ? 16.0 : 24.0),
+                                      // Sign out button removed - already available in drawer
                                     ],
                                   ),
                                 );
@@ -627,64 +659,7 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  /// Build the sign out button
-  Widget _buildSignOutButton(
-    ThemeData theme,
-    bool isMobile,
-    DashboardController controller,
-  ) {
-    // IMPORTANT: This Obx is fine because it's not nested inside another Obx
-    // It's used to observe controller.isSignOutLoading.value
-    return Center(
-      child: Obx(
-        () => NeoPopButton(
-          color: theme.colorScheme.error.withAlpha(204),
-          onTapUp:
-              controller.isSignOutLoading.value ? null : controller.signOut,
-          onTapDown: controller.isSignOutLoading.value ? null : () {},
-          border: Border.all(
-            color: theme.colorScheme.error,
-          ),
-          depth: 5,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
-            child: controller.isSignOutLoading.value
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        theme.colorScheme.onError,
-                      ),
-                    ),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.logout,
-                        color: theme.colorScheme.onError,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Sign Out',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.colorScheme.onError,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Sign out button method removed - functionality available in drawer
 
   /// Build the loading state with shimmer effect
   Widget _buildLoadingState(bool isMobile) {
@@ -778,15 +753,7 @@ class _DashboardViewState extends State<DashboardView> {
               color: Colors.white,
             ),
             SizedBox(height: isMobile ? 24.0 : 32.0),
-
-            // Sign out button shimmer
-            Center(
-              child: Container(
-                width: 120,
-                height: 40,
-                color: Colors.white,
-              ),
-            ),
+            // Sign out button shimmer removed
           ],
         ),
       ),

@@ -155,8 +155,20 @@ class SearchController extends GetxController {
   // Track the most recent search request
   int _lastSearchToken = 0;
 
+  // Mutex to prevent concurrent searches
+  bool _isSearchInProgress = false;
+
   /// Perform search
   Future<void> _performSearch({String? query, bool loadMore = false}) async {
+    // Don't start a new search if one is already in progress
+    if (_isSearchInProgress) {
+      _logger.d('Search already in progress, ignoring new request');
+      return;
+    }
+
+    // Set search in progress flag
+    _isSearchInProgress = true;
+
     // Generate a unique token for this search request
     final currentToken = DateTime.now().microsecondsSinceEpoch;
     final localToken = currentToken;
@@ -175,6 +187,7 @@ class SearchController extends GetxController {
     // Don't load more if we already know there are no more results
     if (loadMore && !hasMoreResults.value) {
       _logger.d('No more results to load');
+      _isSearchInProgress = false;
       return;
     }
 
@@ -195,17 +208,44 @@ class SearchController extends GetxController {
         limit: resultsPerPage.value,
       );
 
-      // Perform search with pagination
-      final results = await _searchService.searchJobs(paginatedFilter);
+      // Add a timeout to prevent hanging
+      final results = await _searchService.searchJobs(paginatedFilter).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          _logger.w('Search timed out after 15 seconds');
+          error.value = 'Search timed out. Please try again.';
+          return <JobModel>[];
+        },
+      );
 
       // Only update results if this is still the most recent search
       if (_lastSearchToken == localToken) {
+        // Clear error if successful
+        if (error.value.isNotEmpty) {
+          error.value = '';
+        }
+
         if (loadMore) {
-          // Append results for pagination
-          searchResults.addAll(results);
+          // Only append if we got results
+          if (results.isNotEmpty) {
+            // Filter out duplicates by ID
+            final existingIds = searchResults.map((job) => job.id).toSet();
+            final newResults =
+                results.where((job) => !existingIds.contains(job.id)).toList();
+
+            if (newResults.isNotEmpty) {
+              searchResults.addAll(newResults);
+              currentPage.value++;
+            }
+          }
         } else {
           // Replace results for new search
           searchResults.value = results;
+
+          // If we got results, increment page for next load
+          if (results.isNotEmpty) {
+            currentPage.value = 2; // Next page will be 2
+          }
         }
 
         // Check if we have more results
@@ -221,12 +261,18 @@ class SearchController extends GetxController {
       }
     } catch (e, s) {
       _logger.e('Error performing search', e, s);
+      if (_lastSearchToken == localToken) {
+        error.value = 'Error searching for jobs. Please try again.';
+      }
     } finally {
       // Only update loading state if this is still the most recent search
       if (_lastSearchToken == localToken) {
         isLoading.value = false;
         update(); // Notify GetBuilder to update UI
       }
+
+      // Reset search in progress flag
+      _isSearchInProgress = false;
     }
   }
 

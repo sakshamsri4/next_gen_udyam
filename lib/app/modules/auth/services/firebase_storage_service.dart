@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:mime/mime.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
-/// A service for handling file storage operations
-class StorageService extends GetxService {
+/// A service for handling Firebase Storage operations
+class FirebaseStorageService extends GetxService {
   /// The Firebase Storage instance
   final FirebaseStorage _storage = FirebaseStorage.instance;
 

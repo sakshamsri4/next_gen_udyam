@@ -17,6 +17,10 @@ class ApplicationsService {
   final LoggerService _logger;
 
   /// Get all applications for a user
+  ///
+  /// Note: This query requires a composite index on 'userId' and 'appliedAt'
+  /// If you encounter a FirebaseException about missing indexes, you need to create
+  /// this index in the Firebase console or follow the link in the error message.
   Future<List<ApplicationModel>> getUserApplications(String userId) async {
     try {
       _logger.i('Getting applications for user: $userId');
@@ -29,7 +33,17 @@ class ApplicationsService {
 
       return snapshot.docs.map(ApplicationModel.fromFirestore).toList();
     } catch (e) {
-      _logger.e('Error getting user applications', e);
+      // Check if this is a missing index error
+      if (e.toString().contains('failed-precondition') &&
+          e.toString().contains('index')) {
+        _logger.e(
+          'Missing Firestore index for applications query. '
+          'Please create a composite index on "userId" and "appliedAt".',
+          e,
+        );
+      } else {
+        _logger.e('Error getting user applications', e);
+      }
       return [];
     }
   }
@@ -114,6 +128,10 @@ class ApplicationsService {
   }
 
   /// Get applications by status
+  ///
+  /// Note: This query requires a composite index on 'userId', 'status', and 'appliedAt'
+  /// If you encounter a FirebaseException about missing indexes, you need to create
+  /// this index in the Firebase console or follow the link in the error message.
   Future<List<ApplicationModel>> getApplicationsByStatus(
     String userId,
     ApplicationStatus status,
@@ -133,7 +151,17 @@ class ApplicationsService {
 
       return snapshot.docs.map(ApplicationModel.fromFirestore).toList();
     } catch (e) {
-      _logger.e('Error getting applications by status', e);
+      // Check if this is a missing index error
+      if (e.toString().contains('failed-precondition') &&
+          e.toString().contains('index')) {
+        _logger.e(
+          'Missing Firestore index for applications by status query. '
+          'Please create a composite index on "userId", "status", and "appliedAt".',
+          e,
+        );
+      } else {
+        _logger.e('Error getting applications by status', e);
+      }
       return [];
     }
   }

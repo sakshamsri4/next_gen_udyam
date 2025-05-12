@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
@@ -9,9 +11,50 @@ import 'package:next_gen/core/services/logger_service.dart';
 /// Controller for managing bottom navigation and app-wide navigation state
 class NavigationController extends GetxController {
   // Dependencies
-  late final LoggerService _logger;
-  late final AuthController _authController;
-  late final AuthService _authService;
+  // Use nullable types with getters to safely handle initialization
+  LoggerService? _loggerInstance;
+  AuthController? _authControllerInstance;
+  AuthService? _authServiceInstance;
+
+  // Safe getters for dependencies
+  LoggerService get _logger {
+    if (_loggerInstance == null) {
+      try {
+        _loggerInstance = Get.find<LoggerService>();
+      } catch (e) {
+        debugPrint('Error finding LoggerService: $e');
+        // Create a fallback logger if needed
+        _loggerInstance = LoggerService();
+      }
+    }
+    return _loggerInstance!;
+  }
+
+  AuthController get _authController {
+    if (_authControllerInstance == null) {
+      try {
+        _authControllerInstance = Get.find<AuthController>();
+      } catch (e) {
+        debugPrint('Error finding AuthController: $e');
+        // Don't create a fallback here as it could cause more issues
+        throw Exception('AuthController not found: $e');
+      }
+    }
+    return _authControllerInstance!;
+  }
+
+  AuthService get _authService {
+    if (_authServiceInstance == null) {
+      try {
+        _authServiceInstance = Get.find<AuthService>();
+      } catch (e) {
+        debugPrint('Error finding AuthService: $e');
+        // Don't create a fallback here as it could cause more issues
+        throw Exception('AuthService not found: $e');
+      }
+    }
+    return _authServiceInstance!;
+  }
 
   // Observable state variables
   final RxInt selectedIndex = 0.obs;
@@ -24,29 +67,31 @@ class NavigationController extends GetxController {
   // Each view should create its own scaffold key
 
   // List of routes for employee - updated for streamlined navigation
+  // These routes must match the order of tabs in EmployeeBottomNav
   final List<String> _employeeRoutes = [
-    Routes.home, // Discover tab
-    Routes.search, // Jobs tab (combines search and saved)
-    Routes.applications, // Applications tab
-    Routes.profile, // Profile tab
+    Routes.home, // Discover tab (index 0)
+    Routes.search, // Jobs tab (index 1)
+    Routes.applications, // Applications tab (index 2)
+    Routes.profile, // Profile tab (index 3)
   ];
 
   // List of routes for employer - updated for streamlined navigation
+  // These routes must match the order of tabs in EmployerBottomNav
   final List<String> _employerRoutes = [
-    Routes.dashboard, // Dashboard tab
-    Routes.jobPosting, // Jobs tab (job posting management)
-    Routes.search, // Applicants tab
-    Routes
-        .companyProfile, // Company tab (combines company profile and settings)
+    Routes.dashboard, // Dashboard tab (index 0)
+    Routes.jobPosting, // Jobs tab (index 1)
+    Routes.search, // Applicants tab (index 2)
+    Routes.companyProfile, // Company tab (index 3)
   ];
 
   // List of routes for admin
+  // These routes must match the order of tabs in AdminSideNav
   final List<String> _adminRoutes = [
-    Routes.dashboard,
-    Routes.jobPosting, // Job posting management
-    Routes.search, // User management
-    Routes.settings, // System settings
-    Routes.profile,
+    Routes.dashboard, // Dashboard (index 0)
+    Routes.jobPosting, // Job posting management (index 1)
+    Routes.search, // User management (index 2)
+    Routes.settings, // System settings (index 3)
+    Routes.profile, // Profile (index 4)
   ];
 
   // Map of route names to tab indices
@@ -66,19 +111,30 @@ class NavigationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _logger = Get.find<LoggerService>();
-    _authController = Get.find<AuthController>();
-    _authService = Get.find<AuthService>();
-    _logger.i('NavigationController initialized');
 
-    // Load user role
-    _loadUserRole();
+    // The getters will handle finding or creating the services
+    // We just need to access them to trigger initialization
+    _logger.i('NavigationController initializing');
 
-    // Listen for auth changes
-    ever(_authController.user, (_) => _loadUserRole());
+    try {
+      // Load user role
+      _loadUserRole();
 
-    // Initialize route indices map
-    _updateRouteIndices();
+      // Listen for auth changes
+      ever(_authController.user, (_) => _loadUserRole());
+
+      // Initialize route indices map
+      _updateRouteIndices();
+
+      _logger.i('NavigationController initialized successfully');
+    } catch (e, stackTrace) {
+      debugPrint('Error during NavigationController initialization: $e');
+      _logger.e(
+        'Error during NavigationController initialization',
+        e,
+        stackTrace,
+      );
+    }
   }
 
   /// Public method to force reload user role
@@ -183,8 +239,25 @@ class NavigationController extends GetxController {
   /// Change the selected tab index and navigate to the corresponding route
   ///
   /// This method safely updates the selectedIndex and navigates to the corresponding route.
-  /// It includes additional error handling and logging for better debugging.
+  /// It includes comprehensive error handling and logging for better debugging.
+  ///
+  /// Improvements:
+  /// - Better timeout handling with more reliable detection
+  /// - More robust error recovery
+  /// - Cleaner retry logic
+  /// - Better state management during navigation
   Future<void> changeIndex(int index) async {
+    // Prevent multiple simultaneous navigation attempts
+    if (isLoading.value) {
+      _logger.w(
+        'Navigation already in progress, ignoring request to change to index $index',
+      );
+      return;
+    }
+
+    // Set loading state to indicate navigation is in progress
+    isLoading.value = true;
+
     try {
       // Validate the index
       if (index < 0) {
@@ -218,13 +291,162 @@ class NavigationController extends GetxController {
       // Update the index first to ensure UI consistency
       selectedIndex.value = index;
 
-      // Navigate to the corresponding route
-      await Get.offAllNamed<dynamic>(targetRoute);
+      // Use a more reliable approach to handle navigation with timeouts
+      final navigationSuccessful = await _navigateWithRetries(targetRoute);
 
-      _logger.i('Navigation completed to index $index (route: $targetRoute)');
+      if (!navigationSuccessful) {
+        _logger.w('Navigation to $targetRoute failed after retries');
+        await _attemptRecoveryNavigation(index, routes);
+      } else {
+        _logger.i('Navigation completed to index $index (route: $targetRoute)');
+      }
     } catch (e, stackTrace) {
       _logger.e('Error changing navigation index to $index', e, stackTrace);
       // Don't rethrow to prevent app crashes from navigation errors
+    } finally {
+      // Always reset loading state when done, regardless of success or failure
+      isLoading.value = false;
+    }
+  }
+
+  /// Attempt to navigate to a route with retries
+  ///
+  /// This method handles the actual navigation with timeout and retry logic.
+  /// It returns true if navigation was successful, false otherwise.
+  Future<bool> _navigateWithRetries(String targetRoute) async {
+    var navigateResult = false;
+    var retryCount = 0;
+    const maxRetries = 2;
+    const timeout = Duration(seconds: 5);
+
+    // Create a completer to handle the timeout more reliably
+    final completer = Completer<bool>();
+
+    while (!navigateResult && retryCount <= maxRetries) {
+      try {
+        if (retryCount > 0) {
+          _logger.i(
+            'Retrying navigation to $targetRoute (attempt ${retryCount + 1}/${maxRetries + 1})',
+          );
+        }
+
+        // Set up a timeout timer
+        final timer = Timer(timeout, () {
+          if (!completer.isCompleted) {
+            _logger.w('Navigation timeout for route: $targetRoute');
+            completer.complete(false);
+          }
+        });
+
+        try {
+          // Attempt navigation
+          final result = await Get.offAllNamed<dynamic>(targetRoute);
+
+          // Cancel the timer if navigation completes
+          timer.cancel();
+
+          // If we get here without an exception, navigation was successful
+          navigateResult = result != null;
+
+          if (navigateResult) {
+            if (!completer.isCompleted) {
+              completer.complete(true);
+            }
+            break;
+          }
+        } catch (navError, navStackTrace) {
+          // Cancel the timer if navigation throws an exception
+          timer.cancel();
+
+          _logger.e(
+            'Error during navigation to route: $targetRoute (attempt ${retryCount + 1}/${maxRetries + 1})',
+            navError,
+            navStackTrace,
+          );
+        }
+
+        // Increment retry count
+        retryCount++;
+
+        // If we've reached max retries, break out of the loop
+        if (retryCount > maxRetries) {
+          if (!completer.isCompleted) {
+            completer.complete(false);
+          }
+          break;
+        }
+
+        // Wait a moment before retrying
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      } catch (e, stackTrace) {
+        _logger.e('Unexpected error during navigation retry', e, stackTrace);
+        if (!completer.isCompleted) {
+          completer.complete(false);
+        }
+        break;
+      }
+    }
+
+    // If the completer hasn't completed yet, complete it with the current result
+    if (!completer.isCompleted) {
+      completer.complete(navigateResult);
+    }
+
+    return completer.future;
+  }
+
+  /// Attempt recovery navigation when the primary navigation fails
+  ///
+  /// This method tries to navigate to a fallback route to recover from navigation failures.
+  Future<void> _attemptRecoveryNavigation(
+    int index,
+    List<String> routes,
+  ) async {
+    // Try to recover by going to the previous tab if possible
+    if (index > 0 && index < routes.length) {
+      try {
+        final previousIndex = index - 1;
+        final previousRoute = routes[previousIndex];
+        _logger.i(
+          'Attempting to recover by navigating to previous tab: $previousRoute',
+        );
+
+        // Update the index to the previous tab
+        selectedIndex.value = previousIndex;
+
+        // Navigate to the previous tab
+        await Get.offAllNamed<dynamic>(previousRoute);
+        _logger.i('Recovered by navigating to previous tab');
+        return;
+      } catch (recoveryError) {
+        _logger.e(
+          'Failed to recover by navigating to previous tab',
+          recoveryError,
+        );
+      }
+    }
+
+    // If we can't go to the previous tab or it failed, try the home route
+    try {
+      _logger.i('Attempting to recover by navigating to home route');
+      selectedIndex.value = 0; // Home is usually at index 0
+      await Get.offAllNamed<dynamic>(Routes.home);
+      _logger.i('Recovered by navigating to home route');
+    } catch (homeRecoveryError) {
+      _logger.e(
+        'Failed to recover from navigation error',
+        homeRecoveryError,
+      );
+
+      // Last resort: try to reset the navigation state
+      try {
+        _logger.i('Last resort: Attempting to reset navigation state');
+        Get.reset();
+        await Get.offAllNamed<dynamic>(Routes.home);
+        _logger.i('Successfully reset navigation state');
+      } catch (resetError) {
+        _logger.e('Failed to reset navigation state', resetError);
+      }
     }
   }
 

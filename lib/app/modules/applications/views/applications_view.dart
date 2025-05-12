@@ -8,6 +8,7 @@ import 'package:next_gen/app/modules/applications/controllers/applications_contr
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
 import 'package:next_gen/app/modules/applications/views/widgets/application_analytics.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
+import 'package:next_gen/app/shared/mixins/keep_alive_mixin.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
@@ -15,12 +16,13 @@ import 'package:next_gen/ui/components/loaders/custom_lottie.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/applications_shimmer.dart';
 
 /// Applications view
-class ApplicationsView extends GetView<ApplicationsController> {
+class ApplicationsView extends GetView<ApplicationsController>
+    with GetViewKeepAliveMixin<ApplicationsController> {
   /// Constructor
-  const ApplicationsView({super.key});
+  ApplicationsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildContent(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final navigationController = Get.find<NavigationController>();

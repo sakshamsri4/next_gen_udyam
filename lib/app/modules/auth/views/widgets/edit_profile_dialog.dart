@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
-import 'package:next_gen/app/modules/auth/services/storage_service.dart';
+import 'package:next_gen/app/modules/auth/services/firebase_storage_service.dart';
 import 'package:next_gen/app/modules/auth/views/widgets/profile_image_picker.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/ui/components/buttons/custom_neopop_button.dart';
@@ -197,7 +197,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
     try {
       final authService = Get.find<AuthService>();
       final authController = Get.find<AuthController>();
-      final storageService = Get.find<StorageService>();
+      final storageService = Get.find<FirebaseStorageService>();
       final logger = Get.find<LoggerService>();
 
       // Upload image if selected

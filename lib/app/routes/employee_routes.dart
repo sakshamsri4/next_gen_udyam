@@ -29,7 +29,7 @@ class EmployeeRoutes {
         // Jobs tab (combines Search and Saved)
         GetPage<dynamic>(
           name: Routes.search,
-          page: () => const JobsView(),
+          page: JobsView.new,
           binding: JobsBinding(),
           bindings: [NavigationBinding()],
           transition: Transition.fadeIn,
@@ -38,7 +38,7 @@ class EmployeeRoutes {
         // Applications tab
         GetPage<dynamic>(
           name: Routes.applications,
-          page: () => const ApplicationsView(),
+          page: ApplicationsView.new,
           binding: ApplicationsBinding(),
           bindings: [NavigationBinding()],
           transition: Transition.fadeIn,

@@ -196,4 +196,9 @@ class JobsController extends GetxController {
     // Re-run search with updated filters
     searchJobs(searchController.text);
   }
+
+  /// Check if a job is saved
+  bool isSaved(String jobId) {
+    return savedJobs.any((savedJob) => savedJob.id == jobId);
+  }
 }
