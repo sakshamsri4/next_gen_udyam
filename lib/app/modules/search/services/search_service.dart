@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
+import 'package:next_gen/app/modules/search/models/saved_search_model.dart';
 import 'package:next_gen/app/modules/search/models/search_filter.dart';
 import 'package:next_gen/app/modules/search/models/search_history.dart';
 import 'package:next_gen/core/services/analytics_service.dart';
@@ -10,6 +12,9 @@ import 'package:next_gen/core/storage/hive_manager.dart';
 
 /// Box name for search history
 const String searchHistoryBoxName = 'searchHistory';
+
+/// Box name for saved searches
+const String savedSearchesBoxName = 'savedSearches';
 
 /// Service for handling search operations
 class SearchService extends GetxService {
@@ -30,6 +35,9 @@ class SearchService extends GetxService {
   final HiveManager _hiveManager;
   final LoggerService _logger;
   final AnalyticsService? _analytics;
+
+  // Get the current user ID (used in multiple methods)
+  String? _getCurrentUserId() => Get.find<AuthController>().user.value?.uid;
 
   /// Initialize the service
   Future<SearchService> init() async {
@@ -323,5 +331,109 @@ class SearchService extends GetxService {
       await Hive.openBox<SearchHistory>(searchHistoryBoxName);
     }
     return Hive.box<SearchHistory>(searchHistoryBoxName);
+  }
+
+  /// Save a search query to saved searches
+  Future<SavedSearchModel?> saveSearch(
+    String query,
+    SearchFilter filter,
+  ) async {
+    try {
+      final userId = _getCurrentUserId();
+      if (userId == null) {
+        _logger.w('Cannot save search: User not logged in');
+        return null;
+      }
+
+      // Create a unique ID
+      final id = DateTime.now().millisecondsSinceEpoch.toString();
+
+      // Create the saved search model
+      final savedSearch = SavedSearchModel(
+        id: id,
+        userId: userId,
+        query: query,
+        filter: filter,
+        createdAt: DateTime.now(),
+      );
+
+      // Save to Firestore
+      await _firestore
+          .collection('saved_searches')
+          .doc(id)
+          .set(savedSearch.toMap());
+
+      // Save to local storage
+      final box = await _getSavedSearchesBox();
+      await box.add(savedSearch);
+
+      _logger.d('Saved search: $query');
+      return savedSearch;
+    } catch (e, s) {
+      _logger.e('Error saving search', e, s);
+      return null;
+    }
+  }
+
+  /// Get saved searches for the current user
+  Future<List<SavedSearchModel>> getSavedSearches() async {
+    try {
+      final userId = _getCurrentUserId();
+      if (userId == null) {
+        _logger.w('Cannot get saved searches: User not logged in');
+        return [];
+      }
+
+      // Get from Firestore
+      final snapshot = await _firestore
+          .collection('saved_searches')
+          .where('userId', isEqualTo: userId)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      final savedSearches =
+          snapshot.docs.map(SavedSearchModel.fromFirestore).toList();
+
+      _logger.d('Retrieved ${savedSearches.length} saved searches');
+      return savedSearches;
+    } catch (e, s) {
+      _logger.e('Error getting saved searches', e, s);
+      return [];
+    }
+  }
+
+  /// Delete a saved search
+  Future<bool> deleteSavedSearch(String id) async {
+    try {
+      final userId = _getCurrentUserId();
+      if (userId == null) {
+        _logger.w('Cannot delete saved search: User not logged in');
+        return false;
+      }
+
+      // Delete from Firestore
+      await _firestore.collection('saved_searches').doc(id).delete();
+
+      // Delete from local storage
+      final box = await _getSavedSearchesBox();
+      final index = box.values.toList().indexWhere((item) => item.id == id);
+      if (index != -1) {
+        await box.deleteAt(index);
+      }
+
+      _logger.d('Deleted saved search: $id');
+      return true;
+    } catch (e, s) {
+      _logger.e('Error deleting saved search', e, s);
+      return false;
+    }
+  }
+
+  /// Get the saved searches box
+  Future<Box<SavedSearchModel>> _getSavedSearchesBox() async {
+    if (!Hive.isBoxOpen(savedSearchesBoxName)) {
+      await Hive.openBox<SavedSearchModel>(savedSearchesBoxName);
+    }
+    return Hive.box<SavedSearchModel>(savedSearchesBoxName);
   }
 }

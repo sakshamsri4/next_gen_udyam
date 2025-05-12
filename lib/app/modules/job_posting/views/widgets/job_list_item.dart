@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:next_gen/app/modules/job_posting/models/job_post_model.dart';
+import 'package:next_gen/core/theme/role_themes.dart';
 
 /// A list item for job postings in the job management screen
 class JobListItem extends StatelessWidget {
@@ -54,13 +55,17 @@ class JobListItem extends StatelessWidget {
 
     return Card(
       margin: EdgeInsets.only(bottom: 16.h),
-      elevation: 2,
+      elevation: 3,
+      shadowColor: RoleThemes.employerPrimary.withAlpha(40),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(16.r),
+        side: BorderSide(
+          color: RoleThemes.employerPrimary.withAlpha(26),
+        ),
       ),
       child: InkWell(
         onTap: onViewDetails,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(16.r),
         child: Padding(
           padding: EdgeInsets.all(16.w),
           child: Column(
@@ -91,7 +96,7 @@ class JobListItem extends StatelessWidget {
                   HeroIcon(
                     job.isRemote ? HeroIcons.globeAlt : HeroIcons.mapPin,
                     size: 16.r,
-                    color: theme.colorScheme.primary,
+                    color: RoleThemes.employerPrimary,
                   ),
                   SizedBox(width: 4.w),
                   Text(
@@ -102,7 +107,7 @@ class JobListItem extends StatelessWidget {
                   HeroIcon(
                     HeroIcons.briefcase,
                     size: 16.r,
-                    color: theme.colorScheme.primary,
+                    color: RoleThemes.employerPrimary,
                   ),
                   SizedBox(width: 4.w),
                   Text(
@@ -119,7 +124,7 @@ class JobListItem extends StatelessWidget {
                   HeroIcon(
                     HeroIcons.calendar,
                     size: 16.r,
-                    color: theme.colorScheme.primary,
+                    color: RoleThemes.employerPrimary,
                   ),
                   SizedBox(width: 4.w),
                   Text(
@@ -130,7 +135,7 @@ class JobListItem extends StatelessWidget {
                   HeroIcon(
                     HeroIcons.users,
                     size: 16.r,
-                    color: theme.colorScheme.primary,
+                    color: RoleThemes.employerPrimary,
                   ),
                   SizedBox(width: 4.w),
                   Text(
@@ -138,6 +143,75 @@ class JobListItem extends StatelessWidget {
                     style: theme.textTheme.bodySmall,
                   ),
                 ],
+              ),
+              SizedBox(height: 12.h),
+
+              // Metrics
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: RoleThemes.employerPrimary.withAlpha(10),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildMetric(
+                          icon: HeroIcons.eye,
+                          value: job.viewCount.toString(),
+                          label: 'Views',
+                          theme: theme,
+                        ),
+                        _buildVerticalDivider(theme),
+                        _buildMetric(
+                          icon: HeroIcons.users,
+                          value: job.applicationCount.toString(),
+                          label: 'Applications',
+                          theme: theme,
+                        ),
+                        _buildVerticalDivider(theme),
+                        _buildMetric(
+                          icon: HeroIcons.chartBar,
+                          value: job.viewCount > 0
+                              ? '${(job.applicationCount / job.viewCount * 100).toStringAsFixed(1)}%'
+                              : '0%',
+                          label: 'Conversion',
+                          theme: theme,
+                        ),
+                      ],
+                    ),
+                    if (job.isFeatured || job.applicationDeadline != null) ...[
+                      Divider(
+                        height: 24.h,
+                        color: theme.dividerColor.withAlpha(128),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          if (job.isFeatured)
+                            _buildMetric(
+                              icon: HeroIcons.star,
+                              value: 'Featured',
+                              label: 'Visibility',
+                              theme: theme,
+                            ),
+                          if (job.applicationDeadline != null) ...[
+                            if (job.isFeatured) _buildVerticalDivider(theme),
+                            _buildMetric(
+                              icon: HeroIcons.clock,
+                              value: DateFormat('MMM d')
+                                  .format(job.applicationDeadline!),
+                              label: 'Deadline',
+                              theme: theme,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
               ),
               SizedBox(height: 16.h),
 
@@ -241,7 +315,7 @@ class JobListItem extends StatelessWidget {
       icon: HeroIcon(
         icon,
         size: 20.r,
-        color: color ?? theme.colorScheme.primary,
+        color: color ?? RoleThemes.employerPrimary,
       ),
       tooltip: tooltip,
       onPressed: onPressed,
@@ -260,7 +334,7 @@ class JobListItem extends StatelessWidget {
       icon: HeroIcon(
         HeroIcons.adjustmentsHorizontal,
         size: 20.r,
-        color: theme.colorScheme.primary,
+        color: RoleThemes.employerPrimary,
       ),
       tooltip: 'Change Status',
       onSelected: onStatusChange,
@@ -328,6 +402,48 @@ class JobListItem extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  /// Build a metric display
+  Widget _buildMetric({
+    required HeroIcons icon,
+    required String value,
+    required String label,
+    required ThemeData theme,
+  }) {
+    return Column(
+      children: [
+        HeroIcon(
+          icon,
+          size: 18.r,
+          color: RoleThemes.employerPrimary,
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          value,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.textTheme.bodySmall?.color
+                ?.withAlpha(179), // 0.7 * 255 = 179
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build a vertical divider
+  Widget _buildVerticalDivider(ThemeData theme) {
+    return Container(
+      height: 40.h,
+      width: 1,
+      color: theme.dividerColor.withAlpha(128), // 0.5 * 255 = 128
     );
   }
 }

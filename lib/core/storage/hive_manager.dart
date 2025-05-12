@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:next_gen/app/modules/applicant_review/models/hive_adapters.dart';
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
 import 'package:next_gen/app/modules/auth/models/signup_session.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
@@ -205,6 +206,10 @@ class HiveManager {
       // Register search module adapters
       _logger.d('Registering search module adapters');
       registerSearchHiveAdapters();
+
+      // Register applicant review module adapters
+      _logger.d('Registering applicant review module adapters');
+      registerApplicantReviewHiveAdapters();
 
       // Register ApplicationModel adapter
       if (!Hive.isAdapterRegistered(applicationModelTypeId)) {

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:next_gen/app/modules/job_details/controllers/job_details_controller.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/about_the_employer.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/header.dart';
+import 'package:next_gen/app/modules/job_details/views/widgets/key_info_summary.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/similar_jobs.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
@@ -31,6 +32,9 @@ class JobDetailsBody extends StatelessWidget {
           children: [
             // Job header
             JobDetailsHeader(job: job),
+
+            // Key information summary
+            KeyInfoSummary(job: job),
 
             // Divider
             Divider(

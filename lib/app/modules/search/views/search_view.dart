@@ -150,7 +150,7 @@ class _SearchViewState extends State<SearchView> {
           // Search input
           Expanded(
             child: TextField(
-              controller: controller.searchTextController,
+              controller: controller.searchController,
               onChanged: controller.onSearchInputChanged,
               decoration: InputDecoration(
                 hintText: 'Search for jobs, companies, or keywords...',
@@ -158,7 +158,7 @@ class _SearchViewState extends State<SearchView> {
                 hintStyle: TextStyle(
                   color: employeeBlue.withAlpha(179), // 0.7 * 255 = 179
                 ),
-                suffixIcon: controller.searchTextController.text.isNotEmpty
+                suffixIcon: controller.searchController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(
                           FontAwesomeIcons.xmark,
@@ -197,7 +197,7 @@ class _SearchViewState extends State<SearchView> {
     }
 
     // Show search history if no query and no results
-    if (controller.searchTextController.text.isEmpty &&
+    if (controller.searchController.text.isEmpty &&
         controller.searchResults.isEmpty) {
       return _buildSearchHistory(context, theme);
     }

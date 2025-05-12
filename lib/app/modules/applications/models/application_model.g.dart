@@ -81,3 +81,72 @@ class ApplicationModelAdapter extends TypeAdapter<ApplicationModel> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class ApplicationStatusAdapter extends TypeAdapter<ApplicationStatus> {
+  @override
+  final int typeId = 11;
+
+  @override
+  ApplicationStatus read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ApplicationStatus.pending;
+      case 1:
+        return ApplicationStatus.reviewed;
+      case 2:
+        return ApplicationStatus.shortlisted;
+      case 3:
+        return ApplicationStatus.interview;
+      case 4:
+        return ApplicationStatus.offered;
+      case 5:
+        return ApplicationStatus.hired;
+      case 6:
+        return ApplicationStatus.rejected;
+      case 7:
+        return ApplicationStatus.withdrawn;
+      default:
+        return ApplicationStatus.pending;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ApplicationStatus obj) {
+    switch (obj) {
+      case ApplicationStatus.pending:
+        writer.writeByte(0);
+        break;
+      case ApplicationStatus.reviewed:
+        writer.writeByte(1);
+        break;
+      case ApplicationStatus.shortlisted:
+        writer.writeByte(2);
+        break;
+      case ApplicationStatus.interview:
+        writer.writeByte(3);
+        break;
+      case ApplicationStatus.offered:
+        writer.writeByte(4);
+        break;
+      case ApplicationStatus.hired:
+        writer.writeByte(5);
+        break;
+      case ApplicationStatus.rejected:
+        writer.writeByte(6);
+        break;
+      case ApplicationStatus.withdrawn:
+        writer.writeByte(7);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ApplicationStatusAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

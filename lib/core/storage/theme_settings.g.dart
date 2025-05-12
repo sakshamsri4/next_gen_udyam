@@ -20,19 +20,22 @@ class ThemeSettingsAdapter extends TypeAdapter<ThemeSettings> {
       isDarkMode: fields[0] as bool,
       useMaterial3: fields[1] as bool,
       useHighContrast: fields[2] as bool,
+      userRole: fields[3] as UserType?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ThemeSettings obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.isDarkMode)
       ..writeByte(1)
       ..write(obj.useMaterial3)
       ..writeByte(2)
-      ..write(obj.useHighContrast);
+      ..write(obj.useHighContrast)
+      ..writeByte(3)
+      ..write(obj.userRole);
   }
 
   @override

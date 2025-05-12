@@ -26,6 +26,11 @@ class SearchFilter {
     this.limit = 10,
   });
 
+  /// Create from a Map
+  factory SearchFilter.fromMap(Map<String, dynamic> map) {
+    return SearchFilter.fromJson(map);
+  }
+
   /// Factory constructor from JSON
   factory SearchFilter.fromJson(Map<String, dynamic> json) {
     return SearchFilter(
@@ -120,6 +125,11 @@ class SearchFilter {
       'page': page,
       'limit': limit,
     };
+  }
+
+  /// Convert to Map for Firestore
+  Map<String, dynamic> toMap() {
+    return toJson();
   }
 
   /// Parse sort option from string

@@ -6,7 +6,8 @@ import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:next_gen/app/modules/applications/controllers/applications_controller.dart';
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
-
+import 'package:next_gen/app/modules/applications/views/widgets/application_timeline.dart';
+import 'package:next_gen/app/modules/applications/views/widgets/communication_history.dart';
 import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
@@ -137,12 +138,20 @@ class _ApplicationDetailsViewState extends State<ApplicationDetailsView> {
           _buildStatusCard(application, theme),
           SizedBox(height: 24.h),
 
+          // Application timeline
+          ApplicationTimeline(application: application),
+          SizedBox(height: 24.h),
+
           // Job details card
           _buildJobDetailsCard(application, job, theme, isDarkMode),
           SizedBox(height: 24.h),
 
           // Application details card
           _buildApplicationDetailsCard(application, theme),
+          SizedBox(height: 24.h),
+
+          // Communication history
+          CommunicationHistory(application: application),
           SizedBox(height: 24.h),
 
           // Actions

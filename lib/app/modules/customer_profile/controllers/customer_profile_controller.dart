@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/customer_profile/models/customer_profile_model.dart';
 import 'package:next_gen/app/modules/customer_profile/services/customer_profile_service.dart';
+import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
 /// Controller for the customer profile screen
@@ -43,6 +45,12 @@ class CustomerProfileController extends GetxController {
   /// Profile completeness percentage (0.0 to 1.0)
   final RxDouble profileCompleteness = 0.0.obs;
 
+  /// Map of skill ratings (skill name -> rating 0-5)
+  final RxMap<String, int> skillRatings = <String, int>{}.obs;
+
+  /// Custom skill text controller
+  final TextEditingController customSkillController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
@@ -64,6 +72,7 @@ class CustomerProfileController extends GetxController {
   @override
   void onClose() {
     _logger.d('CustomerProfileController closed');
+    customSkillController.dispose();
     super.onClose();
   }
 
@@ -434,5 +443,82 @@ class CustomerProfileController extends GetxController {
     _logger.d(
       'Profile completeness: ${(profileCompleteness.value * 100).toStringAsFixed(0)}%',
     );
+  }
+
+  /// Navigate to skills assessment view
+  void navigateToSkillsAssessment() {
+    Get.toNamed<dynamic>('${Routes.profile}/skills-assessment');
+  }
+
+  /// Get skill rating
+  int getSkillRating(String skill) {
+    return skillRatings[skill] ?? 0;
+  }
+
+  /// Update skill rating
+  void updateSkillRating(String skill, int rating) {
+    skillRatings[skill] = rating;
+  }
+
+  /// Add custom skill
+  void addCustomSkill() {
+    final skill = customSkillController.text.trim();
+    if (skill.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please enter a skill name',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // Add to skill ratings
+    skillRatings[skill] = 0;
+
+    // Clear the text field
+    customSkillController.clear();
+
+    Get.snackbar(
+      'Success',
+      'Skill added successfully',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  /// Save skills
+  Future<void> saveSkills() async {
+    try {
+      isUpdating.value = true;
+      _logger.i('Saving skills assessment');
+
+      if (user.value == null) {
+        _logger.w('No user is currently signed in');
+        return;
+      }
+
+      // Convert skill ratings to list of skills
+      final skills = skillRatings.entries
+          .where((entry) => entry.value > 0)
+          .map((entry) => '${entry.key} (${entry.value}/5)')
+          .toList();
+
+      // Update skills
+      await updateSkills(skills);
+
+      Get.snackbar(
+        'Success',
+        'Skills assessment saved successfully',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      _logger.e('Error saving skills assessment', e);
+      Get.snackbar(
+        'Error',
+        'Failed to save skills assessment. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isUpdating.value = false;
+    }
   }
 }

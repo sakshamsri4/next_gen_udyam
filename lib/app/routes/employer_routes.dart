@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:next_gen/app/modules/applicant_review/bindings/applicant_review_binding.dart';
+import 'package:next_gen/app/modules/applicant_review/views/applicant_review_view.dart';
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';
 import 'package:next_gen/app/modules/company_profile/bindings/company_profile_binding.dart';
 import 'package:next_gen/app/modules/company_profile/views/company_profile_view.dart';
@@ -37,6 +39,15 @@ class EmployerRoutes {
         ),
 
         // Applicants tab
+        GetPage<dynamic>(
+          name: Routes.applicantReview,
+          page: () => const ApplicantReviewView(),
+          binding: ApplicantReviewBinding(),
+          bindings: [NavigationBinding()],
+          transition: Transition.fadeIn,
+        ),
+
+        // Search tab (legacy)
         GetPage<dynamic>(
           name: Routes.search,
           page: () => const SearchView(),

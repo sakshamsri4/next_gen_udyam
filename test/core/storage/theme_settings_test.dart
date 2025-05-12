@@ -63,8 +63,8 @@ void main() {
       adapter.write(mockWriter, settings);
 
       // Verify the writer was called with the correct data
-      expect(mockWriter.byteData.length, 4); // Four byte values were written
-      expect(mockWriter.byteData[0], 3); // Number of fields (3 fields now)
+      expect(mockWriter.byteData.length, 5); // Five byte values were written
+      expect(mockWriter.byteData[0], 4); // Number of fields (4 fields now)
       expect(mockWriter.byteData[1], 0); // Field index for isDarkMode
       expect(mockWriter.data[0], true); // isDarkMode value (default is true)
       expect(mockWriter.byteData[2], 1); // Field index for useMaterial3
@@ -74,22 +74,26 @@ void main() {
         mockWriter.data[2],
         false,
       ); // useHighContrast value (default is false)
+      expect(mockWriter.byteData[4], 3); // Field index for userRole
+      expect(mockWriter.data[3], null); // userRole value (default is null)
     });
 
     test('read should deserialize ThemeSettings correctly', () {
       final mockReader = _MockBinaryReader()
-        ..byteData = [3, 0, 1, 2] // numOfFields and field indices
+        ..byteData = [4, 0, 1, 2, 3] // numOfFields and field indices
         ..data = [
           true,
           true,
           false,
-        ]; // isDarkMode, useMaterial3, useHighContrast values
+          null,
+        ]; // isDarkMode, useMaterial3, useHighContrast, userRole values
 
       final result = adapter.read(mockReader);
 
       expect(result.isDarkMode, true);
       expect(result.useMaterial3, true);
       expect(result.useHighContrast, false);
+      expect(result.userRole, null);
     });
 
     test('equals compares typeIds and type', () {
