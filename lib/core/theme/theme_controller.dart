@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/auth/models/user_model.dart';
+import 'package:next_gen/app/modules/auth/services/auth_service.dart';
 import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/storage/storage_service.dart';
 import 'package:next_gen/core/storage/theme_settings.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
+import 'package:next_gen/core/theme/role_themes.dart';
 
 /// Controller for managing app theme
 class ThemeController extends GetxController {
@@ -67,13 +71,23 @@ class ThemeController extends GetxController {
 
   final _isDarkMode = true.obs;
   final _themeSettings = Rx<ThemeSettings>(ThemeSettings());
+  final _currentRole = Rx<UserType?>(null);
 
   /// Whether the app is in dark mode
   bool get isDarkMode => _isDarkMode.value;
 
+  /// Current user role
+  UserType? get currentRole => _currentRole.value;
+
   /// Current theme data
-  ThemeData get theme =>
-      _isDarkMode.value ? AppTheme.darkTheme : AppTheme.lightTheme;
+  ThemeData get theme {
+    // If a role is set, use role-specific theme
+    if (_currentRole.value != null) {
+      return RoleThemes.getThemeForRole(_currentRole.value, _isDarkMode.value);
+    }
+    // Otherwise use default theme
+    return _isDarkMode.value ? AppTheme.darkTheme : AppTheme.lightTheme;
+  }
 
   @override
   void onInit() {
@@ -118,15 +132,24 @@ class ThemeController extends GetxController {
         final settings = _storageService.getThemeSettings();
         _themeSettings.value = settings;
         _isDarkMode.value = settings.isDarkMode;
-        Get.changeThemeMode(
-          _isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
+        _currentRole.value = settings.userRole;
+
+        // Apply theme based on role and dark mode
+        _applyTheme();
+
+        _logger.d(
+          'Theme preference loaded: isDarkMode=${settings.isDarkMode}, userRole=${settings.userRole}',
         );
-        _logger.d('Theme preference loaded: isDarkMode=${settings.isDarkMode}');
       } catch (storageError) {
         _logger.w('Error getting theme settings, using default: $storageError');
         _isDarkMode.value = true;
         _themeSettings.value = ThemeSettings();
-        Get.changeThemeMode(ThemeMode.dark);
+
+        // Try to get user role from auth controller if available
+        _tryLoadUserRoleFromAuth();
+
+        // Apply theme
+        _applyTheme();
       }
     } catch (e, stackTrace) {
       // If there's an error, use the default dark mode
@@ -165,7 +188,7 @@ class ThemeController extends GetxController {
       }
     }
 
-    Get.changeThemeMode(_isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+    _applyTheme();
     _logger.d('Theme toggled: isDarkMode=${_isDarkMode.value}');
   }
 
@@ -185,7 +208,7 @@ class ThemeController extends GetxController {
       }
     }
 
-    Get.changeThemeMode(ThemeMode.light);
+    _applyTheme();
     _logger.d('Light mode set');
   }
 
@@ -205,7 +228,70 @@ class ThemeController extends GetxController {
       }
     }
 
-    Get.changeThemeMode(ThemeMode.dark);
+    _applyTheme();
     _logger.d('Dark mode set');
+  }
+
+  /// Set the user role for theming
+  void setUserRole(UserType? role) {
+    _logger.d('Setting user role: $role');
+    if (_currentRole.value == role) {
+      _logger.d('Role is already set to $role, skipping');
+      return;
+    }
+
+    _currentRole.value = role;
+    _themeSettings.value = _themeSettings.value.copyWith(userRole: role);
+
+    // Try to save theme settings if StorageService is available
+    if (_storageServiceAvailable) {
+      try {
+        _storageService.saveThemeSettings(_themeSettings.value);
+      } catch (e) {
+        _logger.w('Failed to save role settings: $e');
+        _storageServiceAvailable = false;
+      }
+    }
+
+    _applyTheme();
+    _logger.d('User role set to $role');
+  }
+
+  /// Apply the current theme based on role and dark mode
+  void _applyTheme() {
+    final themeData = theme;
+    Get
+      ..changeTheme(themeData)
+      ..changeThemeMode(_isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+    _logger.d(
+      'Theme applied: isDarkMode=${_isDarkMode.value}, role=${_currentRole.value}',
+    );
+  }
+
+  /// Try to load user role from auth service
+  void _tryLoadUserRoleFromAuth() {
+    try {
+      if (Get.isRegistered<AuthController>() &&
+          Get.isRegistered<AuthService>()) {
+        final authService = Get.find<AuthService>();
+
+        // Use a future to get the user model
+        authService.getUserFromFirebase().then((UserModel? userModel) {
+          if (userModel != null && userModel.userType != null) {
+            _currentRole.value = userModel.userType;
+            _logger.d(
+              'Loaded user role from auth service: ${_currentRole.value}',
+            );
+
+            // Apply theme after role is loaded
+            _applyTheme();
+          }
+        }).catchError((Object error) {
+          _logger.w('Error getting user model from Firebase: $error');
+        });
+      }
+    } catch (e) {
+      _logger.w('Failed to load user role from auth service: $e');
+    }
   }
 }

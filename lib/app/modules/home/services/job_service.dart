@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/home/models/job_category.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
@@ -112,9 +113,9 @@ class JobService {
   }
 
   /// Get saved jobs for a user
-  Future<List<String>> getSavedJobs(String userId) async {
+  Future<List<String>> getSavedJobIds(String userId) async {
     try {
-      _logger.i('Fetching saved jobs for user: $userId');
+      _logger.i('Fetching saved job IDs for user: $userId');
 
       final userDoc = await _firestore.collection('users').doc(userId).get();
 
@@ -130,7 +131,135 @@ class JobService {
 
       return [];
     } catch (e) {
+      _logger.e('Error fetching saved job IDs', e);
+      rethrow;
+    }
+  }
+
+  /// Search for jobs
+  Future<List<JobModel>> searchJobs(
+    String query, [
+    Map<String, dynamic>? filters,
+  ]) async {
+    try {
+      _logger.i('Searching for jobs with query: $query');
+
+      // Create base query
+      var jobsQuery = _firestore
+          .collection('jobs')
+          .where('isActive', isEqualTo: true)
+          .orderBy('postedDate', descending: true);
+
+      // Apply filters if provided
+      if (filters != null && filters.isNotEmpty) {
+        if (filters.containsKey('location') && filters['location'] != null) {
+          jobsQuery =
+              jobsQuery.where('location', isEqualTo: filters['location']);
+        }
+
+        if (filters.containsKey('jobType') && filters['jobType'] != null) {
+          jobsQuery = jobsQuery.where('jobType', isEqualTo: filters['jobType']);
+        }
+
+        // Add more filters as needed
+      }
+
+      // Apply text search (simple contains for now)
+      // In a real app, you'd use a more sophisticated search solution
+      final snapshot = await jobsQuery.limit(20).get();
+      final results = snapshot.docs.map(JobModel.fromFirestore).toList();
+
+      // Filter by text query if provided
+      if (query.isNotEmpty) {
+        return results.where((job) {
+          final title = job.title.toLowerCase();
+          final company = job.company.toLowerCase();
+          final description = job.description.toLowerCase();
+          final searchQuery = query.toLowerCase();
+
+          return title.contains(searchQuery) ||
+              company.contains(searchQuery) ||
+              description.contains(searchQuery);
+        }).toList();
+      }
+
+      return results;
+    } catch (e) {
+      _logger.e('Error searching for jobs', e);
+      return []; // Return empty list instead of rethrowing to prevent UI errors
+    }
+  }
+
+  /// Get saved jobs with full details
+  Future<List<JobModel>> getSavedJobs() async {
+    try {
+      _logger.i('Fetching saved jobs');
+
+      // Get current user ID from Firebase Auth
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        _logger.w('No user logged in');
+        return [];
+      }
+
+      // Get saved job IDs
+      final savedJobIds = await getSavedJobIds(user.uid);
+      if (savedJobIds.isEmpty) {
+        return [];
+      }
+
+      // Fetch job details for each saved job
+      final jobs = <JobModel>[];
+      for (final jobId in savedJobIds) {
+        final job = await getJobById(jobId);
+        if (job != null) {
+          jobs.add(job);
+        }
+      }
+
+      return jobs;
+    } catch (e) {
       _logger.e('Error fetching saved jobs', e);
+      return []; // Return empty list instead of rethrowing to prevent UI errors
+    }
+  }
+
+  /// Save a job
+  Future<void> saveJob(JobModel job) async {
+    try {
+      _logger.i('Saving job: ${job.id}');
+
+      // Get current user ID from Firebase Auth
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        _logger.w('No user logged in');
+        throw Exception('User not logged in');
+      }
+
+      // Save the job
+      await toggleSaveJob(userId: user.uid, jobId: job.id, isSaved: false);
+    } catch (e) {
+      _logger.e('Error saving job', e);
+      rethrow;
+    }
+  }
+
+  /// Unsave a job
+  Future<void> unsaveJob(String jobId) async {
+    try {
+      _logger.i('Unsaving job: $jobId');
+
+      // Get current user ID from Firebase Auth
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        _logger.w('No user logged in');
+        throw Exception('User not logged in');
+      }
+
+      // Unsave the job
+      await toggleSaveJob(userId: user.uid, jobId: jobId, isSaved: true);
+    } catch (e) {
+      _logger.e('Error unsaving job', e);
       rethrow;
     }
   }

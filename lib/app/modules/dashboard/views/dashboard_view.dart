@@ -6,8 +6,10 @@ import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:neopop/neopop.dart' hide NeoPopCard;
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/modules/auth/widgets/email_verification_banner.dart';
 import 'package:next_gen/app/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:next_gen/app/modules/dashboard/views/employer_dashboard_view.dart';
 import 'package:next_gen/app/modules/dashboard/widgets/dashboard_widgets.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
@@ -44,130 +46,169 @@ class _DashboardViewState extends State<DashboardView> {
       navigationController = Get.put(NavigationController(), permanent: true);
     }
 
-    // Refresh user data to check email verification status
+    // Refresh user data to check email verification status and load role
     if (Get.isRegistered<AuthController>()) {
       Get.find<AuthController>().refreshUser();
+
+      // Force reload user role in navigation controller
+      if (Get.isRegistered<NavigationController>()) {
+        // Use Future.delayed to ensure this runs after the current frame
+        Future.delayed(Duration.zero, () {
+          Get.find<NavigationController>().reloadUserRole();
+        });
+      }
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Set the selected index to the Dashboard tab (index 0)
-    // This is safer than using initState with a direct value assignment
-    navigationController.selectedIndex.value = 0;
+
+    // Instead of directly modifying the observable value, use a method
+    // that handles the update properly
+    if (navigationController.selectedIndex.value != 0) {
+      // Use Future.microtask to ensure this happens after the current build phase
+      Future.microtask(() {
+        // Use updateIndexFromRoute instead of directly modifying the value
+        navigationController.updateIndexFromRoute(Routes.dashboard);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: const CustomDrawer(),
-      bottomNavigationBar: const RoleBasedBottomNav(),
-      appBar: AppBar(
-        title: const Text('Automotive Jobs Dashboard'),
-        centerTitle: true,
-        elevation: 0,
-        leading: IconButton(
-          icon: const HeroIcon(HeroIcons.bars3),
-          onPressed: () => navigationController.toggleDrawer(_scaffoldKey),
-        ),
-        actions: [
-          // Profile button
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _buildProfileButton(theme, controller),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Email verification banner
-          Obx(() {
-            final authController = Get.find<AuthController>();
-            final user = authController.user.value;
+    // Use GetBuilder instead of Obx to avoid nesting reactive widgets
+    return GetBuilder<NavigationController>(
+      builder: (navController) {
+        final userRole = navController.userRole.value;
 
-            // Only show banner if user exists, email is not verified, and banner is visible
-            if (user != null &&
-                !user.emailVerified &&
-                authController.isVerificationBannerVisible.value) {
-              return EmailVerificationBanner(
-                onResendPressed: authController.sendEmailVerification,
-                onDismissed: authController.toggleVerificationBanner,
-              );
-            }
-            return const SizedBox.shrink();
-          }),
+        // If user is an employer, show the employer dashboard view
+        if (userRole == UserType.employer) {
+          return const EmployerDashboardView();
+        }
 
-          // Main content
-          Expanded(
-            child: ResponsiveBuilder(
-              builder: (context, sizingInformation) {
-                // Determine if we're on a mobile device
-                final isMobile = sizingInformation.deviceScreenType ==
-                    DeviceScreenType.mobile;
+        // Make sure AuthController is registered
+        Get.find<AuthController>();
 
-                return RefreshIndicator(
-                  onRefresh: controller.refreshDashboard,
-                  // IMPORTANT: Use a single Obx widget to observe controller.isLoading.value
-                  // Avoid nesting Obx widgets to prevent "improper use of GetX" errors
-                  child: Obx(
-                    () => controller.isLoading.value
-                        ? _buildLoadingState(isMobile)
-                        : SingleChildScrollView(
-                            // Always use physics to ensure proper scrolling behavior
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Welcome message
-                                _buildWelcomeSection(
-                                  theme,
-                                  isMobile,
-                                  controller,
-                                ),
-                                SizedBox(height: isMobile ? 16.0 : 24.0),
-
-                                // Quick action buttons
-                                _buildQuickActionButtons(theme, isMobile),
-                                SizedBox(height: isMobile ? 24.0 : 32.0),
-
-                                // Statistics section
-                                _buildStatisticsSection(
-                                  theme,
-                                  isMobile,
-                                  controller,
-                                ),
-                                SizedBox(height: isMobile ? 24.0 : 32.0),
-
-                                // Recent activity section
-                                _buildRecentActivitySection(
-                                  theme,
-                                  isMobile,
-                                  controller,
-                                ),
-                                SizedBox(height: isMobile ? 16.0 : 24.0),
-
-                                // Sign out button
-                                _buildSignOutButton(
-                                  theme,
-                                  isMobile,
-                                  controller,
-                                ),
-                                SizedBox(height: isMobile ? 16.0 : 24.0),
-                              ],
-                            ),
-                          ),
-                  ),
-                );
-              },
+        // Otherwise, show the default dashboard view
+        return Scaffold(
+          key: _scaffoldKey,
+          drawer: const CustomDrawer(),
+          bottomNavigationBar: const RoleBasedBottomNav(),
+          appBar: AppBar(
+            title: const Text('Automotive Jobs Dashboard'),
+            centerTitle: true,
+            elevation: 0,
+            leading: IconButton(
+              icon: const HeroIcon(HeroIcons.bars3),
+              onPressed: () => navigationController.toggleDrawer(_scaffoldKey),
             ),
+            actions: [
+              // Profile button
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: _buildProfileButton(theme, controller),
+              ),
+            ],
           ),
-        ],
-      ),
+          body: Column(
+            children: [
+              // Email verification banner - use GetBuilder instead of Obx
+              GetBuilder<AuthController>(
+                builder: (authCtrl) {
+                  final user = authCtrl.user.value;
+
+                  // Only show banner if user exists, email is not verified, and banner is visible
+                  if (user != null &&
+                      !user.emailVerified &&
+                      authCtrl.isVerificationBannerVisible.value) {
+                    return EmailVerificationBanner(
+                      onResendPressed: authCtrl.sendEmailVerification,
+                      onDismissed: authCtrl.toggleVerificationBanner,
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+
+              // Main content
+              Expanded(
+                child: ResponsiveBuilder(
+                  builder: (context, sizingInformation) {
+                    // Determine if we're on a mobile device
+                    final isMobile = sizingInformation.deviceScreenType ==
+                        DeviceScreenType.mobile;
+
+                    return RefreshIndicator(
+                      onRefresh: controller.refreshDashboard,
+                      // Use GetBuilder instead of Obx to avoid nesting reactive widgets
+                      child: GetBuilder<DashboardController>(
+                        builder: (dashCtrl) {
+                          // Use a local variable to access the loading state
+                          final isLoading = dashCtrl.isLoading.value;
+
+                          return isLoading
+                              ? _buildLoadingState(isMobile)
+                              : SingleChildScrollView(
+                                  // Always use physics to ensure proper scrolling behavior
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  padding:
+                                      EdgeInsets.all(isMobile ? 16.0 : 24.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Welcome message
+                                      _buildWelcomeSection(
+                                        theme,
+                                        isMobile,
+                                        controller,
+                                      ),
+                                      SizedBox(height: isMobile ? 16.0 : 24.0),
+
+                                      // Quick action buttons
+                                      _buildQuickActionButtons(theme, isMobile),
+                                      SizedBox(height: isMobile ? 24.0 : 32.0),
+
+                                      // Statistics section
+                                      _buildStatisticsSection(
+                                        theme,
+                                        isMobile,
+                                        controller,
+                                      ),
+                                      SizedBox(height: isMobile ? 24.0 : 32.0),
+
+                                      // Recent activity section
+                                      _buildRecentActivitySection(
+                                        theme,
+                                        isMobile,
+                                        controller,
+                                      ),
+                                      SizedBox(height: isMobile ? 16.0 : 24.0),
+
+                                      // Sign out button
+                                      _buildSignOutButton(
+                                        theme,
+                                        isMobile,
+                                        controller,
+                                      ),
+                                      SizedBox(height: isMobile ? 16.0 : 24.0),
+                                    ],
+                                  ),
+                                );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

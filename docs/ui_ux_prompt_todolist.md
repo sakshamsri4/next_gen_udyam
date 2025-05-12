@@ -6,21 +6,29 @@ This document provides a structured, phased approach to implementing the UI/UX i
 
 ### 1.1 Role-Specific Navigation Systems (High Priority)
 
-- [ ] **Employee Bottom Navigation**
+- [x] **Employee Bottom Navigation**
   - Create `EmployeeBottomNav` widget with blue color scheme (#2563EB)
-  - Implement tabs: Home, Search, Saved, Applications, Profile
+  - Implement streamlined tabs: Discover, Jobs, Applications, Profile
+    - Discover: Combines home feed and recommendations
+    - Jobs: Combines search and saved jobs in a single tab with segments
+    - Applications: Track ongoing applications
+    - Profile: User profile and settings
   - Use job seeker-focused icons from Heroicons
   - Add active/inactive states with proper color transitions
-  - Prompt: "Create a blue-themed bottom navigation bar for employee users with tabs for Home, Search, Saved, Applications, and Profile using Heroicons and proper state management"
+  - Prompt: "Create a blue-themed bottom navigation bar for employee users with a streamlined 4-tab structure (Discover, Jobs, Applications, Profile) that follows modern design principles, with proper segmentation within tabs and intuitive navigation patterns"
 
-- [ ] **Employer Bottom Navigation**
+- [x] **Employer Bottom Navigation**
   - Create `EmployerBottomNav` widget with green color scheme (#059669)
-  - Implement tabs: Dashboard, Jobs, Applicants, Company, Settings
+  - Implement streamlined tabs: Dashboard, Jobs, Applicants, Company
+    - Dashboard: Overview with key metrics and quick actions
+    - Jobs: Manage job postings with status filters
+    - Applicants: Review and manage all applications
+    - Company: Company profile and settings combined
   - Use recruitment-focused icons from Heroicons
   - Add active/inactive states with proper color transitions
-  - Prompt: "Create a green-themed bottom navigation bar for employer users with tabs for Dashboard, Jobs, Applicants, Company, and Settings using Heroicons and proper state management"
+  - Prompt: "Create a green-themed bottom navigation bar for employer users with a streamlined 4-tab structure (Dashboard, Jobs, Applicants, Company) that follows modern design principles, with proper segmentation within tabs and intuitive navigation patterns"
 
-- [ ] **Admin Navigation**
+- [x] **Admin Navigation**
   - Create `AdminSideNav` widget with indigo color scheme (#4F46E5)
   - Implement items: Dashboard, Users, Content, Settings, Analytics
   - Use administration-focused icons from Heroicons
@@ -29,21 +37,21 @@ This document provides a structured, phased approach to implementing the UI/UX i
 
 ### 1.2 Role-Specific Home Screens (High Priority)
 
-- [ ] **Employee Home Screen**
-  - Create `EmployeeHomeView` with job recommendations and activity feed
+- [x] **Employee Home Screen**
+  - Create `DiscoverView` with job recommendations and activity feed
   - Implement quick search bar and recently viewed jobs section
   - Add application status updates section
   - Use blue color scheme for UI elements
   - Prompt: "Design an employee home screen with job recommendations, quick search, recently viewed jobs, and application updates using the blue color palette (#2563EB)"
 
-- [ ] **Employer Dashboard**
+- [x] **Employer Dashboard**
   - Create `EmployerDashboardView` with key metrics and activity overview
   - Implement quick actions section (post job, review applications)
   - Add upcoming interviews and tasks section
   - Use green color scheme for UI elements
   - Prompt: "Design an employer dashboard with key metrics, quick actions, and upcoming tasks using the green color palette (#059669)"
 
-- [ ] **Admin Dashboard**
+- [x] **Admin Dashboard**
   - Create `AdminDashboardView` with system metrics and moderation queue
   - Implement user growth and engagement statistics
   - Add recent activity log and quick actions
@@ -52,7 +60,7 @@ This document provides a structured, phased approach to implementing the UI/UX i
 
 ### 1.3 Role Selection Flow (High Priority)
 
-- [ ] **Enhanced Role Selection Screen**
+- [x] **Enhanced Role Selection Screen**
   - Redesign `RoleSelectionView` with clear visual differentiation
   - Create role cards with appropriate illustrations and colors
   - Add role descriptions and confirmation step
@@ -61,7 +69,7 @@ This document provides a structured, phased approach to implementing the UI/UX i
 
 ### 1.4 Route Management (High Priority)
 
-- [ ] **Role-Specific Routes**
+- [x] **Role-Specific Routes**
   - Create `employee_routes.dart`, `employer_routes.dart`, and `admin_routes.dart`
   - Update `app_pages.dart` to use role-specific routes
   - Implement route guards for unauthorized access

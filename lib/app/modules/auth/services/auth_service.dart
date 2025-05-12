@@ -384,7 +384,53 @@ class AuthService {
     _logger.d('Getting current user from Firebase');
     final user = _auth.currentUser;
     if (user != null) {
-      return UserModel.fromFirebaseUser(user);
+      // First create a basic model from Firebase user
+      final basicModel = UserModel.fromFirebaseUser(user);
+
+      // Try to get additional data from Firestore
+      try {
+        _logger.d('Attempting to get user data from Firestore');
+        final docSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (docSnapshot.exists) {
+          _logger.d('User document exists in Firestore');
+          final data = docSnapshot.data();
+
+          // Extract user type from Firestore data
+          UserType? userType;
+          if (data != null && data['userType'] != null) {
+            final userTypeString = data['userType'] as String;
+            if (userTypeString == 'employee') {
+              userType = UserType.employee;
+            } else if (userTypeString == 'employer') {
+              userType = UserType.employer;
+            } else if (userTypeString == 'admin') {
+              userType = UserType.admin;
+            }
+            _logger.d('Found user type in Firestore: $userType');
+          }
+
+          // Create a new model with the user type
+          final enhancedModel = basicModel.copyWith(
+            userType: userType,
+          );
+
+          // Save to Hive for future use
+          await _saveUserToHive(enhancedModel);
+
+          return enhancedModel;
+        } else {
+          _logger.d('User document does not exist in Firestore');
+        }
+      } catch (e) {
+        _logger.e('Error getting user data from Firestore', e);
+      }
+
+      // Return basic model if Firestore retrieval fails
+      return basicModel;
     }
     return null;
   }

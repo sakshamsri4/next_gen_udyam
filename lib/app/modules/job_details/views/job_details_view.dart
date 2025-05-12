@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/job_details/controllers/job_details_controller.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/body.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/details_bottom_nav_bar.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/details_sliver_app_bar.dart';
+import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/job_details_shimmer.dart';
 
@@ -14,8 +16,9 @@ class JobDetailsView extends GetView<JobDetailsController> {
 
   @override
   Widget build(BuildContext context) {
-    // Print directly to console for debugging
-    print('JobDetailsView: Building view');
+    // Get logger service
+    final logger = Get.find<LoggerService>()
+      ..d('JobDetailsView: Building view');
 
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -23,7 +26,7 @@ class JobDetailsView extends GetView<JobDetailsController> {
     // Start a timer to force exit loading state if it takes too long
     Future.delayed(const Duration(seconds: 5), () {
       if (controller.isLoading.value) {
-        print('JobDetailsView: Force exiting loading state after timeout');
+        logger.w('JobDetailsView: Force exiting loading state after timeout');
         controller.isLoading.value = false;
         if (controller.job.value == null) {
           controller.errorMessage.value =
@@ -39,11 +42,14 @@ class JobDetailsView extends GetView<JobDetailsController> {
         title: const Text('Job Details'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back<dynamic>(),
+          onPressed: () {
+            // Use NavigationController to go back properly
+            Get.find<NavigationController>().navigateBack();
+          },
         ),
       ),
       body: Obx(() {
-        print(
+        logger.d(
             'JobDetailsView: Rebuilding with isLoading=${controller.isLoading.value}, '
             'hasError=${controller.errorMessage.isNotEmpty}, '
             'hasJob=${controller.job.value != null}');
@@ -68,7 +74,8 @@ class JobDetailsView extends GetView<JobDetailsController> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => Get.back<dynamic>(),
+                  onPressed: () =>
+                      Get.find<NavigationController>().navigateBack(),
                   child: const Text('Go Back'),
                 ),
                 const SizedBox(height: 16),
@@ -133,7 +140,8 @@ class JobDetailsView extends GetView<JobDetailsController> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => Get.back<dynamic>(),
+                  onPressed: () =>
+                      Get.find<NavigationController>().navigateBack(),
                   child: const Text('Go Back'),
                 ),
               ],

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:next_gen/app/modules/search/models/search_filter.dart';
-import 'package:next_gen/core/theme/app_theme.dart';
+import 'package:next_gen/core/theme/role_themes.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
 
 /// A modal widget for filtering search results
@@ -34,6 +35,9 @@ class FilterModal extends StatefulWidget {
 class _FilterModalState extends State<FilterModal> {
   late SearchFilter _filter;
   final TextEditingController _locationController = TextEditingController();
+  final RxBool _showSaveSearchOption = false.obs;
+  final TextEditingController _saveSearchNameController =
+      TextEditingController();
 
   // Job type options
   final List<String> _jobTypeOptions = [
@@ -42,11 +46,10 @@ class _FilterModalState extends State<FilterModal> {
     'Contract',
     'Internship',
     'Temporary',
+    'Freelance',
   ];
 
-  // These options are defined for future implementation
-  // of additional filter options
-  // ignore: unused_field
+  // Experience options
   final List<String> _experienceOptions = [
     '0-1 years',
     '1-3 years',
@@ -55,7 +58,7 @@ class _FilterModalState extends State<FilterModal> {
     '10+ years',
   ];
 
-  // ignore: unused_field
+  // Education options
   final List<String> _educationOptions = [
     'High School',
     "Associate's",
@@ -64,13 +67,18 @@ class _FilterModalState extends State<FilterModal> {
     'Doctorate',
   ];
 
-  // ignore: unused_field
+  // Industry options
   final List<String> _industryOptions = [
     'Automotive',
     'Manufacturing',
     'Engineering',
     'Technology',
     'Sales',
+    'Healthcare',
+    'Finance',
+    'Education',
+    'Retail',
+    'Hospitality',
   ];
 
   @override
@@ -83,18 +91,40 @@ class _FilterModalState extends State<FilterModal> {
           initialFilter.maxSalary > 200000 ? 200000 : initialFilter.maxSalary,
     );
     _locationController.text = _filter.location;
+
+    // Show save search option if filter is not empty
+    _showSaveSearchOption.value = initialFilter.isNotEmpty;
   }
 
   @override
   void dispose() {
     _locationController.dispose();
+    _saveSearchNameController.dispose();
     super.dispose();
+  }
+
+  /// Get the number of active filters
+  int _getActiveFilterCount() {
+    var count = 0;
+    if (_filter.location.isNotEmpty) count++;
+    if (_filter.minSalary > 0) count++;
+    if (_filter.maxSalary < 200000) count++;
+    if (_filter.jobTypes.isNotEmpty) count++;
+    if (_filter.experience.isNotEmpty) count++;
+    if (_filter.education.isNotEmpty) count++;
+    if (_filter.industries.isNotEmpty) count++;
+    if (_filter.isRemote) count++;
+    if (_filter.sortBy != SortOption.relevance) count++;
+    return count;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+
+    // Define employee blue color
+    const employeeBlue = RoleThemes.employeePrimary;
+    final employeeLightBlue = employeeBlue.withAlpha(26); // 0.1 * 255 = 26
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -109,15 +139,31 @@ class _FilterModalState extends State<FilterModal> {
                 'Filter Jobs',
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: employeeBlue,
                 ),
               ),
               IconButton(
-                icon: const Icon(FontAwesomeIcons.xmark),
+                icon: const Icon(
+                  FontAwesomeIcons.xmark,
+                  color: employeeBlue,
+                ),
                 onPressed: widget.onCancel,
-                color: isDarkMode ? AppTheme.slateGray : AppTheme.slateGray,
               ),
             ],
           ),
+
+          // Active filters count
+          if (_filter.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                '${_getActiveFilterCount()} active filters',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: employeeBlue,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           const SizedBox(height: 24),
 
           // Location
@@ -125,6 +171,7 @@ class _FilterModalState extends State<FilterModal> {
             'Location',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: employeeBlue,
             ),
           ),
           const SizedBox(height: 8),
@@ -132,18 +179,26 @@ class _FilterModalState extends State<FilterModal> {
             controller: _locationController,
             decoration: InputDecoration(
               hintText: 'Enter location',
-              prefixIcon: Icon(
+              prefixIcon: const Icon(
                 FontAwesomeIcons.locationDot,
                 size: 16,
-                color: isDarkMode ? AppTheme.slateGray : AppTheme.slateGray,
+                color: employeeBlue,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: employeeBlue, width: 2),
+              ),
+              filled: true,
+              fillColor: employeeLightBlue,
             ),
             onChanged: (value) {
               setState(() {
                 _filter = _filter.copyWith(location: value);
+                // Show save search option if filter is not empty
+                _showSaveSearchOption.value = _filter.isNotEmpty;
               });
             },
           ),
@@ -154,6 +209,7 @@ class _FilterModalState extends State<FilterModal> {
             'Salary Range',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: employeeBlue,
             ),
           ),
           const SizedBox(height: 8),
@@ -164,6 +220,8 @@ class _FilterModalState extends State<FilterModal> {
             ),
             max: 200000,
             divisions: 20,
+            activeColor: employeeBlue,
+            inactiveColor: employeeLightBlue,
             labels: RangeLabels(
               '\$${_filter.minSalary}',
               '\$${_filter.maxSalary}',
@@ -174,6 +232,8 @@ class _FilterModalState extends State<FilterModal> {
                   minSalary: values.start.round(),
                   maxSalary: values.end.round(),
                 );
+                // Show save search option if filter is not empty
+                _showSaveSearchOption.value = _filter.isNotEmpty;
               });
             },
           ),
@@ -182,11 +242,15 @@ class _FilterModalState extends State<FilterModal> {
             children: [
               Text(
                 '\$${_filter.minSalary}',
-                style: theme.textTheme.bodyMedium,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: employeeBlue,
+                ),
               ),
               Text(
                 '\$${_filter.maxSalary}',
-                style: theme.textTheme.bodyMedium,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: employeeBlue,
+                ),
               ),
             ],
           ),
@@ -197,6 +261,7 @@ class _FilterModalState extends State<FilterModal> {
             'Job Type',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: employeeBlue,
             ),
           ),
           const SizedBox(height: 8),
@@ -208,6 +273,17 @@ class _FilterModalState extends State<FilterModal> {
               return FilterChip(
                 label: Text(type),
                 selected: isSelected,
+                selectedColor: employeeLightBlue,
+                checkmarkColor: employeeBlue,
+                labelStyle: TextStyle(
+                  color: isSelected
+                      ? employeeBlue
+                      : theme.textTheme.bodyMedium?.color,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                side: BorderSide(
+                  color: isSelected ? employeeBlue : Colors.grey.shade300,
+                ),
                 onSelected: (selected) {
                   setState(() {
                     if (selected) {
@@ -220,6 +296,8 @@ class _FilterModalState extends State<FilterModal> {
                             _filter.jobTypes.where((t) => t != type).toList(),
                       );
                     }
+                    // Show save search option if filter is not empty
+                    _showSaveSearchOption.value = _filter.isNotEmpty;
                   });
                 },
               );
@@ -234,18 +312,171 @@ class _FilterModalState extends State<FilterModal> {
                 'Remote Only',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: employeeBlue,
                 ),
               ),
               const Spacer(),
               Switch(
                 value: _filter.isRemote,
+                activeColor: employeeBlue,
+                activeTrackColor: employeeLightBlue,
                 onChanged: (value) {
                   setState(() {
                     _filter = _filter.copyWith(isRemote: value);
+                    // Show save search option if filter is not empty
+                    _showSaveSearchOption.value = _filter.isNotEmpty;
                   });
                 },
               ),
             ],
+          ),
+          const SizedBox(height: 24),
+
+          // Experience Level
+          Text(
+            'Experience Level',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: employeeBlue,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _experienceOptions.map((exp) {
+              final isSelected = _filter.experience.contains(exp);
+              return FilterChip(
+                label: Text(exp),
+                selected: isSelected,
+                selectedColor: employeeLightBlue,
+                checkmarkColor: employeeBlue,
+                labelStyle: TextStyle(
+                  color: isSelected
+                      ? employeeBlue
+                      : theme.textTheme.bodyMedium?.color,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                side: BorderSide(
+                  color: isSelected ? employeeBlue : Colors.grey.shade300,
+                ),
+                onSelected: (selected) {
+                  setState(() {
+                    if (selected) {
+                      _filter = _filter.copyWith(
+                        experience: [..._filter.experience, exp],
+                      );
+                    } else {
+                      _filter = _filter.copyWith(
+                        experience:
+                            _filter.experience.where((e) => e != exp).toList(),
+                      );
+                    }
+                    // Show save search option if filter is not empty
+                    _showSaveSearchOption.value = _filter.isNotEmpty;
+                  });
+                },
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+
+          // Education Level
+          Text(
+            'Education Level',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: employeeBlue,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _educationOptions.map((edu) {
+              final isSelected = _filter.education.contains(edu);
+              return FilterChip(
+                label: Text(edu),
+                selected: isSelected,
+                selectedColor: employeeLightBlue,
+                checkmarkColor: employeeBlue,
+                labelStyle: TextStyle(
+                  color: isSelected
+                      ? employeeBlue
+                      : theme.textTheme.bodyMedium?.color,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                side: BorderSide(
+                  color: isSelected ? employeeBlue : Colors.grey.shade300,
+                ),
+                onSelected: (selected) {
+                  setState(() {
+                    if (selected) {
+                      _filter = _filter.copyWith(
+                        education: [..._filter.education, edu],
+                      );
+                    } else {
+                      _filter = _filter.copyWith(
+                        education:
+                            _filter.education.where((e) => e != edu).toList(),
+                      );
+                    }
+                    // Show save search option if filter is not empty
+                    _showSaveSearchOption.value = _filter.isNotEmpty;
+                  });
+                },
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+
+          // Industry
+          Text(
+            'Industry',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: employeeBlue,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _industryOptions.map((industry) {
+              final isSelected = _filter.industries.contains(industry);
+              return FilterChip(
+                label: Text(industry),
+                selected: isSelected,
+                selectedColor: employeeLightBlue,
+                checkmarkColor: employeeBlue,
+                labelStyle: TextStyle(
+                  color: isSelected
+                      ? employeeBlue
+                      : theme.textTheme.bodyMedium?.color,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                side: BorderSide(
+                  color: isSelected ? employeeBlue : Colors.grey.shade300,
+                ),
+                onSelected: (selected) {
+                  setState(() {
+                    if (selected) {
+                      _filter = _filter.copyWith(
+                        industries: [..._filter.industries, industry],
+                      );
+                    } else {
+                      _filter = _filter.copyWith(
+                        industries: _filter.industries
+                            .where((i) => i != industry)
+                            .toList(),
+                      );
+                    }
+                    // Show save search option if filter is not empty
+                    _showSaveSearchOption.value = _filter.isNotEmpty;
+                  });
+                },
+              );
+            }).toList(),
           ),
           const SizedBox(height: 24),
 
@@ -254,6 +485,7 @@ class _FilterModalState extends State<FilterModal> {
             'Sort By',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: employeeBlue,
             ),
           ),
           const SizedBox(height: 8),
@@ -263,6 +495,18 @@ class _FilterModalState extends State<FilterModal> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: employeeBlue, width: 2),
+              ),
+              filled: true,
+              fillColor: employeeLightBlue,
+            ),
+            dropdownColor: theme.cardColor,
+            icon: const Icon(
+              FontAwesomeIcons.chevronDown,
+              color: employeeBlue,
+              size: 16,
             ),
             items: SortOption.values.map((option) {
               return DropdownMenuItem<SortOption>(
@@ -274,6 +518,8 @@ class _FilterModalState extends State<FilterModal> {
               if (value != null) {
                 setState(() {
                   _filter = _filter.copyWith(sortBy: value);
+                  // Show save search option if filter is not empty
+                  _showSaveSearchOption.value = _filter.isNotEmpty;
                 });
               }
             },
@@ -287,6 +533,7 @@ class _FilterModalState extends State<FilterModal> {
                 'Sort Order',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: employeeBlue,
                 ),
               ),
               const Spacer(),
@@ -302,9 +549,15 @@ class _FilterModalState extends State<FilterModal> {
                           ? SortOrder.ascending
                           : SortOrder.descending,
                     );
+                    // Show save search option if filter is not empty
+                    _showSaveSearchOption.value = _filter.isNotEmpty;
                   });
                 },
                 borderRadius: BorderRadius.circular(8),
+                selectedBorderColor: employeeBlue,
+                selectedColor: Colors.white,
+                fillColor: employeeBlue,
+                color: employeeBlue,
                 children: const [
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
@@ -318,7 +571,74 @@ class _FilterModalState extends State<FilterModal> {
               ),
             ],
           ),
-          const SizedBox(height: 32),
+
+          // Save Search Option
+          Obx(() {
+            if (_showSaveSearchOption.value) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  Text(
+                    'Save This Search',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: employeeBlue,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _saveSearchNameController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter a name for this search',
+                            prefixIcon: const Icon(
+                              FontAwesomeIcons.bookmark,
+                              size: 16,
+                              color: employeeBlue,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: employeeBlue,
+                                width: 2,
+                              ),
+                            ),
+                            filled: true,
+                            fillColor: employeeLightBlue,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(
+                          FontAwesomeIcons.floppyDisk,
+                          color: employeeBlue,
+                        ),
+                        onPressed: () {
+                          // TODO(developer): Implement save search functionality
+                          Get.snackbar(
+                            'Search Saved',
+                            'Your search has been saved',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: employeeBlue,
+                            colorText: Colors.white,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            } else {
+              return const SizedBox(height: 32);
+            }
+          }),
 
           // Buttons
           Row(
@@ -326,7 +646,10 @@ class _FilterModalState extends State<FilterModal> {
               Expanded(
                 child: CustomNeoPopButton(
                   color: theme.colorScheme.error,
-                  onTap: widget.onReset,
+                  onTap: () {
+                    _saveSearchNameController.clear();
+                    widget.onReset();
+                  },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
@@ -343,7 +666,7 @@ class _FilterModalState extends State<FilterModal> {
               const SizedBox(width: 16),
               Expanded(
                 child: CustomNeoPopButton(
-                  color: theme.colorScheme.primary,
+                  color: employeeBlue,
                   onTap: () => widget.onApply(_filter),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),

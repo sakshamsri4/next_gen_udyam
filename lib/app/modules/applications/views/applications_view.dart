@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:next_gen/app/modules/applications/controllers/applications_controller.dart';
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
-import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/ui/components/loaders/custom_lottie.dart';
@@ -43,7 +43,7 @@ class ApplicationsView extends GetView<ApplicationsController> {
         ),
       ),
       drawer: const CustomDrawer(),
-      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+      bottomNavigationBar: const RoleBasedBottomNav(),
       body: RefreshIndicator(
         onRefresh: controller.refreshApplications,
         child: Obx(() {

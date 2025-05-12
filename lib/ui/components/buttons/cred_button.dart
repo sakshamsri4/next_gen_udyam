@@ -194,7 +194,7 @@ class CredButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius.r),
         boxShadow: [
           BoxShadow(
-            color: bgColor.withAlpha(76), // 0.3 opacity
+            color: bgColor.withAlpha(76), // 0.3 * 255 = 76
             blurRadius: elevation,
             offset: const Offset(0, 4),
           ),

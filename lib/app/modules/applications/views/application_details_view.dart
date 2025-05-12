@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:next_gen/app/modules/applications/controllers/applications_controller.dart';
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
 
-import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
 /// Application details view
@@ -40,7 +40,7 @@ class ApplicationDetailsView extends GetView<ApplicationsController> {
           onPressed: () => Get.back<void>(),
         ),
       ),
-      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+      bottomNavigationBar: const RoleBasedBottomNav(),
       body: Obx(() {
         if (controller.isDetailLoading) {
           return const Center(

@@ -6,7 +6,7 @@ import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/saved_jobs/controllers/saved_jobs_controller.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
-import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/ui/components/cards/custom_job_card.dart';
@@ -41,7 +41,7 @@ class SavedJobsView extends GetView<SavedJobsController> {
           onPressed: () => navigationController.toggleDrawer(scaffoldKey),
         ),
       ),
-      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+      bottomNavigationBar: const RoleBasedBottomNav(),
       body: RefreshIndicator(
         onRefresh: controller.refreshSavedJobs,
         child: Obx(() {

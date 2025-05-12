@@ -91,14 +91,9 @@ class _AppState extends State<App> {
       Get.put(AuthController(), permanent: true);
     }
 
-    // Initialize ScreenUtil before any widgets that use it
-    // Ensure ScreenUtil is initialized synchronously to prevent LateInitializationError
-    ScreenUtil.init(
-      context,
-      designSize: const Size(375, 812),
-      splitScreenMode: true,
-      minTextAdapt: true,
-    );
+    // We'll use a single ScreenUtilInit to properly initialize ScreenUtil
+    // This prevents LateInitializationError in the _splitScreenMode field
+    // The init method is called automatically by ScreenUtilInit
 
     return ScreenUtilInit(
       // Design size based on standard mobile device dimensions
@@ -107,6 +102,7 @@ class _AppState extends State<App> {
       splitScreenMode: true,
       // Use minimal text scaling to maintain design integrity
       minTextAdapt: true,
+      // Initialize ScreenUtil before building the app
       builder: (context, child) {
         return GetMaterialApp(
           title: 'Next Gen Job Portal',

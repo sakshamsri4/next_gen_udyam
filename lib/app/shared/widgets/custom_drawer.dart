@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -21,14 +20,10 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
+  // Controllers
   late final AuthController _authController;
   late final NavigationController _navigationController;
-
-  // Store the values locally to avoid accessing .value in build method
-  UserType? _userRole;
-  int _selectedIndex = 0;
-  User? _user;
-  bool _isLoggedIn = false;
+  late final LoggerService? _logger;
 
   @override
   void initState() {
@@ -38,37 +33,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
       _authController = Get.find<AuthController>();
       _navigationController = Get.find<NavigationController>();
 
-      // Initialize local values
-      _userRole = _navigationController.userRole.value;
-      _selectedIndex = _navigationController.selectedIndex.value;
-      _user = _authController.user.value;
-      _isLoggedIn = _authController.isLoggedIn;
+      // Try to get logger service
+      try {
+        _logger = Get.find<LoggerService>();
+      } catch (e) {
+        debugPrint('LoggerService not available: $e');
+        _logger = null;
+      }
 
-      // Set up listeners to update local values when the observables change
-      ever(_navigationController.userRole, (value) {
-        if (mounted) {
-          setState(() {
-            _userRole = value;
-          });
-        }
-      });
-
-      ever(_navigationController.selectedIndex, (value) {
-        if (mounted) {
-          setState(() {
-            _selectedIndex = value;
-          });
-        }
-      });
-
-      ever(_authController.user, (value) {
-        if (mounted) {
-          setState(() {
-            _user = value;
-            _isLoggedIn = value != null;
-          });
-        }
-      });
+      _logger?.d('CustomDrawer initialized successfully');
     } catch (e) {
       // Handle initialization errors
       debugPrint('Error initializing CustomDrawer: $e');
@@ -95,7 +68,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         child: Column(
           children: [
             // Header with user info
-            _buildHeader(context),
+            Obx(() => _buildHeader(context)),
 
             const Divider(),
 
@@ -105,8 +78,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 padding: EdgeInsets.zero,
                 children: [
                   // Show different navigation items based on user role
-                  // Using local state variable _userRole instead of accessing .value directly
-                  _buildNavigationItems(context),
+                  // Using Obx for reactive UI updates
+                  Obx(() => _buildNavigationItems(context)),
 
                   const Divider(),
 
@@ -115,35 +88,30 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     context: context,
                     icon: FontAwesomeIcons.gear,
                     title: 'Settings',
-                    onTap: () {
-                      Get.toNamed<dynamic>(Routes.settings);
-                      Get.back<void>();
-                    },
+                    onTap: () => _navigateAndClose(Routes.settings),
                   ),
                   _buildNavItem(
                     context: context,
                     icon: FontAwesomeIcons.circleQuestion,
                     title: 'Help & Support',
-                    onTap: () {
-                      Get.toNamed<dynamic>(Routes.support);
-                      Get.back<void>();
-                    },
+                    onTap: () => _navigateAndClose(Routes.support),
                   ),
                   _buildNavItem(
                     context: context,
                     icon: FontAwesomeIcons.circleInfo,
                     title: 'About',
-                    onTap: () {
-                      Get.toNamed<dynamic>(Routes.about);
-                      Get.back<void>();
-                    },
+                    onTap: () => _navigateAndClose(Routes.about),
                   ),
                 ],
               ),
             ),
 
-            // Logout button at the bottom - using local state variable _isLoggedIn
-            if (_isLoggedIn) _buildLogoutButton(context),
+            // Logout button at the bottom - using Obx for reactive UI updates
+            Obx(
+              () => _authController.isLoggedIn
+                  ? _buildLogoutButton(context)
+                  : const SizedBox.shrink(),
+            ),
           ],
         ),
       ),
@@ -153,6 +121,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   // Build the header section with user info
   Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
+    // Get the current user directly from the controller
+    final currentUser = _authController.user.value;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -167,10 +137,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
           ),
 
-          // User avatar - using local state variable _user
-          if (_user != null)
+          // User avatar - using controller value directly
+          if (currentUser != null)
             CustomAvatar(
-              imageUrl: _user?.photoURL ?? '',
+              imageUrl: currentUser.photoURL ?? '',
               height: 80,
               width: 80,
             )
@@ -187,10 +157,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
           const SizedBox(height: 16),
 
-          // User name - using local state variable _user
-          if (_user != null)
+          // User name - using controller value directly
+          if (currentUser != null)
             Text(
-              _user?.displayName ?? 'User',
+              currentUser.displayName ?? 'User',
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -202,10 +172,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
               label: const Text('Sign In'),
             ),
 
-          // User email - using local state variable _user
-          if (_user != null)
+          // User email - using controller value directly
+          if (currentUser != null)
             Text(
-              _user?.email ?? '',
+              currentUser.email ?? '',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withAlpha(179),
               ),
@@ -217,8 +187,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   // Build navigation items based on user role
   Widget _buildNavigationItems(BuildContext context) {
-    // Using local state variable _userRole instead of accessing .value directly
-    if (_userRole == UserType.employer) {
+    // Get values directly from controllers
+    final userRole = _navigationController.userRole.value;
+    final selectedIndex = _navigationController.selectedIndex.value;
+
+    if (userRole == UserType.employer) {
       // Employer navigation items
       return Column(
         children: [
@@ -230,7 +203,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(0);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 0,
+            isSelected: selectedIndex == 0,
           ),
           _buildNavItem(
             context: context,
@@ -240,7 +213,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(1);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 1,
+            isSelected: selectedIndex == 1,
           ),
           _buildNavItem(
             context: context,
@@ -250,7 +223,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(2);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 2,
+            isSelected: selectedIndex == 2,
           ),
           _buildNavItem(
             context: context,
@@ -260,7 +233,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(3);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 3,
+            isSelected: selectedIndex == 3,
           ),
           _buildNavItem(
             context: context,
@@ -270,11 +243,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(4);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 4,
+            isSelected: selectedIndex == 4,
           ),
         ],
       );
-    } else if (_userRole == UserType.admin) {
+    } else if (userRole == UserType.admin) {
       // Admin navigation items
       return Column(
         children: [
@@ -286,7 +259,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(0);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 0,
+            isSelected: selectedIndex == 0,
           ),
           _buildNavItem(
             context: context,
@@ -296,7 +269,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(1);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 1,
+            isSelected: selectedIndex == 1,
           ),
           _buildNavItem(
             context: context,
@@ -306,7 +279,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(2);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 2,
+            isSelected: selectedIndex == 2,
           ),
           _buildNavItem(
             context: context,
@@ -316,7 +289,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(3);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 3,
+            isSelected: selectedIndex == 3,
           ),
           _buildNavItem(
             context: context,
@@ -326,7 +299,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(4);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 4,
+            isSelected: selectedIndex == 4,
           ),
         ],
       );
@@ -342,7 +315,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(0);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 0,
+            isSelected: selectedIndex == 0,
           ),
           _buildNavItem(
             context: context,
@@ -352,7 +325,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(1);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 1,
+            isSelected: selectedIndex == 1,
           ),
           _buildNavItem(
             context: context,
@@ -362,7 +335,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(2);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 2,
+            isSelected: selectedIndex == 2,
           ),
           _buildNavItem(
             context: context,
@@ -372,7 +345,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(3);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 3,
+            isSelected: selectedIndex == 3,
           ),
           _buildNavItem(
             context: context,
@@ -382,7 +355,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               _navigationController.changeIndex(4);
               Get.back<void>();
             },
-            isSelected: _selectedIndex == 4,
+            isSelected: selectedIndex == 4,
           ),
         ],
       );
@@ -427,6 +400,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
         vertical: 4,
       ),
     );
+  }
+
+  // Helper method to navigate to a route and close the drawer
+  void _navigateAndClose(String route) {
+    // Using a separate function instead of cascade notation
+    // because Get.toNamed can return null and cascade would cause issues
+    final result = Get.toNamed<dynamic>(route);
+    // Only close drawer if navigation was successful
+    if (result != null) {
+      Get.back<void>();
+    } else {
+      Get.back<void>();
+    }
   }
 
   // Build the logout button

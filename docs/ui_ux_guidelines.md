@@ -36,26 +36,31 @@ This document outlines the UI/UX guidelines for the Next Gen Udyam job portal ap
 ### Employee (Job Seeker) Interface
 
 #### Primary Navigation
-- **Home**: Personalized job recommendations and activity feed
-- **Search**: Advanced job search with filters and saved searches
-- **Saved**: Bookmarked jobs and saved searches
+- **Discover**: Personalized job recommendations and activity feed
+- **Jobs**: Combined search and saved jobs with segmented views
 - **Applications**: Application tracking and history
 - **Profile**: Personal profile and resume management
 
+This streamlined 4-tab structure follows modern design principles and reduces cognitive load while maintaining all key functionality through proper segmentation within tabs.
+
 #### Key Screens
-1. **Home Screen**
+1. **Discover Screen**
    - Personalized job recommendations based on profile and history
    - Recently viewed jobs
    - Application status updates
    - Quick search bar
    - Job market insights relevant to the user's field
+   - Activity feed with relevant industry news
 
-2. **Job Search Screen**
+2. **Jobs Screen**
+   - Segmented view with tabs for "Search" and "Saved"
    - Prominent search bar with advanced filters
    - Filter chips for quick refinement
    - Sort options (relevance, date, salary)
    - Search results with clear job cards
    - Save search functionality
+   - Easy access to saved/bookmarked jobs
+   - Quick toggle between search and saved views
 
 3. **Job Details Screen**
    - Clear job title, company, and key details at the top
@@ -84,8 +89,9 @@ This document outlines the UI/UX guidelines for the Next Gen Udyam job portal ap
 - **Dashboard**: Key metrics and activity overview
 - **Jobs**: Job posting management
 - **Applicants**: Applicant tracking and management
-- **Company**: Company profile management
-- **Settings**: Account and notification settings
+- **Company**: Company profile and settings combined
+
+This streamlined 4-tab structure follows modern design principles and reduces cognitive load while maintaining all key functionality through proper organization within each tab.
 
 #### Key Screens
 1. **Dashboard Screen**

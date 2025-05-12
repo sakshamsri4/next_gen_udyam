@@ -7,9 +7,9 @@ import 'package:next_gen/app/modules/job_posting/controllers/job_posting_control
 import 'package:next_gen/app/modules/job_posting/models/job_post_model.dart';
 import 'package:next_gen/app/modules/job_posting/views/widgets/job_creation_form.dart';
 import 'package:next_gen/app/modules/job_posting/views/widgets/job_list_item.dart';
-import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:next_gen/app/shared/widgets/empty_state.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/job_management_shimmer.dart';
 
@@ -42,7 +42,7 @@ class JobPostingView extends GetView<JobPostingController> {
         ],
       ),
       drawer: const CustomDrawer(),
-      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+      bottomNavigationBar: const RoleBasedBottomNav(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showJobCreationForm(context),
         backgroundColor: theme.colorScheme.primary,

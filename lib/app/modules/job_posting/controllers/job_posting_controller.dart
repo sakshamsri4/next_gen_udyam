@@ -28,6 +28,9 @@ class JobPostingController extends GetxController
   Rx<CompanyProfileModel?>? _testProfile;
 
   /// Set a test profile for testing purposes
+  /// Note: Using a method instead of a setter because the parameter type is complex
+  /// and a setter would be less clear
+  // ignore: use_setters_to_change_properties
   void setTestProfile(Rx<CompanyProfileModel?> profile) {
     _testProfile = profile;
   }

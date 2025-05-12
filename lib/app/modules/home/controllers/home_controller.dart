@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/app/modules/home/models/application_update.dart';
 import 'package:next_gen/app/modules/home/models/job_category.dart';
 import 'package:next_gen/app/modules/home/services/job_service.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
@@ -47,6 +48,14 @@ class HomeController extends GetxController {
   // Carousel indicator
   final RxInt _carouselIndex = 0.obs;
 
+  // Employee home screen data
+  final RxString userName = ''.obs;
+  final RxBool isLoading = false.obs;
+  final RxList<JobModel> recommendedJobs = <JobModel>[].obs;
+  final RxList<JobModel> recentlyViewedJobs = <JobModel>[].obs;
+  final RxList<ApplicationUpdate> applicationUpdates =
+      <ApplicationUpdate>[].obs;
+
   /// Get featured jobs loading state
   bool get isFeaturedJobsLoading => _isFeaturedJobsLoading.value;
 
@@ -87,6 +96,7 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     _loadHomeData();
+    refreshJobs(); // Load employee home screen data
   }
 
   @override
@@ -195,11 +205,10 @@ class HomeController extends GetxController {
   Future<void> _loadSavedJobs() async {
     try {
       if (_authController.isLoggedIn) {
-        final userId = _authController.user.value?.uid ?? '';
-        if (userId.isNotEmpty) {
-          final savedJobs = await _jobService.getSavedJobs(userId);
-          _savedJobIds.assignAll(savedJobs);
-        }
+        // Get saved job IDs
+        final savedJobs = await _jobService.getSavedJobs();
+        final savedJobIds = savedJobs.map((job) => job.id).toList();
+        _savedJobIds.assignAll(savedJobIds);
       }
     } catch (e) {
       _logger.e('Error loading saved jobs', e);
@@ -282,5 +291,124 @@ class HomeController extends GetxController {
   /// Refresh all data
   Future<void> refreshData() async {
     await _loadHomeData();
+  }
+
+  /// Refresh jobs for employee home screen
+  Future<void> refreshJobs() async {
+    isLoading.value = true;
+
+    try {
+      // Load user name
+      _loadUserName();
+
+      // Load recommended jobs
+      await _loadRecommendedJobs();
+
+      // Load recently viewed jobs
+      await _loadRecentlyViewedJobs();
+
+      // Load application updates
+      await _loadApplicationUpdates();
+    } catch (e) {
+      _logger.e('Error refreshing jobs', e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Load user name from auth controller
+  void _loadUserName() {
+    try {
+      final user = _authController.user.value;
+      if (user != null && user.displayName != null) {
+        userName.value = user.displayName!;
+      } else {
+        userName.value = 'there';
+      }
+    } catch (e) {
+      _logger.e('Error loading user name', e);
+      userName.value = 'there';
+    }
+  }
+
+  /// Load recommended jobs
+  Future<void> _loadRecommendedJobs() async {
+    try {
+      // In a real app, this would use a recommendation algorithm
+      // For now, we'll just use the featured jobs
+      final jobs = await _jobService.getFeaturedJobs();
+      recommendedJobs.assignAll(jobs);
+    } catch (e) {
+      _logger.e('Error loading recommended jobs', e);
+      recommendedJobs.clear();
+    }
+  }
+
+  /// Load recently viewed jobs
+  Future<void> _loadRecentlyViewedJobs() async {
+    try {
+      // In a real app, this would load from local storage or user history
+      // For now, we'll just use the recent jobs
+      final jobs = await _jobService.getRecentJobs();
+      recentlyViewedJobs.assignAll(jobs);
+    } catch (e) {
+      _logger.e('Error loading recently viewed jobs', e);
+      recentlyViewedJobs.clear();
+    }
+  }
+
+  /// Load application updates
+  Future<void> _loadApplicationUpdates() async {
+    try {
+      // In a real app, this would load from the user's applications
+      // For now, we'll just use mock data
+      applicationUpdates.assignAll([
+        ApplicationUpdate(
+          id: '1',
+          jobId: '101',
+          jobTitle: 'Senior Developer',
+          companyName: 'Tech Solutions',
+          status: 'Application Received',
+          date: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+        ApplicationUpdate(
+          id: '2',
+          jobId: '102',
+          jobTitle: 'Product Manager',
+          companyName: 'Innovate Inc',
+          status: 'Interview Scheduled',
+          date: DateTime.now().subtract(const Duration(days: 3)),
+          message: 'Interview scheduled for next Monday at 10:00 AM',
+        ),
+        ApplicationUpdate(
+          id: '3',
+          jobId: '103',
+          jobTitle: 'UX Designer',
+          companyName: 'Creative Designs',
+          status: 'Application Rejected',
+          date: DateTime.now().subtract(const Duration(days: 5)),
+          message:
+              'Thank you for your interest, but we have decided to move forward with other candidates.',
+        ),
+      ]);
+    } catch (e) {
+      _logger.e('Error loading application updates', e);
+      applicationUpdates.clear();
+    }
+  }
+
+  /// View job details
+  void viewJobDetails(String jobId) {
+    Get.toNamed<dynamic>('/jobs/$jobId');
+  }
+
+  /// View application details
+  void viewApplicationDetails(String applicationId) {
+    Get.toNamed<dynamic>('/applications/$applicationId');
+  }
+
+  /// Search jobs
+  void searchJobs(String query) {
+    Get.toNamed<dynamic>('/search', arguments: {'query': query});
   }
 }

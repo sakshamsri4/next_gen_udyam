@@ -111,8 +111,8 @@ class JobDetailsController extends GetxController {
   /// Load job details by ID
   Future<void> loadJobDetails(String jobId) async {
     try {
-      // Print directly to console for debugging
-      print('''
+      // Log debugging information
+      _logger.d('''
 ===== DEBUG INFO =====
 Loading job details for ID: $jobId
 Current loading state: ${isLoading.value}
@@ -128,7 +128,7 @@ Current job value: ${job.value?.title ?? 'null'}
       var operationTimedOut = false;
       Future.delayed(const Duration(seconds: 10), () {
         if (isLoading.value) {
-          print('Operation timed out after 10 seconds');
+          _logger.w('Operation timed out after 10 seconds');
           operationTimedOut = true;
           isLoading.value = false;
           errorMessage.value = 'Operation timed out. Please try again.';
@@ -136,34 +136,35 @@ Current job value: ${job.value?.title ?? 'null'}
       });
 
       // Get job details
-      print('Fetching job data from service for ID: $jobId');
+      _logger.d('Fetching job data from service for ID: $jobId');
       final jobData = await _jobDetailsService.getJobDetails(jobId);
 
       // Check if operation was cancelled due to timeout
       if (operationTimedOut) {
-        print('Operation was already cancelled due to timeout');
+        _logger.w('Operation was already cancelled due to timeout');
         return;
       }
 
       if (jobData == null) {
-        print('Job not found with ID: $jobId');
+        _logger.w('Job not found with ID: $jobId');
         errorMessage.value = 'Job not found';
         isLoading.value = false;
         return;
       }
 
-      print('Job data received: ${jobData.title}');
+      _logger.d('Job data received: ${jobData.title}');
       job.value = jobData;
 
       // Get company details - with error handling
       try {
-        print('Fetching company details for: ${jobData.company}');
+        _logger.d('Fetching company details for: ${jobData.company}');
         final company =
             await _jobDetailsService.getCompanyDetails(jobData.company);
         companyDetails.value = company;
-        print('Company details received: ${company != null ? 'yes' : 'no'}');
+        _logger
+            .d('Company details received: ${company != null ? 'yes' : 'no'}');
       } catch (e) {
-        print('Error fetching company details: $e');
+        _logger.e('Error fetching company details', e);
         // Continue with default company details
         companyDetails.value = {
           'name': jobData.company,
@@ -173,16 +174,16 @@ Current job value: ${job.value?.title ?? 'null'}
 
       // Get similar jobs - with error handling
       try {
-        print('Fetching similar jobs');
+        _logger.d('Fetching similar jobs');
         final similar = await _jobDetailsService.getSimilarJobs(
           currentJobId: jobId,
           jobType: jobData.jobType,
           industry: jobData.industry,
         );
         similarJobs.value = similar;
-        print('Similar jobs received: ${similar.length}');
+        _logger.d('Similar jobs received: ${similar.length}');
       } catch (e) {
-        print('Error fetching similar jobs: $e');
+        _logger.e('Error fetching similar jobs', e);
         // Continue with empty similar jobs
         similarJobs.value = [];
       }
@@ -192,44 +193,44 @@ Current job value: ${job.value?.title ?? 'null'}
         final userId = _authController.user.value?.uid;
         if (userId != null) {
           try {
-            print('Checking if user $userId has applied for job $jobId');
+            _logger.d('Checking if user $userId has applied for job $jobId');
             // Check if user has applied for the job
             hasUserApplied.value = await _jobDetailsService.hasApplied(
               userId: userId,
               jobId: jobId,
             );
-            print('User has applied: ${hasUserApplied.value}');
+            _logger.d('User has applied: ${hasUserApplied.value}');
           } catch (e) {
-            print('Error checking application status: $e');
+            _logger.e('Error checking application status', e);
             // Default to not applied
             hasUserApplied.value = false;
           }
 
           // Check if job is saved
           try {
-            print('Checking if job is saved');
+            _logger.d('Checking if job is saved');
             final jobService = Get.find<JobService>();
-            final savedJobs = await jobService.getSavedJobs(userId);
-            isJobSaved.value = savedJobs.contains(jobId);
-            print('Job is saved: ${isJobSaved.value}');
+            final savedJobs = await jobService.getSavedJobs();
+            isJobSaved.value = savedJobs.any((job) => job.id == jobId);
+            _logger.d('Job is saved: ${isJobSaved.value}');
           } catch (e) {
-            print('Error checking saved status: $e');
+            _logger.e('Error checking saved status', e);
             // Default to not saved
             isJobSaved.value = false;
           }
         }
       }
 
-      print('Job details loading completed successfully');
+      _logger.i('Job details loading completed successfully');
 
       // Force UI update by setting isLoading to false
       isLoading.value = false;
     } catch (e) {
-      print('ERROR LOADING JOB DETAILS: $e');
+      _logger.e('ERROR LOADING JOB DETAILS', e);
       // Create a dummy job for testing if needed
       if (Get.isRegistered<JobModel>()) {
         try {
-          print('Creating fallback job model');
+          _logger.d('Creating fallback job model');
           job.value = JobModel(
             id: jobId,
             title: 'Sample Job (Error Loading)',
@@ -241,13 +242,13 @@ Current job value: ${job.value?.title ?? 'null'}
             postedDate: DateTime.now(),
           );
         } catch (modelError) {
-          print('Error creating fallback model: $modelError');
+          _logger.e('Error creating fallback model', modelError);
         }
       }
 
       errorMessage.value = 'Failed to load job details: $e';
     } finally {
-      print('Setting isLoading to false in finally block');
+      _logger.d('Setting isLoading to false in finally block');
       isLoading.value = false;
     }
   }

@@ -7,6 +7,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
+import 'package:next_gen/app/modules/auth/services/signup_session_service.dart';
 import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/firebase/firebase_initializer.dart';
 // Analytics service commented out for now, will be implemented later
@@ -56,41 +57,66 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   // Create a FirebaseInitializer instance only once
   FirebaseInitializer? firebaseInitializer;
 
-  try {
-    // Check if FirebaseInitializer is already registered
-    if (serviceLocator.isRegistered<FirebaseInitializer>()) {
-      debugPrint(
-        'FirebaseInitializer already registered, using existing instance',
+  // Use a retry mechanism for Firebase initialization
+  for (var attempt = 1; attempt <= 3; attempt++) {
+    try {
+      debugPrint('Firebase initialization attempt $attempt');
+
+      // Check if FirebaseInitializer is already registered
+      if (serviceLocator.isRegistered<FirebaseInitializer>()) {
+        debugPrint(
+          'FirebaseInitializer already registered, using existing instance',
+        );
+        firebaseInitializer = serviceLocator<FirebaseInitializer>();
+      } else {
+        // Create a new FirebaseInitializer instance
+        firebaseInitializer = FirebaseInitializer();
+
+        // Register it with the service locator
+        serviceLocator
+            .registerSingleton<FirebaseInitializer>(firebaseInitializer);
+        debugPrint('Registered new FirebaseInitializer with service locator');
+      }
+
+      // Initialize Firebase with a timeout
+      final firebaseResult = await firebaseInitializer.initialize(
+        timeout: Duration(
+          seconds: 15 + (5 * attempt),
+        ), // Increase timeout with each attempt
       );
-      firebaseInitializer = serviceLocator<FirebaseInitializer>();
-    } else {
-      // Create a new FirebaseInitializer instance
-      firebaseInitializer = FirebaseInitializer();
 
-      // Register it with the service locator
-      serviceLocator
-          .registerSingleton<FirebaseInitializer>(firebaseInitializer);
-      debugPrint('Registered new FirebaseInitializer with service locator');
+      if (firebaseResult.isSuccess) {
+        debugPrint('Firebase initialized successfully on attempt $attempt');
+        break; // Exit the retry loop on success
+      } else {
+        debugPrint(
+          'Firebase initialization failed on attempt $attempt: ${firebaseResult.error}',
+        );
+        debugPrint('Error details: ${firebaseResult.errorDetails}');
+
+        if (attempt < 3) {
+          // Wait before retrying
+          final delay = Duration(milliseconds: 500 * attempt);
+          debugPrint('Waiting ${delay.inMilliseconds}ms before next attempt');
+          await Future<void>.delayed(delay);
+        } else {
+          debugPrint('All Firebase initialization attempts failed');
+          // Continue with app initialization even if Firebase fails
+        }
+      }
+    } catch (e) {
+      debugPrint('Error during Firebase initialization attempt $attempt: $e');
+
+      if (attempt < 3) {
+        // Wait before retrying
+        final delay = Duration(milliseconds: 500 * attempt);
+        debugPrint('Waiting ${delay.inMilliseconds}ms before next attempt');
+        await Future<void>.delayed(delay);
+      } else {
+        debugPrint('All Firebase initialization attempts failed');
+        // Continue with app initialization even if Firebase fails
+      }
     }
-
-    // Initialize Firebase with a timeout
-    final firebaseResult = await firebaseInitializer.initialize(
-      timeout:
-          const Duration(seconds: 15), // Longer timeout for initial app startup
-    );
-
-    if (firebaseResult.isSuccess) {
-      debugPrint('Firebase initialized successfully');
-    } else {
-      debugPrint(
-        'Firebase initialization failed or timed out: ${firebaseResult.error}',
-      );
-      debugPrint('Error details: ${firebaseResult.errorDetails}');
-      // Continue with app initialization even if Firebase fails
-    }
-  } catch (e) {
-    debugPrint('Error during Firebase initialization: $e');
-    // Continue with app initialization even if Firebase fails
   }
 
   // Initialize all services using the service locator
@@ -121,29 +147,54 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
       serviceLocator.registerSingleton<HiveManager>(hiveManager);
       debugPrint('Registered HiveManager after initial failure');
 
-      // Initialize Hive synchronously
-      try {
-        // Wait for Hive to initialize
-        await hiveManager.initialize();
-        debugPrint('Hive initialized successfully after initial failure');
-      } catch (e) {
-        debugPrint('Failed to initialize Hive after registration: $e');
-        // Try one more time with a delay
+      // Initialize Hive synchronously with retry mechanism
+      for (var attempt = 1; attempt <= 3; attempt++) {
         try {
-          await Future<void>.delayed(const Duration(milliseconds: 500));
+          debugPrint('Attempting to initialize Hive (attempt $attempt)');
+          // Wait for Hive to initialize
           await hiveManager.initialize();
-          debugPrint('Hive initialized successfully on second attempt');
-        } catch (e2) {
-          debugPrint('Failed to initialize Hive on second attempt: $e2');
+          debugPrint('Hive initialized successfully on attempt $attempt');
+          break; // Exit the loop if successful
+        } catch (e) {
+          debugPrint('Failed to initialize Hive on attempt $attempt: $e');
+          if (attempt < 3) {
+            // Increase delay with each attempt
+            final delay = Duration(milliseconds: 500 * attempt);
+            debugPrint('Waiting ${delay.inMilliseconds}ms before next attempt');
+            await Future<void>.delayed(delay);
+          } else {
+            debugPrint('All Hive initialization attempts failed');
+          }
         }
       }
     } else if (!serviceLocator<HiveManager>().isInitialized) {
-      // If HiveManager is registered but not initialized, initialize it
-      try {
-        await serviceLocator<HiveManager>().initialize();
-        debugPrint('Initialized existing HiveManager instance');
-      } catch (e) {
-        debugPrint('Failed to initialize existing HiveManager: $e');
+      // If HiveManager is registered but not initialized, initialize it with retry
+      debugPrint(
+        'HiveManager is registered but not initialized, initializing now',
+      );
+      for (var attempt = 1; attempt <= 3; attempt++) {
+        try {
+          debugPrint(
+            'Attempting to initialize existing HiveManager (attempt $attempt)',
+          );
+          await serviceLocator<HiveManager>().initialize();
+          debugPrint(
+            'Initialized existing HiveManager instance on attempt $attempt',
+          );
+          break; // Exit the loop if successful
+        } catch (e) {
+          debugPrint(
+            'Failed to initialize existing HiveManager on attempt $attempt: $e',
+          );
+          if (attempt < 3) {
+            // Increase delay with each attempt
+            final delay = Duration(milliseconds: 500 * attempt);
+            debugPrint('Waiting ${delay.inMilliseconds}ms before next attempt');
+            await Future<void>.delayed(delay);
+          } else {
+            debugPrint('All HiveManager initialization attempts failed');
+          }
+        }
       }
     }
 
@@ -222,168 +273,93 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
 }
 
 /// Register services with GetX for backward compatibility
-Future<void> _registerServicesWithGetX(dynamic loggerDynamic) async {
-  final logger = loggerDynamic as LoggerService;
+/// This simplified version ensures we only register each service once
+/// and always use the instance from the service locator if available
+Future<void> _registerServicesWithGetX(LoggerService logger) async {
   logger.i('Registering services with GetX for backward compatibility');
 
   try {
-    // Register LoggerService
-    if (!Get.isRegistered<LoggerService>()) {
-      Get.put(serviceLocator<LoggerService>(), permanent: true);
-    }
-
-    // Register HiveManager first as StorageService depends on it
-    if (!Get.isRegistered<HiveManager>()) {
-      logger.i('Registering HiveManager with GetX');
-      Get.put(serviceLocator<HiveManager>(), permanent: true);
-    }
-
-    // Register StorageService after HiveManager
-    if (!Get.isRegistered<StorageService>()) {
-      logger.i('Registering StorageService with GetX');
-      Get.put(serviceLocator<StorageService>(), permanent: true);
-    }
-
-    // Register ThemeController
-    if (!Get.isRegistered<ThemeController>()) {
-      try {
-        // Try to get ThemeController from service locator
-        if (serviceLocator.isRegistered<ThemeController>()) {
-          logger
-              .i('Registering ThemeController with GetX from service locator');
-          Get.put(serviceLocator<ThemeController>(), permanent: true);
-        } else {
-          // If not registered in service locator, create a new instance
-          logger.i(
-            'ThemeController not found in service locator, creating new instance',
-          );
-          final themeController = ThemeController();
-          Get.put(themeController, permanent: true);
-
-          // Also register with service locator for future use
-          try {
-            serviceLocator.registerSingleton<ThemeController>(themeController);
-            logger.i('Registered ThemeController with service locator');
-          } catch (e) {
-            logger.w(
-              'Failed to register ThemeController with service locator',
-              e,
-            );
-            // Continue even if registration fails
-          }
-        }
-      } catch (e) {
-        logger.w(
-          'Error registering ThemeController, creating new instance',
-          e,
-        );
-        Get.put(ThemeController(), permanent: true);
+    // Define a helper function to register a service
+    void registerService<T>(T instance, String serviceName) {
+      if (!Get.isRegistered<T>()) {
+        Get.put<T>(instance, permanent: true);
+        logger.d('Registered $serviceName with GetX');
+      } else {
+        logger.d('$serviceName already registered with GetX');
       }
     }
 
-    // Register ConnectivityService
-    if (!Get.isRegistered<ConnectivityService>()) {
-      try {
-        if (serviceLocator.isRegistered<ConnectivityService>()) {
-          // Use the existing instance from service locator
-          logger.i(
-            'Registering ConnectivityService with GetX from service locator',
-          );
-          Get.put(serviceLocator<ConnectivityService>(), permanent: true);
-        } else {
-          // Create a new instance if not in service locator
-          logger.i(
-            'ConnectivityService not found in service locator, creating new instance',
-          );
-          final connectivityService = await ConnectivityService().init();
-          Get.put(connectivityService, permanent: true);
+    // Register all services from the service locator
+    // This ensures we're using the same instances in both GetIt and GetX
 
-          // Also register with service locator
-          try {
-            serviceLocator
-                .registerSingleton<ConnectivityService>(connectivityService);
-            logger.i('Registered ConnectivityService with service locator');
-          } catch (e) {
-            logger.w(
-              'Failed to register ConnectivityService with service locator',
-              e,
-            );
-          }
-        }
-      } catch (e) {
-        logger.w(
-          'Error registering ConnectivityService, creating new instance',
-          e,
-        );
-        final connectivityService = await ConnectivityService().init();
-        Get.put(connectivityService, permanent: true);
-      }
+    // Core services
+    registerService<LoggerService>(
+      serviceLocator<LoggerService>(),
+      'LoggerService',
+    );
+
+    registerService<HiveManager>(
+      serviceLocator<HiveManager>(),
+      'HiveManager',
+    );
+
+    registerService<StorageService>(
+      serviceLocator<StorageService>(),
+      'StorageService',
+    );
+
+    registerService<ThemeController>(
+      serviceLocator<ThemeController>(),
+      'ThemeController',
+    );
+
+    // Network services
+    if (serviceLocator.isRegistered<ConnectivityService>()) {
+      registerService<ConnectivityService>(
+        serviceLocator<ConnectivityService>(),
+        'ConnectivityService',
+      );
     }
 
-    // Register ErrorService
-    if (!Get.isRegistered<ErrorService>()) {
-      try {
-        if (serviceLocator.isRegistered<ErrorService>()) {
-          // Use the existing instance from service locator
-          logger.i('Registering ErrorService with GetX from service locator');
-          Get.put(serviceLocator<ErrorService>(), permanent: true);
-        } else {
-          // Create a new instance if not in service locator
-          logger.i(
-            'ErrorService not found in service locator, creating new instance',
-          );
-          final errorService = await ErrorService().init();
-          Get.put(errorService, permanent: true);
-
-          // Also register with service locator
-          try {
-            serviceLocator.registerSingleton<ErrorService>(errorService);
-            logger.i('Registered ErrorService with service locator');
-          } catch (e) {
-            logger.w('Failed to register ErrorService with service locator', e);
-          }
-        }
-      } catch (e) {
-        logger.w('Error registering ErrorService, creating new instance', e);
-        final errorService = await ErrorService().init();
-        Get.put(errorService, permanent: true);
-      }
+    // Error handling
+    if (serviceLocator.isRegistered<ErrorService>()) {
+      registerService<ErrorService>(
+        serviceLocator<ErrorService>(),
+        'ErrorService',
+      );
     }
 
-    // Register AuthService
-    if (!Get.isRegistered<AuthService>()) {
-      try {
-        if (serviceLocator.isRegistered<AuthService>()) {
-          // Use the existing instance from service locator
-          logger.i('Registering AuthService with GetX from service locator');
-          Get.put(serviceLocator<AuthService>(), permanent: true);
-        } else {
-          // Create a new instance if not in service locator
-          logger.i(
-            'AuthService not found in service locator, creating new instance',
-          );
-          final authService = AuthService();
-          Get.put(authService, permanent: true);
+    // Auth services
+    if (serviceLocator.isRegistered<AuthService>()) {
+      registerService<AuthService>(
+        serviceLocator<AuthService>(),
+        'AuthService',
+      );
+    }
 
-          // Also register with service locator
-          try {
-            serviceLocator.registerSingleton<AuthService>(authService);
-            logger.i('Registered AuthService with service locator');
-          } catch (e) {
-            logger.w('Failed to register AuthService with service locator', e);
-          }
-        }
-      } catch (e) {
-        logger.w('Error registering AuthService, creating new instance', e);
-        final authService = AuthService();
-        Get.put(authService, permanent: true);
-      }
+    // Signup session service
+    if (serviceLocator.isRegistered<SignupSessionService>()) {
+      registerService<SignupSessionService>(
+        serviceLocator<SignupSessionService>(),
+        'SignupSessionService',
+      );
+    }
+
+    // Firebase services
+    if (serviceLocator.isRegistered<FirebaseInitializer>()) {
+      registerService<FirebaseInitializer>(
+        serviceLocator<FirebaseInitializer>(),
+        'FirebaseInitializer',
+      );
     }
 
     // Analytics service commented out for now, will be implemented later
     /*
-    if (!Get.isRegistered<AnalyticsService>()) {
-      Get.put(serviceLocator<AnalyticsService>(), permanent: true);
+    if (serviceLocator.isRegistered<AnalyticsService>()) {
+      registerService<AnalyticsService>(
+        serviceLocator<AnalyticsService>(),
+        'AnalyticsService'
+      );
     }
     */
 

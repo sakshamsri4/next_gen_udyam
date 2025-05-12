@@ -8,7 +8,7 @@ import 'package:next_gen/app/modules/dashboard/controllers/dashboard_controller.
 import 'package:next_gen/app/modules/dashboard/widgets/dashboard_widgets.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
-import 'package:next_gen/app/shared/widgets/bottom_navigation_bar.dart';
+import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -45,7 +45,7 @@ class _DashboardViewState extends State<DashboardView> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      bottomNavigationBar: const CustomAnimatedBottomNavBar(),
+      bottomNavigationBar: const RoleBasedBottomNav(),
       appBar: AppBar(
         title: const Text('Automotive Jobs Dashboard'),
         centerTitle: true,

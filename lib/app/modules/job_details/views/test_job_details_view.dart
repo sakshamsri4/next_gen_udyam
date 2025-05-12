@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/job_details/controllers/job_details_controller.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
+import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
 /// A simplified test view for job details to diagnose loading issues
@@ -11,7 +12,9 @@ class TestJobDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('TestJobDetailsView: Building view');
+    // Get logger service
+    final logger = Get.find<LoggerService>()
+      ..d('TestJobDetailsView: Building view');
 
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -33,7 +36,7 @@ class TestJobDetailsView extends StatelessWidget {
             icon: const Icon(Icons.refresh),
             onPressed: () {
               // Force reload with a test job
-              print('Creating test job model');
+              logger.d('Creating test job model');
               final testJob = JobModel(
                 id: 'test_job_id',
                 title: 'Test Job',

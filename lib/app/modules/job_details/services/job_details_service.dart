@@ -43,7 +43,14 @@ class JobDetailsService {
         return null;
       }
 
-      if (!doc.data()!.containsKey('title')) {
+      // Add proper null check for doc.data()
+      final data = doc.data();
+      if (data == null) {
+        _logger.w('Job document data is null: $jobId');
+        return null;
+      }
+
+      if (!data.containsKey('title')) {
         _logger.w('Invalid job document structure: $jobId');
         return null;
       }

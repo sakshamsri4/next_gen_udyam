@@ -54,7 +54,21 @@ class ApplicationModel {
 
   /// Factory constructor from Firestore document
   factory ApplicationModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data()! as Map<String, dynamic>;
+    // Add proper null check for doc.data()
+    final docData = doc.data();
+    if (docData == null) {
+      // Return a default model if data is null
+      return ApplicationModel(
+        id: doc.id,
+        userId: 'unknown',
+        jobId: 'unknown',
+        jobTitle: 'Unknown Job',
+        company: 'Unknown Company',
+        appliedAt: DateTime.now(),
+      );
+    }
+
+    final data = docData as Map<String, dynamic>;
 
     // Parse status from string
     final statusStr = data['status'] as String? ?? 'pending';
@@ -64,9 +78,14 @@ class ApplicationModel {
     );
 
     // Parse timestamps
-    final appliedAtTimestamp = data['appliedAt'] as Timestamp?;
-    final lastUpdatedTimestamp = data['lastUpdated'] as Timestamp?;
-    final interviewDateTimestamp = data['interviewDate'] as Timestamp?;
+    final appliedAtTimestamp =
+        data['appliedAt'] is Timestamp ? data['appliedAt'] as Timestamp : null;
+    final lastUpdatedTimestamp = data['lastUpdated'] is Timestamp
+        ? data['lastUpdated'] as Timestamp
+        : null;
+    final interviewDateTimestamp = data['interviewDate'] is Timestamp
+        ? data['interviewDate'] as Timestamp
+        : null;
 
     return ApplicationModel(
       id: doc.id,

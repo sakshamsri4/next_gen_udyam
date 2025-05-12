@@ -4,6 +4,7 @@ import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/home/services/job_service.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
 /// Enum for job sorting options
@@ -49,13 +50,17 @@ class SavedJobsController extends GetxController {
     required JobService jobService,
     required LoggerService logger,
     AuthController? authController,
+    NavigationController? navigationController,
   })  : _jobService = jobService,
         _logger = logger,
-        _authController = authController ?? Get.find<AuthController>();
+        _authController = authController ?? Get.find<AuthController>(),
+        _navigationController =
+            navigationController ?? Get.find<NavigationController>();
 
   final JobService _jobService;
   final LoggerService _logger;
   final AuthController _authController;
+  final NavigationController _navigationController;
   final ScrollController scrollController = ScrollController();
 
   // Observable state variables
@@ -125,22 +130,8 @@ class SavedJobsController extends GetxController {
         throw Exception('User ID not available');
       }
 
-      // Get saved job IDs
-      final savedJobIds = await _jobService.getSavedJobs(userId);
-
-      // Fetch job details for each saved job
-      final jobs = <JobModel>[];
-      for (final jobId in savedJobIds) {
-        try {
-          final job = await _jobService.getJobById(jobId);
-          if (job != null) {
-            jobs.add(job);
-          }
-        } catch (e) {
-          _logger.e('Error fetching job details for job $jobId', e);
-          // Continue with other jobs even if one fails
-        }
-      }
+      // Get saved jobs with details
+      final jobs = await _jobService.getSavedJobs();
 
       // Store all jobs and apply filtering/sorting
       _allSavedJobs.assignAll(jobs);
@@ -270,11 +261,18 @@ class SavedJobsController extends GetxController {
 
   /// Navigate to job details
   void navigateToJobDetails(String jobId) {
-    Get.toNamed<dynamic>(Routes.jobs, arguments: jobId);
+    // Use NavigationController to navigate to job details
+    // This preserves the current tab context
+    _navigationController.navigateToDetail(Routes.jobs, arguments: jobId);
   }
 
   /// Navigate to company profile
   void navigateToCompanyProfile(String companyName) {
-    Get.toNamed<dynamic>(Routes.profile, arguments: companyName);
+    // Use NavigationController to navigate to company profile
+    // This preserves the current tab context
+    _navigationController.navigateToDetail(
+      Routes.profile,
+      arguments: companyName,
+    );
   }
 }

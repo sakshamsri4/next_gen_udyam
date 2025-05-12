@@ -46,16 +46,70 @@ Future<void> initializeServices() async {
   logger
     ..i('Service Locator: Hive initialized and StorageService registered')
 
-    // Register connectivity service
+    // Register connectivity service with retry mechanism
     ..i('Service Locator: Registering connectivity service...');
-  final connectivityService = await ConnectivityService().init();
+
+  // Try to initialize ConnectivityService with retries
+  ConnectivityService? connectivityService;
+  for (var attempt = 1; attempt <= 3; attempt++) {
+    try {
+      logger.d('Initializing ConnectivityService (attempt $attempt)');
+      connectivityService = await ConnectivityService().init();
+      logger.d(
+        'ConnectivityService initialized successfully on attempt $attempt',
+      );
+      break;
+    } catch (e) {
+      logger.e('Error initializing ConnectivityService on attempt $attempt', e);
+      if (attempt < 3) {
+        // Wait before retrying
+        await Future<void>.delayed(Duration(milliseconds: 300 * attempt));
+      }
+    }
+  }
+
+  // If all attempts failed, create an instance without initialization
+  if (connectivityService == null) {
+    logger.w(
+      'All ConnectivityService initialization attempts failed, creating uninitialized instance',
+    );
+    connectivityService = ConnectivityService();
+  }
+
   serviceLocator.registerSingleton<ConnectivityService>(connectivityService);
   logger
     ..i('Service Locator: Connectivity service registered')
 
-    // Register error service
+    // Register error service with retry mechanism
     ..i('Service Locator: Registering error service...');
-  final errorService = await ErrorService().init();
+
+  // Try to initialize ErrorService with retries
+  ErrorService? errorService;
+  for (var attempt = 1; attempt <= 3; attempt++) {
+    try {
+      logger.d('Initializing ErrorService (attempt $attempt)');
+      errorService = await ErrorService().init();
+      logger.d(
+        'ErrorService initialized successfully on attempt $attempt',
+      );
+      break;
+    } catch (e) {
+      logger.e('Error initializing ErrorService on attempt $attempt', e);
+      if (attempt < 3) {
+        // Wait before retrying
+        await Future<void>.delayed(Duration(milliseconds: 300 * attempt));
+      }
+    }
+  }
+
+  // If all attempts failed, create an instance without initialization
+  if (errorService == null) {
+    logger.w(
+      'All ErrorService initialization attempts failed, creating uninitialized instance',
+    );
+    errorService = ErrorService();
+  }
+
   serviceLocator.registerSingleton<ErrorService>(errorService);
   logger
     ..i('Service Locator: Error service registered')

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
@@ -56,6 +57,12 @@ class HiveManager {
   /// Flag to track if Hive has been initialized
   static bool _isInitialized = false;
 
+  /// Lock to prevent concurrent initialization
+  static final Completer<void> _initializationCompleter = Completer<void>();
+
+  /// Flag to track if initialization is in progress
+  static bool _isInitializing = false;
+
   /// Initialize Hive
   Future<void> initialize() async {
     // If already initialized, don't initialize again
@@ -63,6 +70,17 @@ class HiveManager {
       _logger.i('Hive already initialized, skipping initialization');
       return;
     }
+
+    // If initialization is in progress, wait for it to complete
+    if (_isInitializing) {
+      _logger
+          .i('Hive initialization already in progress, waiting for completion');
+      await _initializationCompleter.future;
+      return;
+    }
+
+    // Mark initialization as in progress
+    _isInitializing = true;
 
     _logger.i('Initializing Hive...');
 
@@ -87,6 +105,12 @@ class HiveManager {
 
       // Mark as initialized
       _isInitialized = true;
+
+      // Complete the initialization completer
+      if (!_initializationCompleter.isCompleted) {
+        _initializationCompleter.complete();
+      }
+
       _logger.i('Hive initialized successfully');
     } catch (e, stackTrace) {
       _logger.e('Error initializing Hive', e, stackTrace);
@@ -94,12 +118,32 @@ class HiveManager {
       if (e is HiveError) {
         _logger.e('HiveError details: ${e.message}', e, stackTrace);
       }
+
+      // Complete the initialization completer with an error
+      if (!_initializationCompleter.isCompleted) {
+        _initializationCompleter.completeError(e, stackTrace);
+      }
+
+      // Reset initialization flag to allow retry
+      _isInitializing = false;
+
       rethrow;
     }
   }
 
   /// Check if Hive is initialized
   bool get isInitialized => _isInitialized;
+
+  /// Wait for Hive to be initialized
+  Future<void> ensureInitialized() async {
+    if (_isInitialized) return;
+
+    if (_isInitializing) {
+      await _initializationCompleter.future;
+    } else {
+      await initialize();
+    }
+  }
 
   /// Verify that critical boxes are open
   void _verifyBoxesAreOpen() {
@@ -271,7 +315,40 @@ class HiveManager {
 
   /// Get a box by name
   /// This method now tries to open the box if it's not already open
+  /// It also checks if Hive is initialized first
   Box<T> getBox<T>(String boxName) {
+    // Check if Hive is initialized
+    if (!_isInitialized) {
+      _logger.w('Hive is not initialized when trying to get box $boxName');
+
+      // Try to initialize Hive synchronously (this will throw if it fails)
+      try {
+        // Schedule asynchronous initialization for future access
+        // but we can't wait for it here since this is a synchronous method
+        ensureInitialized().then((_) {
+          _logger.d('Hive initialized asynchronously after getBox attempt');
+        }).catchError((Object error) {
+          _logger.e(
+            'Error initializing Hive asynchronously after getBox attempt',
+            error,
+          );
+        });
+
+        // Throw a descriptive error
+        throw HiveError(
+          'Hive is not initialized. Call HiveManager.initialize() or '
+          'HiveManager.ensureInitialized() before accessing boxes.',
+        );
+      } catch (e) {
+        // Rethrow with a clear message
+        throw HiveError(
+          'Hive is not initialized and could not be initialized synchronously. '
+          'Call HiveManager.initialize() before accessing boxes.',
+        );
+      }
+    }
+
+    // Hive is initialized, now check if the box is open
     if (!Hive.isBoxOpen(boxName)) {
       _logger.w('Box $boxName is not open, attempting to open it first');
       try {
@@ -309,9 +386,47 @@ class HiveManager {
   }
 
   /// Get a value from a box
+  /// This method now checks if Hive is initialized first
   T? getValue<T>(String boxName, dynamic key, {T? defaultValue}) {
     try {
-      // Check if the box is open first
+      // Check if Hive is initialized
+      if (!_isInitialized) {
+        _logger.w(
+          'Hive is not initialized when trying to get value from box $boxName for key: $key',
+        );
+
+        // Schedule asynchronous initialization for future access
+        ensureInitialized().then((_) {
+          _logger.d('Hive initialized asynchronously after getValue attempt');
+
+          // Try to get the value after initialization
+          if (Hive.isBoxOpen(boxName)) {
+            try {
+              final box = Hive.box<T>(boxName);
+              final value = box.get(key);
+              _logger.d(
+                'Successfully retrieved value after initialization: $value',
+              );
+              // We can't return this value since we're in an async callback
+            } catch (innerError) {
+              _logger.e(
+                'Error getting value after initialization',
+                innerError,
+              );
+            }
+          }
+        }).catchError((Object error) {
+          _logger.e(
+            'Error initializing Hive asynchronously after getValue attempt',
+            error,
+          );
+        });
+
+        // Return default value since we can't access the box now
+        return defaultValue;
+      }
+
+      // Check if the box is open
       if (!Hive.isBoxOpen(boxName)) {
         _logger.w(
           'Box $boxName is not open when trying to get value for key: $key',
@@ -346,9 +461,20 @@ class HiveManager {
   }
 
   /// Put a value in a box
+  /// This method now ensures Hive is initialized first
   Future<void> putValue<T>(String boxName, dynamic key, T value) async {
     try {
-      // Check if the box is open first
+      // Ensure Hive is initialized first
+      if (!_isInitialized) {
+        _logger.w(
+          'Hive is not initialized when trying to put value in box $boxName for key: $key',
+        );
+        // Wait for Hive to be initialized
+        await ensureInitialized();
+        _logger.d('Hive initialized for putValue operation');
+      }
+
+      // Check if the box is open
       if (!Hive.isBoxOpen(boxName)) {
         _logger.w(
           'Box $boxName is not open when trying to put value for key: $key',
@@ -371,6 +497,10 @@ class HiveManager {
 
       // Try one more time with a fresh box opening
       try {
+        // Ensure Hive is initialized
+        await ensureInitialized();
+
+        // Open the box and put the value
         final box = await _openBoxIfNeeded<T>(boxName);
         await box.put(key, value);
         _logger.d('Successfully put value in box $boxName after retry');
@@ -386,16 +516,32 @@ class HiveManager {
   }
 
   /// Delete a value from a box
+  /// This method now ensures Hive is initialized first
   Future<void> deleteValue<T>(String boxName, dynamic key) async {
     try {
+      // Ensure Hive is initialized first
+      if (!_isInitialized) {
+        _logger.w(
+          'Hive is not initialized when trying to delete value from box $boxName',
+        );
+        // Wait for Hive to be initialized
+        await ensureInitialized();
+        _logger.d('Hive initialized for deleteValue operation');
+      }
+
       // Try to get the box
       final box = getBox<T>(boxName);
       await box.delete(key);
+      _logger.d('Successfully deleted value from box $boxName for key: $key');
     } catch (e, stackTrace) {
       _logger.e('Error deleting value from box $boxName', e, stackTrace);
 
       // Try to open the box asynchronously and then delete the value
       try {
+        // Ensure Hive is initialized
+        await ensureInitialized();
+
+        // Open the box and delete the value
         final box = await _openBoxIfNeeded<T>(boxName);
         await box.delete(key);
         _logger
@@ -412,16 +558,32 @@ class HiveManager {
   }
 
   /// Clear a box
+  /// This method now ensures Hive is initialized first
   Future<void> clearBox<T>(String boxName) async {
     try {
+      // Ensure Hive is initialized first
+      if (!_isInitialized) {
+        _logger.w(
+          'Hive is not initialized when trying to clear box $boxName',
+        );
+        // Wait for Hive to be initialized
+        await ensureInitialized();
+        _logger.d('Hive initialized for clearBox operation');
+      }
+
       // Try to get the box
       final box = getBox<T>(boxName);
       await box.clear();
+      _logger.d('Successfully cleared box $boxName');
     } catch (e, stackTrace) {
       _logger.e('Error clearing box $boxName', e, stackTrace);
 
       // Try to open the box asynchronously and then clear it
       try {
+        // Ensure Hive is initialized
+        await ensureInitialized();
+
+        // Open the box and clear it
         final box = await _openBoxIfNeeded<T>(boxName);
         await box.clear();
         _logger.d('Successfully cleared box $boxName after opening it');
@@ -437,14 +599,42 @@ class HiveManager {
   }
 
   /// Close a box
+  /// This method now checks if Hive is initialized first
   Future<void> closeBox(String boxName) async {
+    // Only try to close the box if Hive is initialized
+    if (!_isInitialized) {
+      _logger.w('Hive is not initialized when trying to close box $boxName');
+      return;
+    }
+
     if (Hive.isBoxOpen(boxName)) {
-      await Hive.box<dynamic>(boxName).close();
+      try {
+        await Hive.box<dynamic>(boxName).close();
+        _logger.d('Successfully closed box $boxName');
+      } catch (e, stackTrace) {
+        _logger.e('Error closing box $boxName', e, stackTrace);
+        // Don't rethrow to allow the app to continue
+      }
+    } else {
+      _logger.d('Box $boxName is not open, no need to close it');
     }
   }
 
   /// Close all boxes
+  /// This method now checks if Hive is initialized first
   Future<void> closeAllBoxes() async {
-    await Hive.close();
+    // Only try to close all boxes if Hive is initialized
+    if (!_isInitialized) {
+      _logger.w('Hive is not initialized when trying to close all boxes');
+      return;
+    }
+
+    try {
+      await Hive.close();
+      _logger.d('Successfully closed all boxes');
+    } catch (e, stackTrace) {
+      _logger.e('Error closing all boxes', e, stackTrace);
+      // Don't rethrow to allow the app to continue
+    }
   }
 }

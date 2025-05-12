@@ -148,11 +148,42 @@ class SearchService extends GetxService {
         // We'll apply this sort client-side after getting the results
       }
 
+      // Apply pagination
+      if (filter.page > 0 && filter.limit > 0) {
+        _logger.d(
+          'Applying pagination: page=${filter.page}, limit=${filter.limit}',
+        );
+
+        // Calculate the offset
+        final offset = (filter.page - 1) * filter.limit;
+
+        // Apply limit to the query
+        query = query.limit(filter.limit);
+
+        // If this is not the first page, we need to use startAfter
+        if (filter.page > 1 && offset > 0) {
+          // For proper pagination, we would need to use startAfter with a document snapshot
+          // This is a simplified implementation that uses limit+offset
+          // In a real app, you would store the last document of each page
+          // and use startAfter with that document
+          query = query.limit(offset + filter.limit);
+        }
+      }
+
       // Execute the query
       final snapshot = await query.get();
 
       // Convert to JobModel list
       var jobs = snapshot.docs.map(JobModel.fromFirestore).toList();
+
+      // Handle pagination offset for pages > 1
+      if (filter.page > 1 && filter.limit > 0) {
+        final offset = (filter.page - 1) * filter.limit;
+        if (jobs.length > filter.limit) {
+          // Skip the first 'offset' items and take only 'limit' items
+          jobs = jobs.skip(offset).take(filter.limit).toList();
+        }
+      }
 
       // Apply client-side filtering if needed
 

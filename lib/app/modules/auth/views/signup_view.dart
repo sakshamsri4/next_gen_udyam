@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
-import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
@@ -14,49 +13,6 @@ import 'package:responsive_builder/responsive_builder.dart';
 
 class SignupView extends GetView<AuthController> {
   const SignupView({super.key});
-
-  // Build a role option widget
-  Widget _buildRoleOption(
-    BuildContext context,
-    String title,
-    UserType role,
-    bool isDarkMode,
-  ) {
-    return Obx(
-      () => InkWell(
-        onTap: () => controller.setRole(role),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: controller.selectedRole.value == role
-                ? Theme.of(context).colorScheme.primary
-                : isDarkMode
-                    ? AppTheme.darkSurface2
-                    : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: controller.selectedRole.value == role
-                  ? Theme.of(context).colorScheme.primary
-                  : isDarkMode
-                      ? AppTheme.darkSurface3
-                      : AppTheme.slateGray.withAlpha(100),
-            ),
-          ),
-          child: Text(
-            title,
-            style: TextStyle(
-              color: controller.selectedRole.value == role
-                  ? Colors.white
-                  : isDarkMode
-                      ? AppTheme.offWhite
-                      : Colors.black87,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -215,48 +171,6 @@ class SignupView extends GetView<AuthController> {
                               ),
                               const SizedBox(height: 32),
 
-                              const SizedBox(height: 16),
-
-                              // Role Selection UI
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Choose your role:',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                  const SizedBox(height: 12),
-
-                                  // Role options
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: [
-                                      _buildRoleOption(
-                                        context,
-                                        'Job Seeker',
-                                        UserType.employee,
-                                        isDarkMode,
-                                      ),
-                                      _buildRoleOption(
-                                        context,
-                                        'Employer',
-                                        UserType.employer,
-                                        isDarkMode,
-                                      ),
-                                      _buildRoleOption(
-                                        context,
-                                        'Admin',
-                                        UserType.admin,
-                                        isDarkMode,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                ],
-                              ),
-
                               // Sign Up Button
                               Obx(
                                 () => CustomNeoPopButton.primary(
@@ -308,8 +222,9 @@ class SignupView extends GetView<AuthController> {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ), // Reduced padding
                               child: Text(
                                 'OR',
                                 style: TextStyle(
@@ -317,6 +232,7 @@ class SignupView extends GetView<AuthController> {
                                       ? AppTheme.slateGray
                                       : AppTheme.slateGray,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 12, // Smaller font size
                                 ),
                               ),
                             ),
@@ -352,6 +268,8 @@ class SignupView extends GetView<AuthController> {
                                   : Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Prevent row from taking full width
                                       children: [
                                         const FaIcon(
                                           FontAwesomeIcons.google,
@@ -359,14 +277,19 @@ class SignupView extends GetView<AuthController> {
                                           color: Colors.red,
                                         ),
                                         const SizedBox(width: 12),
-                                        Text(
-                                          'Sign up with Google',
-                                          style: TextStyle(
-                                            color: isDarkMode
-                                                ? AppTheme.offWhite
-                                                : Colors.black87,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16,
+                                        Flexible(
+                                          // Make text flexible to prevent overflow
+                                          child: Text(
+                                            'Sign up with Google',
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? AppTheme.offWhite
+                                                  : Colors.black87,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 16,
+                                            ),
+                                            overflow: TextOverflow
+                                                .ellipsis, // Add ellipsis if text overflows
                                           ),
                                         ),
                                       ],
@@ -378,8 +301,10 @@ class SignupView extends GetView<AuthController> {
                         const SizedBox(height: 32),
 
                         // Sign In Link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          // Use Wrap instead of Row to handle overflow
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
                               'Already have an account?',

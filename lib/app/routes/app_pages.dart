@@ -2,10 +2,12 @@ import 'package:get/get.dart';
 import 'package:next_gen/app/middleware/auth_middleware.dart';
 import 'package:next_gen/app/middleware/onboarding_middleware.dart';
 import 'package:next_gen/app/middleware/role_middleware.dart';
+import 'package:next_gen/app/modules/admin/views/admin_dashboard_view.dart';
 import 'package:next_gen/app/modules/applications/bindings/applications_binding.dart';
 import 'package:next_gen/app/modules/applications/views/application_details_view.dart';
 import 'package:next_gen/app/modules/applications/views/applications_view.dart';
 import 'package:next_gen/app/modules/auth/bindings/auth_binding.dart';
+import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/modules/auth/views/auth_view.dart';
 import 'package:next_gen/app/modules/auth/views/forgot_password_view.dart';
 import 'package:next_gen/app/modules/auth/views/login_view.dart';
@@ -19,6 +21,8 @@ import 'package:next_gen/app/modules/customer_profile/bindings/customer_profile_
 import 'package:next_gen/app/modules/customer_profile/views/customer_profile_view.dart';
 import 'package:next_gen/app/modules/dashboard/bindings/dashboard_binding.dart';
 import 'package:next_gen/app/modules/dashboard/views/dashboard_view.dart';
+import 'package:next_gen/app/modules/employee/views/discover_view.dart';
+import 'package:next_gen/app/modules/employer/views/employer_dashboard_view.dart';
 import 'package:next_gen/app/modules/error/bindings/error_binding.dart';
 import 'package:next_gen/app/modules/error/views/error_view.dart';
 import 'package:next_gen/app/modules/home/bindings/home_binding.dart';
@@ -40,7 +44,11 @@ import 'package:next_gen/app/modules/search/bindings/search_binding.dart';
 import 'package:next_gen/app/modules/search/views/search_view.dart';
 import 'package:next_gen/app/modules/showcase/bindings/showcase_binding.dart';
 import 'package:next_gen/app/modules/showcase/views/showcase_view.dart';
+import 'package:next_gen/app/routes/admin_routes.dart';
+import 'package:next_gen/app/routes/employee_routes.dart';
+import 'package:next_gen/app/routes/employer_routes.dart';
 import 'package:next_gen/app/shared/bindings/navigation_binding.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 
 part 'app_routes.dart';
 
@@ -50,12 +58,39 @@ class AppPages {
   static const initial = Routes.login;
 
   static final routes = [
+    // Use role-specific routes based on user role
     GetPage<dynamic>(
       name: _Paths.home,
-      page: () => const HomeView(),
-      bindings: [HomeBinding(), AuthBinding()],
+      page: () {
+        // Get the navigation controller to determine the user role
+        try {
+          final navigationController = Get.find<NavigationController>();
+          final userRole = navigationController.userRole.value;
+
+          // Return the appropriate view based on role
+          switch (userRole) {
+            case UserType.employee:
+              return const DiscoverView();
+            case UserType.employer:
+              return const EmployerDashboardView();
+            case UserType.admin:
+              return const AdminDashboardView();
+            case null:
+              return const HomeView();
+          }
+        } catch (e) {
+          // If we can't determine the role, fall back to the default view
+          return const HomeView();
+        }
+      },
+      bindings: [HomeBinding(), AuthBinding(), NavigationBinding()],
       middlewares: [OnboardingMiddleware(), AuthMiddleware(), RoleMiddleware()],
     ),
+
+    // Include role-specific routes
+    ...EmployeeRoutes.routes,
+    ...EmployerRoutes.routes,
+    ...AdminRoutes.routes,
     GetPage<dynamic>(
       name: _Paths.auth,
       page: () => const AuthView(),

@@ -26,11 +26,19 @@ class SearchController extends GetxController {
   // Debouncer for search
   late final Debouncer<String> _searchDebouncer;
 
+  // Stream subscriptions
+  final List<StreamSubscription<dynamic>> _subscriptions =
+      <StreamSubscription<dynamic>>[];
+
   // Observable state variables
   final RxBool isLoading = false.obs;
   final RxBool isFilterVisible = false.obs;
+  final RxBool hasMoreResults = true.obs;
+  final RxInt currentPage = 1.obs;
+  final RxInt resultsPerPage = 10.obs;
   final RxList<JobModel> searchResults = <JobModel>[].obs;
   final RxList<SearchHistory> searchHistory = <SearchHistory>[].obs;
+  final RxList<SearchFilter> savedSearches = <SearchFilter>[].obs;
   final Rx<SearchFilter> filter = SearchFilter().obs;
 
   @override
@@ -50,26 +58,38 @@ class SearchController extends GetxController {
     // Initialize search service
     _initSearchService();
 
-    // Listen to debouncer
-    _searchDebouncer.values.listen((query) {
-      if (query.isNotEmpty) {
-        _performSearch(query: query);
-      }
-    });
+    // Listen to debouncer and store the subscription
+    _subscriptions.add(
+      _searchDebouncer.values.listen((query) {
+        if (query.isNotEmpty) {
+          _performSearch(query: query);
+        }
+      }),
+    );
+
+    _logger.d('Added debouncer subscription to _subscriptions list');
   }
 
   @override
   void onReady() {
     super.onReady();
-    // Load search history
+    // Load search history and saved searches
     _loadSearchHistory();
+    _loadSavedSearches();
   }
 
   @override
   void onClose() {
     // Dispose resources
     searchTextController.dispose();
-    // No need to close the debouncer as it doesn't have a close method
+
+    // Cancel all stream subscriptions
+    for (final subscription in _subscriptions) {
+      subscription.cancel();
+    }
+    _subscriptions.clear();
+    _logger.d('Cancelled all stream subscriptions');
+
     super.onClose();
   }
 
@@ -97,18 +117,68 @@ class SearchController extends GetxController {
     }
   }
 
+  /// Load saved searches
+  Future<void> _loadSavedSearches() async {
+    _logger.d('Loading saved searches');
+    try {
+      // Saved searches will be implemented in a future update
+      // final saved = await _searchService.getSavedSearches();
+      // savedSearches.value = saved;
+
+      // Mock data for now
+      savedSearches.value = [
+        SearchFilter(
+          query: 'Software Engineer',
+          location: 'San Francisco',
+          jobTypes: ['Full-time'],
+          isRemote: true,
+        ),
+        SearchFilter(
+          query: 'Product Manager',
+          location: 'New York',
+          minSalary: 100000,
+          maxSalary: 150000,
+        ),
+        SearchFilter(
+          query: 'UX Designer',
+          location: 'Remote',
+          jobTypes: ['Contract', 'Full-time'],
+          isRemote: true,
+        ),
+      ];
+    } catch (e, s) {
+      _logger.e('Error loading saved searches', e, s);
+    }
+  }
+
   // Track the most recent search request
   int _lastSearchToken = 0;
 
   /// Perform search
-  Future<void> _performSearch({String? query}) async {
+  Future<void> _performSearch({String? query, bool loadMore = false}) async {
     // Generate a unique token for this search request
     final currentToken = DateTime.now().microsecondsSinceEpoch;
     final localToken = currentToken;
     _lastSearchToken = currentToken;
 
+    // Reset pagination if this is a new search
+    if (!loadMore) {
+      currentPage.value = 1;
+      hasMoreResults.value = true;
+      // Clear existing results for new search
+      if (searchResults.isNotEmpty) {
+        searchResults.clear();
+      }
+    }
+
+    // Don't load more if we already know there are no more results
+    if (loadMore && !hasMoreResults.value) {
+      _logger.d('No more results to load');
+      return;
+    }
+
     _logger.i('Performing search with query: ${query ?? filter.value.query} '
-        '(token: $localToken)');
+        '(token: $localToken, page: ${currentPage.value})');
     isLoading.value = true;
     update(); // Notify GetBuilder to update UI
 
@@ -118,13 +188,32 @@ class SearchController extends GetxController {
         filter.value = filter.value.copyWith(query: query);
       }
 
-      // Perform search
-      final results = await _searchService.searchJobs(filter.value);
+      // Create a paginated filter by adding page and limit
+      final paginatedFilter = filter.value.copyWith(
+        page: currentPage.value,
+        limit: resultsPerPage.value,
+      );
+
+      // Perform search with pagination
+      final results = await _searchService.searchJobs(paginatedFilter);
 
       // Only update results if this is still the most recent search
       if (_lastSearchToken == localToken) {
-        searchResults.value = results;
-        _logger.d('Search results updated (token: $localToken)');
+        if (loadMore) {
+          // Append results for pagination
+          searchResults.addAll(results);
+        } else {
+          // Replace results for new search
+          searchResults.value = results;
+        }
+
+        // Check if we have more results
+        hasMoreResults.value = results.length >= resultsPerPage.value;
+
+        _logger.d(
+            'Search results updated: hasMoreResults=${hasMoreResults.value}, '
+            'resultsCount=${results.length}, resultsPerPage=${resultsPerPage.value}, '
+            'token=$localToken, page=${currentPage.value}');
       } else {
         _logger.d('Search results discarded - newer search exists '
             '(token: $localToken, latest: $_lastSearchToken)');
@@ -176,6 +265,22 @@ class SearchController extends GetxController {
     _logger.d('Resetting filter');
     filter.value = SearchFilter(query: filter.value.query);
     update(); // Notify GetBuilder to update UI
+  }
+
+  /// Load more search results (pagination)
+  Future<void> loadMoreResults() async {
+    _logger.d('Loading more results (page: ${currentPage.value})');
+
+    // Don't load more if we're already loading or there are no more results
+    if (isLoading.value || !hasMoreResults.value) {
+      _logger.d(
+        'Skipping load more: isLoading=${isLoading.value}, hasMoreResults=${hasMoreResults.value}',
+      );
+      return;
+    }
+
+    // Perform search with loadMore=true to append results
+    await _performSearch(loadMore: true);
   }
 
   /// Clear search history
