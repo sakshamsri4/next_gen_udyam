@@ -55,10 +55,25 @@ class ResumeView extends GetView<ResumeController> {
           return _buildResumeList(theme, isDarkMode);
         }),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: controller.pickAndUploadResume,
-        backgroundColor: AppTheme.electricBlue,
-        child: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Resume Builder button
+          FloatingActionButton.small(
+            onPressed: controller.navigateToResumeBuilderView,
+            backgroundColor: Colors.green,
+            heroTag: 'resume_builder',
+            child: const Icon(Icons.edit_document),
+          ),
+          SizedBox(height: 16.h),
+          // Upload Resume button
+          FloatingActionButton(
+            onPressed: controller.pickAndUploadResume,
+            backgroundColor: AppTheme.electricBlue,
+            heroTag: 'upload_resume',
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

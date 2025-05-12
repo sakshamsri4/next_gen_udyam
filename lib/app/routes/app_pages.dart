@@ -19,6 +19,7 @@ import 'package:next_gen/app/modules/company_profile/bindings/company_profile_bi
 import 'package:next_gen/app/modules/company_profile/views/company_profile_view.dart';
 import 'package:next_gen/app/modules/customer_profile/bindings/customer_profile_binding.dart';
 import 'package:next_gen/app/modules/customer_profile/views/customer_profile_view.dart';
+import 'package:next_gen/app/modules/customer_profile/views/skills_assessment_view.dart';
 import 'package:next_gen/app/modules/dashboard/bindings/dashboard_binding.dart';
 import 'package:next_gen/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:next_gen/app/modules/employee/views/discover_view.dart';
@@ -35,6 +36,7 @@ import 'package:next_gen/app/modules/job_posting/views/job_posting_view.dart';
 import 'package:next_gen/app/modules/onboarding/bindings/onboarding_binding.dart';
 import 'package:next_gen/app/modules/onboarding/views/onboarding_view.dart';
 import 'package:next_gen/app/modules/resume/bindings/resume_binding.dart';
+import 'package:next_gen/app/modules/resume/views/resume_builder_view.dart';
 import 'package:next_gen/app/modules/resume/views/resume_view.dart';
 import 'package:next_gen/app/modules/role_selection/bindings/role_selection_binding.dart';
 import 'package:next_gen/app/modules/role_selection/views/role_selection_view.dart';
@@ -162,10 +164,24 @@ class AppPages {
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
     GetPage<dynamic>(
+      name: '${_Paths.resume}/builder',
+      page: () => const ResumeBuilderView(),
+      bindings: [ResumeBinding(), NavigationBinding()],
+      transition: Transition.rightToLeft,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
       name: _Paths.profile,
       page: () => const ProfileView(),
       bindings: [AuthBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
+      middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+    GetPage<dynamic>(
+      name: '${_Paths.profile}/skills-assessment',
+      page: () => const SkillsAssessmentView(),
+      bindings: [CustomerProfileBinding(), NavigationBinding()],
+      transition: Transition.rightToLeft,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
     ),
     GetPage<dynamic>(

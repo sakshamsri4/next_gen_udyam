@@ -85,12 +85,7 @@ class CustomerProfileView extends GetView<CustomerProfileController> {
                         SizedBox(height: 16.h),
 
                         // Skills section
-                        if (profile.skills.isNotEmpty)
-                          _buildSimpleSection(
-                            theme,
-                            'Skills',
-                            'Add your skills to showcase your expertise.',
-                          ),
+                        _buildSkillsSection(theme, profile.skills),
 
                         SizedBox(height: 16.h),
 
@@ -173,6 +168,55 @@ class CustomerProfileView extends GetView<CustomerProfileController> {
                       );
                     },
                     child: Text('Add ${title.toLowerCase()}'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build the skills section
+  Widget _buildSkillsSection(ThemeData theme, List<String> skills) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Skills',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Card(
+          child: Padding(
+            padding: EdgeInsets.all(16.r),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (skills.isEmpty)
+                  Text(
+                    'Add your skills to showcase your expertise.',
+                    style: theme.textTheme.bodyLarge,
+                  )
+                else
+                  Wrap(
+                    spacing: 8.w,
+                    runSpacing: 8.h,
+                    children: skills.map((skill) {
+                      return Chip(
+                        label: Text(skill),
+                        backgroundColor: const Color(0xFFE6F0FF), // Light blue
+                      );
+                    }).toList(),
+                  ),
+                SizedBox(height: 16.h),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: controller.navigateToSkillsAssessment,
+                    child: const Text('Assess your skills'),
                   ),
                 ),
               ],

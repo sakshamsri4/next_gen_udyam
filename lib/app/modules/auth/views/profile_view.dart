@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:neopop/neopop.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/auth/views/widgets/edit_profile_dialog.dart';
+import 'package:next_gen/app/modules/auth/views/widgets/profile_completion_indicator.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
@@ -109,6 +110,11 @@ class _ProfileViewState extends State<ProfileView> {
               ),
 
               const SizedBox(height: 40),
+
+              // Profile Completion Indicator
+              const ProfileCompletionIndicator(),
+
+              const SizedBox(height: 24),
 
               // Profile Info Card
               Card(

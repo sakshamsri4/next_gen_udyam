@@ -6,6 +6,7 @@ import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:next_gen/app/modules/applications/controllers/applications_controller.dart';
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
+import 'package:next_gen/app/modules/applications/views/widgets/application_analytics.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
@@ -148,16 +149,44 @@ class ApplicationsView extends GetView<ApplicationsController> {
         // Status filter tabs
         _buildStatusFilterTabs(theme),
 
-        // Applications list
+        // Applications list and analytics
         Expanded(
-          child: ListView.builder(
+          child: ListView(
             controller: controller.scrollController,
             padding: EdgeInsets.all(16.w),
-            itemCount: controller.filteredApplications.length,
-            itemBuilder: (context, index) {
-              final application = controller.filteredApplications[index];
-              return _buildApplicationCard(application, theme, isDarkMode);
-            },
+            children: [
+              // Analytics card
+              const ApplicationAnalytics(),
+              SizedBox(height: 24.h),
+
+              // Applications header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Your Applications',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Obx(
+                    () => Text(
+                      '${controller.filteredApplications.length} ${controller.filteredApplications.length == 1 ? 'Application' : 'Applications'}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isDarkMode ? Colors.white54 : Colors.black45,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+
+              // Applications list
+              ...controller.filteredApplications.map(
+                (application) =>
+                    _buildApplicationCard(application, theme, isDarkMode),
+              ),
+            ],
           ),
         ),
       ],

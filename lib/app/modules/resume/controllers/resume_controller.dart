@@ -493,4 +493,40 @@ class ResumeController extends GetxController {
   void navigateToResumeView() {
     Get.toNamed<dynamic>(Routes.resume);
   }
+
+  /// Navigate to resume builder view
+  void navigateToResumeBuilderView() {
+    Get.toNamed<dynamic>('${Routes.resume}/builder');
+  }
+
+  /// Generate resume from template
+  Future<void> generateResumeFromTemplate(String templateName) async {
+    try {
+      _logger.i('Generating resume from template: $templateName');
+
+      // Show a snackbar for now since this is a placeholder
+      Get.snackbar(
+        'Coming Soon',
+        'Resume generation from templates is under development.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppTheme.electricBlue,
+        colorText: Colors.white,
+      );
+
+      // In a real implementation, this would:
+      // 1. Generate a PDF based on the template and user data
+      // 2. Upload the PDF to Firebase Storage
+      // 3. Create a ResumeModel entry in Firestore
+      // 4. Add the resume to the local list
+    } catch (e) {
+      _logger.e('Error generating resume from template', e);
+      Get.snackbar(
+        'Error',
+        'Failed to generate resume: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
 }

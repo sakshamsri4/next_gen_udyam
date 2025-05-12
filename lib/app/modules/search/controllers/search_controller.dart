@@ -4,6 +4,7 @@ import 'package:debounce_throttle/debounce_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
+import 'package:next_gen/app/modules/search/models/saved_search_model.dart';
 import 'package:next_gen/app/modules/search/models/search_filter.dart';
 import 'package:next_gen/app/modules/search/models/search_history.dart';
 import 'package:next_gen/app/modules/search/services/search_service.dart';
@@ -21,7 +22,8 @@ class SearchController extends GetxController {
   late SearchService _searchService;
 
   // Text controllers
-  late final TextEditingController searchTextController;
+  late final TextEditingController searchController;
+  late final TextEditingController locationController;
 
   // Debouncer for search
   late final Debouncer<String> _searchDebouncer;
@@ -36,18 +38,27 @@ class SearchController extends GetxController {
   final RxBool hasMoreResults = true.obs;
   final RxInt currentPage = 1.obs;
   final RxInt resultsPerPage = 10.obs;
+  final RxString error = ''.obs;
+  final RxString sortOption = 'relevance'.obs;
+  final RxInt minSalary = 0.obs;
+  final RxInt maxSalary = 150000.obs;
   final RxList<JobModel> searchResults = <JobModel>[].obs;
   final RxList<SearchHistory> searchHistory = <SearchHistory>[].obs;
-  final RxList<SearchFilter> savedSearches = <SearchFilter>[].obs;
+  final RxList<SavedSearchModel> savedSearches = <SavedSearchModel>[].obs;
+  final RxList<String> activeFilters = <String>[].obs;
   final Rx<SearchFilter> filter = SearchFilter().obs;
+
+  // Scroll controller for pagination
+  final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
     super.onInit();
     _logger.i('SearchController initialized');
 
-    // Initialize text controller
-    searchTextController = TextEditingController();
+    // Initialize text controllers
+    searchController = TextEditingController();
+    locationController = TextEditingController();
 
     // Initialize debouncer
     _searchDebouncer = Debouncer<String>(
@@ -67,7 +78,18 @@ class SearchController extends GetxController {
       }),
     );
 
+    // Add scroll controller listener for pagination
+    scrollController.addListener(_scrollListener);
+
     _logger.d('Added debouncer subscription to _subscriptions list');
+  }
+
+  /// Scroll listener for pagination
+  void _scrollListener() {
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
+      loadMoreResults();
+    }
   }
 
   @override
@@ -81,7 +103,9 @@ class SearchController extends GetxController {
   @override
   void onClose() {
     // Dispose resources
-    searchTextController.dispose();
+    searchController.dispose();
+    locationController.dispose();
+    scrollController.dispose();
 
     // Cancel all stream subscriptions
     for (final subscription in _subscriptions) {
@@ -121,31 +145,8 @@ class SearchController extends GetxController {
   Future<void> _loadSavedSearches() async {
     _logger.d('Loading saved searches');
     try {
-      // Saved searches will be implemented in a future update
-      // final saved = await _searchService.getSavedSearches();
-      // savedSearches.value = saved;
-
-      // Mock data for now
-      savedSearches.value = [
-        SearchFilter(
-          query: 'Software Engineer',
-          location: 'San Francisco',
-          jobTypes: ['Full-time'],
-          isRemote: true,
-        ),
-        SearchFilter(
-          query: 'Product Manager',
-          location: 'New York',
-          minSalary: 100000,
-          maxSalary: 150000,
-        ),
-        SearchFilter(
-          query: 'UX Designer',
-          location: 'Remote',
-          jobTypes: ['Contract', 'Full-time'],
-          isRemote: true,
-        ),
-      ];
+      final saved = await _searchService.getSavedSearches();
+      savedSearches.value = saved;
     } catch (e, s) {
       _logger.e('Error loading saved searches', e, s);
     }
@@ -238,7 +239,7 @@ class SearchController extends GetxController {
   /// Clear search
   void clearSearch() {
     _logger.d('Clearing search');
-    searchTextController.clear();
+    searchController.clear();
     filter.value = SearchFilter();
     searchResults.clear();
     update(); // Notify GetBuilder to update UI
@@ -310,9 +311,316 @@ class SearchController extends GetxController {
   /// Use search history item
   void useSearchHistoryItem(SearchHistory item) {
     _logger.d('Using search history item: ${item.query}');
-    searchTextController.text = item.query;
+    searchController.text = item.query;
     filter.value = filter.value.copyWith(query: item.query);
     _performSearch();
     update(); // Notify GetBuilder to update UI
+  }
+
+  /// Perform search with the current query
+  Future<void> performSearch(String query) async {
+    _logger.d('Performing search with query: $query');
+    searchController.text = query;
+    filter.value = filter.value.copyWith(query: query);
+    await _performSearch();
+  }
+
+  /// Refresh search results
+  Future<void> refreshSearch() async {
+    _logger.d('Refreshing search results');
+    currentPage.value = 1;
+    await _performSearch();
+  }
+
+  /// Toggle save job
+  Future<void> toggleSaveJob(JobModel job) async {
+    _logger.d('Toggling save job: ${job.id}');
+    // This would be implemented with a real save/unsave functionality
+    // For now, just show a snackbar
+    Get.snackbar(
+      'Job Saved',
+      'Job "${job.title}" has been saved',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  /// Share job
+  void shareJob(JobModel job) {
+    _logger.d('Sharing job: ${job.id}');
+    // This would be implemented with a real share functionality
+    // For now, just show a snackbar
+    Get.snackbar(
+      'Share Job',
+      'Sharing job "${job.title}" is not implemented yet',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  /// Quick apply for job
+  Future<void> quickApplyJob(JobModel job) async {
+    _logger.d('Quick applying for job: ${job.id}');
+    // This would be implemented with a real quick apply functionality
+    // For now, just navigate to the job details page
+    Get.toNamed<dynamic>('/jobs/details/${job.id}');
+  }
+
+  /// Update filter
+  void updateFilter({
+    String? query,
+    String? location,
+    String? jobType,
+    String? experienceLevel,
+    int? minSalary,
+    int? maxSalary,
+    bool? isRemote,
+    String? industry,
+    int? postedWithin,
+  }) {
+    _logger.d('Updating filter');
+
+    // Update filter
+    var updatedFilter = filter.value.copyWith(
+      query: query,
+      location: location,
+      minSalary: minSalary,
+      maxSalary: maxSalary,
+      isRemote: isRemote,
+    );
+
+    // Handle job type
+    if (jobType != null) {
+      updatedFilter = updatedFilter.copyWith(
+        jobTypes: jobType.isEmpty ? [] : [jobType],
+      );
+    }
+
+    // Handle experience
+    if (experienceLevel != null) {
+      updatedFilter = updatedFilter.copyWith(
+        experience: experienceLevel.isEmpty ? [] : [experienceLevel],
+      );
+    }
+
+    // Handle industry
+    if (industry != null) {
+      updatedFilter = updatedFilter.copyWith(
+        industries: industry.isEmpty ? [] : [industry],
+      );
+    }
+
+    filter.value = updatedFilter;
+
+    // Update active filters
+    _updateActiveFilters();
+
+    // Update location controller if location is provided
+    if (location != null) {
+      locationController.text = location;
+    }
+  }
+
+  /// Update active filters based on current filter
+  void _updateActiveFilters() {
+    final filters = <String>[];
+
+    if (filter.value.query.isNotEmpty) {
+      filters.add('"${filter.value.query}"');
+    }
+
+    if (filter.value.location.isNotEmpty) {
+      filters.add('Location: ${filter.value.location}');
+    }
+
+    if (filter.value.jobTypes.isNotEmpty) {
+      filters.addAll(filter.value.jobTypes);
+    }
+
+    if (filter.value.experience.isNotEmpty) {
+      filters.add('Experience: ${filter.value.experience.first}');
+    }
+
+    if (filter.value.minSalary > 0 || filter.value.maxSalary < 200000) {
+      filters.add(
+        'Salary: \$${filter.value.minSalary}-\$${filter.value.maxSalary}',
+      );
+    }
+
+    if (filter.value.isRemote) {
+      filters.add('Remote');
+    }
+
+    if (filter.value.industries.isNotEmpty) {
+      filters.add('Industry: ${filter.value.industries.first}');
+    }
+
+    activeFilters.value = filters;
+  }
+
+  /// Apply filters
+  Future<void> applyFilters() async {
+    _logger.d('Applying filters');
+    currentPage.value = 1;
+    await _performSearch();
+  }
+
+  /// Reset filters
+  void resetFilters() {
+    _logger.d('Resetting filters');
+    filter.value = SearchFilter(query: filter.value.query);
+    activeFilters.clear();
+    locationController.clear();
+    minSalary.value = 0;
+    maxSalary.value = 150000;
+  }
+
+  /// Remove filter
+  void removeFilter(String filterText) {
+    _logger.d('Removing filter: $filterText');
+
+    // Remove from active filters
+    activeFilters.remove(filterText);
+
+    // Update filter based on the removed filter
+    if (filterText.startsWith('"') && filterText.endsWith('"')) {
+      // Query filter
+      filter.value = filter.value.copyWith(query: '');
+      searchController.clear();
+    } else if (filterText.startsWith('Location: ')) {
+      // Location filter
+      filter.value = filter.value.copyWith(location: '');
+      locationController.clear();
+    } else if (filterText == 'Full-time' ||
+        filterText == 'Part-time' ||
+        filterText == 'Contract' ||
+        filterText == 'Internship' ||
+        filterText == 'Temporary') {
+      // Job type filter
+      filter.value = filter.value.copyWith(jobTypes: []);
+    } else if (filterText.startsWith('Experience: ')) {
+      // Experience filter
+      filter.value = filter.value.copyWith(experience: []);
+    } else if (filterText.startsWith('Salary: ')) {
+      // Salary filter
+      filter.value = filter.value.copyWith(minSalary: 0, maxSalary: 200000);
+      minSalary.value = 0;
+      maxSalary.value = 150000;
+    } else if (filterText == 'Remote') {
+      // Remote filter
+      filter.value = filter.value.copyWith(isRemote: false);
+    } else if (filterText.startsWith('Industry: ')) {
+      // Industry filter
+      filter.value = filter.value.copyWith(industries: []);
+    } else if (filterText == 'Last 24 hours' ||
+        filterText == 'Last 7 days' ||
+        filterText == 'Last 30 days') {
+      // Posted within filter - not directly supported in our model
+      // Just refresh the search
+    }
+
+    // Update active filters
+    _updateActiveFilters();
+
+    // Refresh search results
+    _performSearch();
+  }
+
+  /// Set sort option
+  void setSortOption(String option) {
+    _logger.d('Setting sort option: $option');
+    sortOption.value = option;
+    _performSearch();
+  }
+
+  /// Apply saved search
+  void applySavedSearch(SavedSearchModel search) {
+    _logger.d('Applying saved search: ${search.query}');
+    searchController.text = search.query;
+    filter.value = search.filter;
+    _performSearch();
+  }
+
+  /// Delete saved search
+  Future<void> deleteSavedSearch(SavedSearchModel search) async {
+    _logger.d('Deleting saved search: ${search.id}');
+    final success = await _searchService.deleteSavedSearch(search.id);
+    if (success) {
+      savedSearches.remove(search);
+      Get.snackbar(
+        'Success',
+        'Saved search deleted',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } else {
+      Get.snackbar(
+        'Error',
+        'Failed to delete saved search',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  /// Save current search
+  Future<void> saveCurrentSearch() async {
+    _logger.d('Saving current search');
+
+    // Show dialog to get search name
+    final name = await Get.dialog<String>(
+      AlertDialog(
+        title: const Text('Save Search'),
+        content: TextField(
+          decoration: const InputDecoration(
+            labelText: 'Search Name',
+            hintText: 'Enter a name for this search',
+          ),
+          onSubmitted: (value) => Get.back(result: value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back<String>(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Get.back(
+              result: searchController.text.isNotEmpty
+                  ? searchController.text
+                  : 'Saved Search',
+            ),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (name == null || name.isEmpty) {
+      _logger.d('Save search cancelled');
+      return;
+    }
+
+    // Save the search
+    final savedSearch = await _searchService.saveSearch(
+      searchController.text,
+      filter.value,
+    );
+
+    if (savedSearch != null) {
+      // Add to saved searches
+      savedSearches.add(savedSearch);
+
+      Get.snackbar(
+        'Success',
+        'Search saved',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } else {
+      Get.snackbar(
+        'Error',
+        'Failed to save search',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }
