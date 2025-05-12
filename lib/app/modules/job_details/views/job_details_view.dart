@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/job_details/controllers/job_details_controller.dart';
-import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/body.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/details_bottom_nav_bar.dart';
 import 'package:next_gen/app/modules/job_details/views/widgets/details_sliver_app_bar.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/job_details_shimmer.dart';
