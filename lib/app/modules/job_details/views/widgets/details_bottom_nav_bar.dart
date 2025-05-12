@@ -128,7 +128,8 @@ class DetailsBottomNavBar extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: RoleThemes.employeePrimary.withOpacity(0.3), // 0.3 * 255 ≈ 77
+          color: RoleThemes.employeePrimary
+              .withValues(alpha: 77), // 0.3 * 255 ≈ 77
           width: 1.5,
         ),
       ),
@@ -152,5 +153,12 @@ class DetailsBottomNavBar extends StatelessWidget {
     final companyName = job.company;
     final shareText =
         'Check out this job: $jobTitle at $companyName\n\nApply now on Next Gen Udyam!';
+
+    // Show a snackbar for now as actual sharing functionality would require platform-specific implementations
+    Get.snackbar(
+      'Share Job',
+      'Sharing: $shareText',
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 }
