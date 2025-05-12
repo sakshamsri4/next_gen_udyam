@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 
-part 'interview_model.g.dart';
+// We're using custom adapters defined in hive_adapters.dart instead of generated ones
+// part 'interview_model.g.dart';
 
 /// Type ID for InterviewModel Hive adapter
 const interviewModelTypeId = 60;

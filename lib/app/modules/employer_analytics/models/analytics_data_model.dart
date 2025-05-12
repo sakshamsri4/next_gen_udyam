@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 
-part 'analytics_data_model.g.dart';
+// We're using custom adapters defined in hive_adapters.dart instead of generated ones
+// part 'analytics_data_model.g.dart';
 
 /// Type ID for AnalyticsDataModel Hive adapter
 const analyticsDataModelTypeId = 50;

@@ -105,6 +105,16 @@ class InterviewModelAdapter extends TypeAdapter<InterviewModel> {
       ..writeByte(21)
       ..write(obj.updatedAt);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is InterviewModelAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }
 
 /// Adapter for InterviewStatus
