@@ -197,7 +197,6 @@ class EmployerAnalyticsView extends GetView<EmployerAnalyticsController> {
 
   /// Build tab bar
   Widget _buildTabBar(BuildContext context) {
-    final theme = Theme.of(context);
     const primaryColor = RoleThemes.employerPrimary;
 
     return Container(

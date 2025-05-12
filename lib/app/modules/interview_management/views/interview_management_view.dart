@@ -50,8 +50,10 @@ class InterviewManagementView extends GetView<InterviewManagementController> {
           style: HeroIconStyle.solid,
           color: Colors.white,
         ),
-        label: const Text('Schedule Interview',
-            style: TextStyle(color: Colors.white)),
+        label: const Text(
+          'Schedule Interview',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -454,7 +456,6 @@ class InterviewManagementView extends GetView<InterviewManagementController> {
   /// Show cancel confirmation
   void _showCancelConfirmation(BuildContext context, InterviewModel interview) {
     final theme = Theme.of(context);
-    const primaryColor = RoleThemes.employerPrimary;
 
     Get.dialog<void>(
       Dialog(

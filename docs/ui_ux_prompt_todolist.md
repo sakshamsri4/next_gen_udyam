@@ -147,17 +147,8 @@ This document provides a structured, phased approach to implementing the UI/UX i
   - Enhance `CompanyProfileView` with comprehensive sections
   - Implement media gallery for company photos
   - Add team members and culture sections
-  - Include analytics for profile views
-  - Prompt: "Enhance the company profile screen with media gallery, team section, and analytics using the green color palette"
 
-### 3.4 Employer Analytics (Medium Priority)
 
-- [x] **Analytics Dashboard**
-  - Create `EmployerAnalyticsView` with key metrics
-  - Implement charts and graphs for job performance
-  - Add applicant funnel visualization
-  - Include export functionality
-  - Prompt: "Design an employer analytics dashboard with charts, applicant funnel, and export functionality using the green color palette"
 
 ### 3.5 Interview Management (Medium Priority)
 

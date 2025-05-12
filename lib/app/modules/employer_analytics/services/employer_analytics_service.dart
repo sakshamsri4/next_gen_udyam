@@ -1,23 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/employer_analytics/models/analytics_data_model.dart';
 import 'package:next_gen/core/services/analytics_service.dart';
-import 'package:next_gen/core/services/auth_service.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
 /// Service for employer analytics
 class EmployerAnalyticsService {
   /// Constructor
   EmployerAnalyticsService() {
-    _firestore = FirebaseFirestore.instance;
     _logger = Get.find<LoggerService>();
-    _authService = Get.find<AuthService>();
     _analyticsService = Get.find<AnalyticsService>();
   }
 
-  late final FirebaseFirestore _firestore;
   late final LoggerService _logger;
-  late final AuthService _authService;
   late final AnalyticsService _analyticsService;
 
   /// Get analytics data for the current employer
