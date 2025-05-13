@@ -8,6 +8,8 @@ import 'package:next_gen/app/modules/auth/models/user_model.dart';
 // Import UserTypeAdapter explicitly from user_type_adapter.dart to avoid ambiguity
 import 'package:next_gen/app/modules/auth/models/user_type_adapter.dart'
     as user_type;
+import 'package:next_gen/app/modules/employer_analytics/models/hive_adapters.dart';
+import 'package:next_gen/app/modules/interview_management/models/hive_adapters.dart';
 import 'package:next_gen/app/modules/onboarding/models/onboarding_status.dart';
 import 'package:next_gen/app/modules/resume/models/resume_model.dart';
 import 'package:next_gen/app/modules/search/models/hive_adapters.dart';
@@ -210,6 +212,14 @@ class HiveManager {
       // Register applicant review module adapters
       _logger.d('Registering applicant review module adapters');
       registerApplicantReviewHiveAdapters();
+
+      // Register analytics module adapters
+      _logger.d('Registering analytics module adapters');
+      registerAnalyticsHiveAdapters();
+
+      // Register interview management module adapters
+      _logger.d('Registering interview management module adapters');
+      registerInterviewHiveAdapters();
 
       // Register ApplicationModel adapter
       if (!Hive.isAdapterRegistered(applicationModelTypeId)) {

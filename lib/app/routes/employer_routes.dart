@@ -6,6 +6,10 @@ import 'package:next_gen/app/modules/company_profile/bindings/company_profile_bi
 import 'package:next_gen/app/modules/company_profile/views/company_profile_view.dart';
 import 'package:next_gen/app/modules/employer/bindings/employer_dashboard_binding.dart';
 import 'package:next_gen/app/modules/employer/views/employer_dashboard_view.dart';
+import 'package:next_gen/app/modules/employer_analytics/bindings/employer_analytics_binding.dart';
+import 'package:next_gen/app/modules/employer_analytics/views/employer_analytics_view.dart';
+import 'package:next_gen/app/modules/interview_management/bindings/interview_management_binding.dart';
+import 'package:next_gen/app/modules/interview_management/views/interview_management_view.dart';
 import 'package:next_gen/app/modules/job_posting/bindings/job_posting_binding.dart';
 import 'package:next_gen/app/modules/job_posting/views/job_posting_view.dart';
 import 'package:next_gen/app/modules/search/bindings/search_binding.dart';
@@ -34,7 +38,7 @@ class EmployerRoutes {
           name: Routes.jobPosting,
           page: () => const JobPostingView(),
           binding: JobPostingBinding(),
-          bindings: [NavigationBinding()],
+          bindings: [NavigationBinding(), CompanyProfileBinding()],
           transition: Transition.fadeIn,
         ),
 
@@ -62,6 +66,24 @@ class EmployerRoutes {
           page: () => const CompanyProfileView(),
           binding: CompanyProfileBinding(),
           bindings: [NavigationBinding(), AuthBinding()],
+          transition: Transition.fadeIn,
+        ),
+
+        // Analytics dashboard
+        GetPage<dynamic>(
+          name: Routes.employerAnalytics,
+          page: () => const EmployerAnalyticsView(),
+          binding: EmployerAnalyticsBinding(),
+          bindings: [NavigationBinding()],
+          transition: Transition.fadeIn,
+        ),
+
+        // Interview management
+        GetPage<dynamic>(
+          name: Routes.interviewManagement,
+          page: () => const InterviewManagementView(),
+          binding: InterviewManagementBinding(),
+          bindings: [NavigationBinding()],
           transition: Transition.fadeIn,
         ),
       ];

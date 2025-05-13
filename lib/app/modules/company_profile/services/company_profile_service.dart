@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:next_gen/app/modules/auth/services/storage_service.dart';
+import 'package:next_gen/app/modules/auth/services/firebase_storage_service.dart';
 import 'package:next_gen/app/modules/company_profile/models/company_profile_model.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
@@ -16,14 +16,14 @@ class CompanyProfileService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// The storage service for uploading company logos
-  late final StorageService _storageService;
+  late final FirebaseStorageService _storageService;
 
   /// The logger service
   late final LoggerService _logger;
 
   @override
   void onInit() {
-    _storageService = Get.find<StorageService>();
+    _storageService = Get.find<FirebaseStorageService>();
     _logger = Get.find<LoggerService>();
     super.onInit();
   }

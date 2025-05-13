@@ -28,6 +28,8 @@ abstract class Routes {
   static const applicantReview = _Paths.applicantReview;
   static const welcome = _Paths.welcome;
   static const verificationSuccess = _Paths.verificationSuccess;
+  static const employerAnalytics = _Paths.employerAnalytics;
+  static const interviewManagement = _Paths.interviewManagement;
 }
 
 abstract class _Paths {
@@ -57,4 +59,6 @@ abstract class _Paths {
   static const applicantReview = '/applicant-review';
   static const welcome = '/welcome';
   static const verificationSuccess = '/verification_success';
+  static const employerAnalytics = '/employer-analytics';
+  static const interviewManagement = '/interview-management';
 }

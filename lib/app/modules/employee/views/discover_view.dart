@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/employee/controllers/employee_home_controller.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
+import 'package:next_gen/app/shared/mixins/keep_alive_mixin.dart';
 import 'package:next_gen/app/shared/widgets/role_based_layout.dart';
 import 'package:next_gen/core/theme/role_themes.dart';
 import 'package:next_gen/ui/components/cards/custom_job_card.dart';
@@ -13,12 +15,29 @@ import 'package:next_gen/ui/components/cards/custom_job_card.dart';
 ///
 /// This screen combines job recommendations, activity feed, and quick access
 /// to recently viewed jobs. It serves as the main landing page for employee users.
-class DiscoverView extends GetView<EmployeeHomeController> {
+/// Uses GetViewKeepAliveMixin to preserve state when switching tabs.
+class DiscoverView extends GetView<EmployeeHomeController>
+    with GetViewKeepAliveMixin<EmployeeHomeController> {
   /// Creates a discover view
-  const DiscoverView({super.key});
+  DiscoverView({super.key});
+
+  // Get the navigation controller
+  late final NavigationController navigationController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildContent(BuildContext context) {
+    // Initialize the navigation controller
+    if (!Get.isRegistered<NavigationController>()) {
+      navigationController = Get.put(NavigationController(), permanent: true);
+    } else {
+      navigationController = Get.find<NavigationController>();
+    }
+
+    // Ensure the navigation index is set correctly
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      navigationController.updateIndexFromRoute('/discover');
+    });
+
     return RoleBasedLayout(
       title: 'Discover',
       body: RefreshIndicator(

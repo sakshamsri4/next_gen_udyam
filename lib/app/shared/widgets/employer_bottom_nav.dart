@@ -6,21 +6,97 @@ import 'package:next_gen/core/services/logger_service.dart';
 
 /// A bottom navigation bar specifically designed for employer users
 ///
-/// This widget uses a pure reactive approach with GetX to avoid state management issues.
-/// It observes the NavigationController's selectedIndex and rebuilds only when that value changes.
+/// This widget uses a StatefulWidget approach to properly manage state and avoid
+/// reactive state management issues. It listens to the NavigationController's
+/// selectedIndex and rebuilds only when that value changes.
 /// The color scheme is green-themed to visually indicate the employer role.
 ///
 /// Features a streamlined 4-tab structure:
-/// - Dashboard: Overview with key metrics and quick actions
-/// - Jobs: Manage job postings with status filters
-/// - Applicants: Review and manage all applications
-/// - Company: Company profile and settings combined
-class EmployerBottomNav extends StatelessWidget {
+/// - Dashboard: Overview with key metrics and quick actions (Routes.dashboard)
+/// - Jobs: Manage job postings with status filters (Routes.jobPosting)
+/// - Applicants: Review and manage all applications (Routes.search)
+/// - Company: Company profile and settings combined (Routes.companyProfile)
+class EmployerBottomNav extends StatefulWidget {
   /// Creates an employer-specific bottom navigation bar
   const EmployerBottomNav({super.key});
 
   @override
+  State<EmployerBottomNav> createState() => _EmployerBottomNavState();
+}
+
+class _EmployerBottomNavState extends State<EmployerBottomNav> {
+  // Controllers
+  NavigationController? _navigationController;
+  LoggerService? _logger;
+
+  // Local state variables to avoid direct .value access in build
+  int _selectedIndex = 0;
+
+  // Workers to listen for changes
+  final List<Worker> _workers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initControllers();
+  }
+
+  @override
+  void dispose() {
+    // Dispose of all workers
+    for (final worker in _workers) {
+      worker.dispose();
+    }
+    super.dispose();
+  }
+
+  /// Initialize controllers and set up listeners
+  void _initControllers() {
+    try {
+      // Try to get the navigation controller
+      _navigationController = Get.find<NavigationController>();
+
+      // Try to get the logger service
+      try {
+        _logger = Get.find<LoggerService>();
+      } catch (e) {
+        debugPrint('LoggerService not available: $e');
+      }
+
+      // Initialize local state from controller
+      _selectedIndex = _navigationController!.selectedIndex.value;
+
+      // Set up worker to listen for changes
+      _workers.add(
+        ever(_navigationController!.selectedIndex, (index) {
+          if (mounted) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }
+        }),
+      );
+
+      _logger?.d('EmployerBottomNav initialized successfully');
+    } catch (e) {
+      debugPrint('Error initializing EmployerBottomNav: $e');
+
+      // Try to log the error if LoggerService is available
+      try {
+        Get.find<LoggerService>().e('Error initializing EmployerBottomNav', e);
+      } catch (_) {
+        // Silently ignore if LoggerService is not available
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // If navigation controller is not available, return empty container
+    if (_navigationController == null) {
+      return const SizedBox.shrink();
+    }
+
     // Define the employer-specific colors
     const primaryColor = Color(0xFF059669); // Green primary color
     const primaryLightColor =
@@ -29,115 +105,90 @@ class EmployerBottomNav extends StatelessWidget {
         ? const Color(0xFF1E293B) // Dark warm gray for dark mode
         : Colors.white;
 
-    // Get the navigation controller
-    late final NavigationController navigationController;
-    try {
-      navigationController = Get.find<NavigationController>();
-    } catch (e) {
-      // Handle the case where NavigationController is not found
-      debugPrint('Error finding NavigationController: $e');
-
-      // Try to log the error if LoggerService is available
-      try {
-        Get.find<LoggerService>().e('Error finding NavigationController', e);
-      } catch (_) {
-        // Silently ignore if LoggerService is not available
-      }
-
-      // Return an empty container if we can't find the controller
-      return const SizedBox.shrink();
-    }
-
-    // Use Obx to observe the selectedIndex
-    return Obx(() {
-      // Get the current selected index from the controller
-      final selectedIndex = navigationController.selectedIndex.value;
-
-      return Container(
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(26),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8,
-              horizontal: 8,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  context,
-                  icon: HeroIcons.home,
-                  label: 'Dashboard',
-                  index: 0,
-                  isSelected: selectedIndex == 0,
-                  navigationController: navigationController,
-                  primaryColor: primaryColor,
-                  primaryLightColor: primaryLightColor,
-                ),
-                _buildNavItem(
-                  context,
-                  icon: HeroIcons.briefcase,
-                  label: 'Jobs',
-                  index: 1,
-                  isSelected: selectedIndex == 1,
-                  navigationController: navigationController,
-                  primaryColor: primaryColor,
-                  primaryLightColor: primaryLightColor,
-                ),
-                _buildNavItem(
-                  context,
-                  icon: HeroIcons.users,
-                  label: 'Applicants',
-                  index: 2,
-                  isSelected: selectedIndex == 2,
-                  navigationController: navigationController,
-                  primaryColor: primaryColor,
-                  primaryLightColor: primaryLightColor,
-                ),
-                _buildNavItem(
-                  context,
-                  icon: HeroIcons.buildingOffice2,
-                  label: 'Company',
-                  index: 3,
-                  isSelected: selectedIndex == 3,
-                  navigationController: navigationController,
-                  primaryColor: primaryColor,
-                  primaryLightColor: primaryLightColor,
-                ),
-              ],
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(26),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8,
+            horizontal: 8,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                context,
+                icon: HeroIcons.home,
+                label: 'Dashboard',
+                index: 0,
+                isSelected: _selectedIndex == 0,
+                primaryColor: primaryColor,
+                primaryLightColor: primaryLightColor,
+              ),
+              _buildNavItem(
+                context,
+                icon: HeroIcons.briefcase,
+                label: 'Jobs',
+                index: 1,
+                isSelected: _selectedIndex == 1,
+                primaryColor: primaryColor,
+                primaryLightColor: primaryLightColor,
+              ),
+              _buildNavItem(
+                context,
+                icon: HeroIcons.users,
+                label: 'Applicants',
+                index: 2,
+                isSelected: _selectedIndex == 2,
+                primaryColor: primaryColor,
+                primaryLightColor: primaryLightColor,
+              ),
+              _buildNavItem(
+                context,
+                icon: HeroIcons.buildingOffice2,
+                label: 'Company',
+                index: 3,
+                isSelected: _selectedIndex == 3,
+                primaryColor: primaryColor,
+                primaryLightColor: primaryLightColor,
+              ),
+            ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   /// Build a navigation item
   ///
-  /// This method is static and pure - it doesn't depend on any instance variables
-  /// and doesn't use Obx, making it more efficient and less prone to rebuild issues.
+  /// This method is pure - it doesn't depend on any observable variables
+  /// making it more efficient and less prone to rebuild issues.
   Widget _buildNavItem(
     BuildContext context, {
     required HeroIcons icon,
     required String label,
     required int index,
     required bool isSelected,
-    required NavigationController navigationController,
     required Color primaryColor,
     required Color primaryLightColor,
   }) {
     return InkWell(
-      onTap: () => navigationController.changeIndex(index),
+      onTap: () {
+        if (_navigationController != null &&
+            !_navigationController!.isLoading.value) {
+          _navigationController?.changeIndex(index);
+        }
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(

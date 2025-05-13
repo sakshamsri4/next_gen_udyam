@@ -8,6 +8,8 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
 import 'package:next_gen/app/modules/auth/services/signup_session_service.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
+import 'package:next_gen/app/shared/widgets/role_based_navigation_factory.dart';
 import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/firebase/firebase_initializer.dart';
 // Analytics service commented out for now, will be implemented later
@@ -351,6 +353,29 @@ Future<void> _registerServicesWithGetX(LoggerService logger) async {
         serviceLocator<FirebaseInitializer>(),
         'FirebaseInitializer',
       );
+    }
+
+    // Navigation controller
+    try {
+      // Check if NavigationController is already registered with GetX
+      if (!Get.isRegistered<NavigationController>()) {
+        // Create a new instance and register it
+        final navigationController = NavigationController();
+        Get.put<NavigationController>(navigationController, permanent: true);
+        logger.i('Registered NavigationController with GetX');
+
+        // Initialize RoleBasedNavigationFactory
+        RoleBasedNavigationFactory.init();
+        logger.i('Initialized RoleBasedNavigationFactory');
+      } else {
+        logger.d('NavigationController already registered with GetX');
+
+        // Initialize RoleBasedNavigationFactory if not already done
+        RoleBasedNavigationFactory.init();
+        logger.d('Initialized RoleBasedNavigationFactory');
+      }
+    } catch (e) {
+      logger.e('Error registering NavigationController', e);
     }
 
     // Analytics service commented out for now, will be implemented later

@@ -20,7 +20,7 @@ class EmployeeRoutes {
         // Discover tab (Home)
         GetPage<dynamic>(
           name: Routes.home,
-          page: () => const DiscoverView(),
+          page: DiscoverView.new,
           binding: EmployeeHomeBinding(),
           bindings: [NavigationBinding()],
           transition: Transition.fadeIn,
@@ -29,7 +29,7 @@ class EmployeeRoutes {
         // Jobs tab (combines Search and Saved)
         GetPage<dynamic>(
           name: Routes.search,
-          page: () => const JobsView(),
+          page: JobsView.new,
           binding: JobsBinding(),
           bindings: [NavigationBinding()],
           transition: Transition.fadeIn,
@@ -38,7 +38,7 @@ class EmployeeRoutes {
         // Applications tab
         GetPage<dynamic>(
           name: Routes.applications,
-          page: () => const ApplicationsView(),
+          page: ApplicationsView.new,
           binding: ApplicationsBinding(),
           bindings: [NavigationBinding()],
           transition: Transition.fadeIn,
@@ -47,7 +47,7 @@ class EmployeeRoutes {
         // Profile tab
         GetPage<dynamic>(
           name: Routes.profile,
-          page: () => const ProfileView(),
+          page: ProfileView.new,
           binding: AuthBinding(),
           bindings: [NavigationBinding()],
           transition: Transition.fadeIn,

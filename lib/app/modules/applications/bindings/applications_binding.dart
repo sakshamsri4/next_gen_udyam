@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/applications/controllers/applications_controller.dart';
 import 'package:next_gen/app/modules/applications/services/applications_service.dart';
+import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
 /// Binding for the applications module
@@ -14,6 +15,15 @@ class ApplicationsBinding extends Bindings {
       ..d('ApplicationsBinding: Registering dependencies')
       ..d('Registering ApplicationsService')
       ..d('Registering ApplicationsController');
+
+    // Make sure AuthController is registered
+    if (!Get.isRegistered<AuthController>()) {
+      logger.d('ApplicationsBinding: Registering AuthController');
+      Get.put<AuthController>(
+        AuthController(),
+        permanent: true,
+      );
+    }
 
     // Register services
     Get

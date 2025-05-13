@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -60,69 +61,76 @@ class _CustomDrawerState extends State<CustomDrawer> {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    return Drawer(
-      backgroundColor:
-          isDarkMode ? AppTheme.darkSurface : AppTheme.lightSurface,
-      elevation: 0,
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Header with user info
-            Obx(() => _buildHeader(context)),
+    // Use a single Obx wrapper for the entire drawer content
+    // This avoids nested Obx widgets which can cause "improper use of Get" errors
+    return Obx(() {
+      // Get all reactive values at the top level
+      final currentUser = _authController.user.value;
+      final userRole = _navigationController.userRole.value;
+      final selectedIndex = _navigationController.selectedIndex.value;
+      final isLoggedIn = _authController.isLoggedIn;
 
-            const Divider(),
+      return Drawer(
+        backgroundColor:
+            isDarkMode ? AppTheme.darkSurface : AppTheme.lightSurface,
+        elevation: 0,
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header with user info - no Obx needed here
+              _buildHeader(context, currentUser),
 
-            // Navigation items
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  // Show different navigation items based on user role
-                  // Using Obx for reactive UI updates
-                  Obx(() => _buildNavigationItems(context)),
+              const Divider(),
 
-                  const Divider(),
+              // Navigation items
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    // Show different navigation items based on user role
+                    // No Obx needed here
+                    _buildNavigationItems(context, userRole, selectedIndex),
 
-                  // Additional menu items
-                  _buildNavItem(
-                    context: context,
-                    icon: FontAwesomeIcons.gear,
-                    title: 'Settings',
-                    onTap: () => _navigateAndClose(Routes.settings),
-                  ),
-                  _buildNavItem(
-                    context: context,
-                    icon: FontAwesomeIcons.circleQuestion,
-                    title: 'Help & Support',
-                    onTap: () => _navigateAndClose(Routes.support),
-                  ),
-                  _buildNavItem(
-                    context: context,
-                    icon: FontAwesomeIcons.circleInfo,
-                    title: 'About',
-                    onTap: () => _navigateAndClose(Routes.about),
-                  ),
-                ],
+                    const Divider(),
+
+                    // Additional menu items
+                    _buildNavItem(
+                      context: context,
+                      icon: FontAwesomeIcons.gear,
+                      title: 'Settings',
+                      onTap: () => _navigateAndClose(Routes.settings),
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: FontAwesomeIcons.circleQuestion,
+                      title: 'Help & Support',
+                      onTap: () => _navigateAndClose(Routes.support),
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      icon: FontAwesomeIcons.circleInfo,
+                      title: 'About',
+                      onTap: () => _navigateAndClose(Routes.about),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            // Logout button at the bottom - using Obx for reactive UI updates
-            Obx(
-              () => _authController.isLoggedIn
-                  ? _buildLogoutButton(context)
-                  : const SizedBox.shrink(),
-            ),
-          ],
+              // Logout button at the bottom - no Obx needed here
+              if (isLoggedIn)
+                _buildLogoutButton(context)
+              else
+                const SizedBox.shrink(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   // Build the header section with user info
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, User? currentUser) {
     final theme = Theme.of(context);
-    // Get the current user directly from the controller
-    final currentUser = _authController.user.value;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -186,10 +194,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   // Build navigation items based on user role
-  Widget _buildNavigationItems(BuildContext context) {
-    // Get values directly from controllers
-    final userRole = _navigationController.userRole.value;
-    final selectedIndex = _navigationController.selectedIndex.value;
+  Widget _buildNavigationItems(
+    BuildContext context,
+    UserType? userRole,
+    int selectedIndex,
+  ) {
+    // No need to get values from controllers as they're passed as parameters
 
     if (userRole == UserType.employer) {
       // Employer navigation items
@@ -244,6 +254,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
               Get.back<void>();
             },
             isSelected: selectedIndex == 4,
+          ),
+          const Divider(),
+          _buildNavItem(
+            context: context,
+            icon: FontAwesomeIcons.chartBar,
+            title: 'Analytics',
+            onTap: () => _navigateAndClose(Routes.employerAnalytics),
+          ),
+          _buildNavItem(
+            context: context,
+            icon: FontAwesomeIcons.calendarCheck,
+            title: 'Interviews',
+            onTap: () => _navigateAndClose(Routes.interviewManagement),
           ),
         ],
       );

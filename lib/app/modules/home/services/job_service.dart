@@ -18,6 +18,10 @@ class JobService {
   final LoggerService _logger;
 
   /// Get featured jobs
+  ///
+  /// Note: This query requires a composite index on 'isFeatured', 'isActive', and 'postedDate'
+  /// If you encounter a FirebaseException about missing indexes, you need to create
+  /// this index in the Firebase console or follow the link in the error message.
   Future<List<JobModel>> getFeaturedJobs() async {
     try {
       _logger.i('Fetching featured jobs');
@@ -31,12 +35,29 @@ class JobService {
 
       return snapshot.docs.map(JobModel.fromFirestore).toList();
     } catch (e) {
-      _logger.e('Error fetching featured jobs', e);
-      rethrow;
+      // Check if this is a missing index error
+      if (e.toString().contains('failed-precondition') &&
+          e.toString().contains('index')) {
+        _logger.e(
+          'Missing Firestore index for featured jobs query. '
+          'Please create a composite index on "isFeatured", "isActive", and "postedDate".',
+          e,
+        );
+        return []; // Return empty list instead of rethrowing to prevent UI errors
+      } else {
+        _logger.e('Error fetching featured jobs', e);
+        return []; // Return empty list instead of rethrowing to prevent UI errors
+      }
     }
   }
 
   /// Get recent jobs
+  ///
+  /// Note: This query requires composite indexes:
+  /// 1. On 'isActive' and 'postedDate' for the base query
+  /// 2. On 'isActive', 'jobType', and 'postedDate' when category is provided
+  /// If you encounter a FirebaseException about missing indexes, you need to create
+  /// these indexes in the Firebase console or follow the link in the error message.
   Future<List<JobModel>> getRecentJobs({String? category}) async {
     try {
       _logger.i('Fetching recent jobs with category: $category');
@@ -55,8 +76,19 @@ class JobService {
       final snapshot = await filteredQuery.limit(10).get();
       return snapshot.docs.map(JobModel.fromFirestore).toList();
     } catch (e) {
-      _logger.e('Error fetching recent jobs', e);
-      rethrow;
+      // Check if this is a missing index error
+      if (e.toString().contains('failed-precondition') &&
+          e.toString().contains('index')) {
+        _logger.e(
+          'Missing Firestore index for recent jobs query. '
+          'Please create the required composite indexes for this query.',
+          e,
+        );
+        return []; // Return empty list instead of rethrowing to prevent UI errors
+      } else {
+        _logger.e('Error fetching recent jobs', e);
+        return []; // Return empty list instead of rethrowing to prevent UI errors
+      }
     }
   }
 
@@ -137,6 +169,12 @@ class JobService {
   }
 
   /// Search for jobs
+  ///
+  /// Note: This query requires composite indexes depending on the filters used:
+  /// 1. On 'isActive' and 'postedDate' for the base query
+  /// 2. Additional indexes when location or jobType filters are applied
+  /// If you encounter a FirebaseException about missing indexes, you need to create
+  /// these indexes in the Firebase console or follow the link in the error message.
   Future<List<JobModel>> searchJobs(
     String query, [
     Map<String, dynamic>? filters,
@@ -185,7 +223,17 @@ class JobService {
 
       return results;
     } catch (e) {
-      _logger.e('Error searching for jobs', e);
+      // Check if this is a missing index error
+      if (e.toString().contains('failed-precondition') &&
+          e.toString().contains('index')) {
+        _logger.e(
+          'Missing Firestore index for job search query. '
+          'Please create the required composite indexes for this query.',
+          e,
+        );
+      } else {
+        _logger.e('Error searching for jobs', e);
+      }
       return []; // Return empty list instead of rethrowing to prevent UI errors
     }
   }

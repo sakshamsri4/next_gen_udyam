@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
+import 'package:next_gen/app/modules/auth/services/firebase_storage_service.dart';
 import 'package:next_gen/app/modules/auth/services/signup_session_service.dart';
-import 'package:next_gen/app/modules/auth/services/storage_service.dart';
 import 'package:next_gen/core/di/service_locator.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 
@@ -52,11 +52,11 @@ class AuthBinding extends Bindings {
       );
     }
 
-    // Register StorageService if not already registered
-    if (!Get.isRegistered<StorageService>()) {
-      logger.d('AuthBinding: Registering StorageService');
-      Get.put<StorageService>(
-        StorageService(),
+    // Register FirebaseStorageService if not already registered
+    if (!Get.isRegistered<FirebaseStorageService>()) {
+      logger.d('AuthBinding: Registering FirebaseStorageService');
+      Get.put<FirebaseStorageService>(
+        FirebaseStorageService(),
         permanent: true,
       );
     }

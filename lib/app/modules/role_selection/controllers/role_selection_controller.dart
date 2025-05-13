@@ -6,6 +6,7 @@ import 'package:next_gen/app/modules/auth/models/signup_session.dart';
 import 'package:next_gen/app/modules/auth/models/user_model.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/storage/storage_service.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
@@ -261,9 +262,89 @@ class RoleSelectionController extends GetxController {
         }
       }
 
+      // Make sure NavigationController is registered and has the correct role
+      try {
+        if (Get.isRegistered<NavigationController>()) {
+          final navigationController = Get.find<NavigationController>();
+          // Force reload user role to ensure it's up to date
+          await navigationController.reloadUserRole();
+          _logger
+              .d('NavigationController role updated to: ${selectedRole.value}');
+        } else {
+          _logger.w(
+            'NavigationController not registered, creating a new instance',
+          );
+          final navigationController =
+              Get.put(NavigationController(), permanent: true);
+          // Force reload user role
+          await navigationController.reloadUserRole();
+          _logger.d(
+            'New NavigationController registered with role: ${selectedRole.value}',
+          );
+        }
+      } catch (e, stackTrace) {
+        _logger.e('Error updating NavigationController', e, stackTrace);
+        // Continue anyway as we'll try to navigate
+      }
+
       // Navigate to appropriate screen based on role
       _logger.d('Navigating to dashboard with role: ${selectedRole.value}');
-      await Get.offAllNamed<dynamic>(Routes.dashboard);
+
+      // Use a try-catch block with timeout to handle navigation errors
+      try {
+        final future = Get.offAllNamed<dynamic>(Routes.dashboard);
+        if (future != null) {
+          final result = await future.timeout(
+            const Duration(seconds: 5),
+            onTimeout: () {
+              _logger.w('Navigation timeout for route: ${Routes.dashboard}');
+              return null;
+            },
+          );
+
+          if (result == null) {
+            _logger.w('Navigation to dashboard failed or timed out');
+            // Try to recover by going to a safe route
+            try {
+              await Get.offAllNamed<dynamic>(Routes.home);
+              _logger.i('Recovered by navigating to home route');
+            } catch (recoveryError) {
+              _logger.e(
+                'Failed to recover from navigation error',
+                recoveryError,
+              );
+            }
+          } else {
+            _logger.i('Navigation to dashboard completed successfully');
+          }
+        } else {
+          _logger.w(
+            'Get.offAllNamed returned null for route: ${Routes.dashboard}',
+          );
+          // Try to recover by going to a safe route
+          try {
+            await Get.offAllNamed<dynamic>(Routes.home);
+            _logger.i('Recovered by navigating to home route');
+          } catch (recoveryError) {
+            _logger.e(
+              'Failed to recover from navigation error',
+              recoveryError,
+            );
+          }
+        }
+      } catch (e, stackTrace) {
+        _logger.e('Error during navigation to dashboard', e, stackTrace);
+        // Try to recover by going to a safe route
+        try {
+          await Get.offAllNamed<dynamic>(Routes.home);
+          _logger.i('Recovered by navigating to home route after error');
+        } catch (recoveryError) {
+          _logger.e(
+            'Failed to recover from navigation error',
+            recoveryError,
+          );
+        }
+      }
 
       // Try to clear signup session as we've completed the flow
       try {

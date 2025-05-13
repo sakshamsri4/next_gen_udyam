@@ -13,7 +13,7 @@ import 'package:next_gen/app/modules/applicant_review/views/widgets/communicatio
 import 'package:next_gen/app/modules/applications/models/application_model.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
 import 'package:next_gen/app/shared/widgets/empty_state.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/core/theme/role_themes.dart';
 
 /// A view for reviewing applicants
@@ -68,7 +68,7 @@ class ApplicantReviewView extends GetView<ApplicantReviewController> {
         ],
       ),
       drawer: const CustomDrawer(),
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       floatingActionButton: Obx(() {
         final selectedCount = controller.selectedApplications.length;
         if (selectedCount == 0) {

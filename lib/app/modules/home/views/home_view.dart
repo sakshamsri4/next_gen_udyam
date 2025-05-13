@@ -9,7 +9,7 @@ import 'package:next_gen/app/modules/home/views/employee_home_view.dart';
 import 'package:next_gen/app/modules/home/views/widgets/body.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/core/theme/theme_controller.dart';
 import 'package:next_gen/ui/components/avatars/custom_avatar.dart';
 
@@ -74,7 +74,7 @@ class _HomeViewState extends State<HomeView> {
       return Scaffold(
         key: _scaffoldKey,
         backgroundColor: theme.scaffoldBackgroundColor,
-        bottomNavigationBar: const RoleBasedBottomNav(),
+        bottomNavigationBar: const UnifiedBottomNav(),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,

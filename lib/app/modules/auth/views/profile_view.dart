@@ -6,44 +6,83 @@ import 'package:next_gen/app/modules/auth/views/widgets/edit_profile_dialog.dart
 import 'package:next_gen/app/modules/auth/views/widgets/profile_completion_indicator.dart';
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/mixins/keep_alive_mixin.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
+import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 
-class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
+/// Profile view for displaying and editing user profile information
+///
+/// This view uses GetViewKeepAliveMixin to preserve state when switching tabs.
+class ProfileView extends GetView<AuthController>
+    with GetViewKeepAliveMixin<AuthController> {
+  /// Creates a profile view
+  ProfileView({super.key});
 
-  @override
-  State<ProfileView> createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView> {
-  late final AuthController controller;
+  // Get the navigation controller
   late final NavigationController navigationController;
 
-  @override
-  void initState() {
-    super.initState();
-    // Get the controllers
-    controller = Get.find<AuthController>();
+  // Logger for debugging
+  late final LoggerService _logger;
 
-    // Get or register NavigationController
-    if (Get.isRegistered<NavigationController>()) {
-      navigationController = Get.find<NavigationController>();
-    } else {
-      navigationController = Get.put(NavigationController(), permanent: true);
+  // Initialize logger
+  void _initLogger() {
+    try {
+      _logger = Get.find<LoggerService>();
+    } catch (e) {
+      debugPrint('Error finding LoggerService: $e');
+      _logger = LoggerService();
+      Get.put(_logger, permanent: true);
     }
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Update the navigation index after dependencies are resolved
-    // This is safer than using initState with a post-frame callback
-    navigationController.selectedIndex.value = 4;
-  }
+  Widget buildContent(BuildContext context) {
+    // Initialize logger
+    _initLogger();
+    _logger.i('ProfileView: Building profile view');
 
-  @override
-  Widget build(BuildContext context) {
+    // Initialize the navigation controller
+    try {
+      if (!Get.isRegistered<NavigationController>()) {
+        _logger.d(
+          'ProfileView: NavigationController not registered, registering now',
+        );
+        navigationController = Get.put(NavigationController(), permanent: true);
+      } else {
+        _logger.d('ProfileView: Found existing NavigationController');
+        navigationController = Get.find<NavigationController>();
+      }
+    } catch (e) {
+      _logger.e('ProfileView: Error initializing NavigationController', e);
+      // Create a fallback controller
+      navigationController = NavigationController();
+      Get.put(navigationController, permanent: true);
+    }
+
+    // Ensure the navigation index is set correctly
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _logger.d(
+        'ProfileView: Updating navigation index for route ${Routes.profile}',
+      );
+      navigationController.updateIndexFromRoute(Routes.profile);
+    });
+
+    // Check if AuthController is properly initialized
+    _logger
+      ..d(
+        'ProfileView: AuthController loading state: ${controller.isLoading.value}',
+      )
+      ..d(
+        'ProfileView: AuthController user: ${controller.user.value?.uid ?? 'null'}',
+      );
+
+    // Ensure the user data is loaded
+    if (controller.isLoading.value) {
+      _logger.i('ProfileView: AuthController is loading, refreshing user data');
+      controller.refreshUser();
+    }
+
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -57,15 +96,34 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ],
       ),
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       body: Obx(() {
+        _logger.d(
+          'ProfileView: Rendering body, isLoading: ${controller.isLoading.value}',
+        );
+
         if (controller.isLoading.value) {
+          _logger.i('ProfileView: Showing loading indicator');
+          // Add a timeout to force refresh if loading takes too long
+          Future.delayed(const Duration(seconds: 5), () {
+            if (controller.isLoading.value) {
+              _logger.w('ProfileView: Loading timeout, forcing refresh');
+              controller.refreshUser();
+            }
+          });
           return const Center(child: CircularProgressIndicator());
         }
 
         final user = controller.user.value;
+        _logger.d('ProfileView: User value: ${user?.uid ?? 'null'}');
 
         if (user == null) {
+          _logger.w('ProfileView: User is null, showing error message');
+          // Try to recover by refreshing the user
+          Future.delayed(const Duration(seconds: 1), () {
+            _logger.i('ProfileView: Attempting to recover by refreshing user');
+            controller.refreshUser();
+          });
           return const Center(
             child: Text('User not found. Please login again.'),
           );
@@ -252,6 +310,7 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
+  /// Show logout confirmation dialog
   void _showLogoutConfirmation(BuildContext context) {
     Get.dialog<void>(
       AlertDialog(

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/auth/controllers/auth_controller.dart';
+import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/theme/role_themes.dart';
 
 /// Profile completion indicator widget
@@ -12,15 +13,48 @@ class ProfileCompletionIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<AuthController>();
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+
+    // Get logger
+    LoggerService? logger;
+    try {
+      logger = Get.find<LoggerService>();
+    } catch (e) {
+      debugPrint('Error finding LoggerService: $e');
+    }
+
+    // Safely get the AuthController
+    AuthController? controller;
+    try {
+      controller = Get.find<AuthController>();
+      logger?.d('ProfileCompletionIndicator: Found AuthController');
+    } catch (e) {
+      logger?.e('ProfileCompletionIndicator: Error finding AuthController', e);
+      debugPrint('Error finding AuthController: $e');
+      // Return a placeholder if controller is not found
+      return Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: const Center(
+            child: Text('Unable to load profile completion data'),
+          ),
+        ),
+      );
+    }
 
     // Calculate completion percentage
     final user = controller.user.value;
     if (user == null) {
+      logger?.w('ProfileCompletionIndicator: User is null');
       return const SizedBox.shrink();
     }
+
+    logger?.d('ProfileCompletionIndicator: Building with user ${user.uid}');
 
     // Calculate profile completion percentage
     final completionItems = <CompletionItem>[

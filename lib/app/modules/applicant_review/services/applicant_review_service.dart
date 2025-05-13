@@ -18,6 +18,10 @@ class ApplicantReviewService {
   final LoggerService _logger;
 
   /// Get all applications for a job
+  ///
+  /// Note: This query requires a composite index on 'jobId' and 'appliedAt'
+  /// If you encounter a FirebaseException about missing indexes, you need to create
+  /// this index in the Firebase console or follow the link in the error message.
   Future<List<ApplicationModel>> getJobApplications(String jobId) async {
     try {
       _logger.i('Getting applications for job: $jobId');
@@ -30,7 +34,17 @@ class ApplicantReviewService {
 
       return snapshot.docs.map(ApplicationModel.fromFirestore).toList();
     } catch (e) {
-      _logger.e('Error getting job applications', e);
+      // Check if this is a missing index error
+      if (e.toString().contains('failed-precondition') &&
+          e.toString().contains('index')) {
+        _logger.e(
+          'Missing Firestore index for job applications query. '
+          'Please create a composite index on "jobId" and "appliedAt".',
+          e,
+        );
+      } else {
+        _logger.e('Error getting job applications', e);
+      }
       return [];
     }
   }

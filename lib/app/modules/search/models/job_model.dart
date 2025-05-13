@@ -172,6 +172,22 @@ class JobModel {
   @HiveField(19)
   final bool isActive;
 
+  /// Match percentage for the job based on user profile (0-100)
+  /// This is a calculated field, not stored in the database
+  int? get matchPercentage {
+    // In a real implementation, this would be calculated based on the user's profile
+    // For now, we'll return a random value between 60 and 95
+    if (_cachedMatchPercentage == null) {
+      // Use a deterministic approach based on job ID to ensure consistency
+      final hash = id.hashCode.abs();
+      _cachedMatchPercentage = 60 + (hash % 36); // Range: 60-95
+    }
+    return _cachedMatchPercentage;
+  }
+
+  // Cache the match percentage to ensure consistency
+  int? _cachedMatchPercentage;
+
   /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {

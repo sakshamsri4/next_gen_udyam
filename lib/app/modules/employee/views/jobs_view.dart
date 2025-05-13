@@ -4,21 +4,39 @@ import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/employee/controllers/jobs_controller.dart';
 import 'package:next_gen/app/modules/employee/views/widgets/simple_filter_modal.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
-import 'package:next_gen/app/modules/search/views/widgets/job_card.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
+import 'package:next_gen/app/shared/mixins/keep_alive_mixin.dart';
 import 'package:next_gen/app/shared/widgets/role_based_layout.dart';
 import 'package:next_gen/core/theme/role_themes.dart';
+import 'package:next_gen/ui/components/cards/unified_job_card.dart';
 
 /// Jobs view for employee users
 ///
 /// This screen combines search and saved jobs functionality in a single tab
 /// with segmented views. It allows users to search for jobs and access their
 /// saved jobs in one place.
-class JobsView extends GetView<JobsController> {
+class JobsView extends GetView<JobsController>
+    with GetViewKeepAliveMixin<JobsController> {
   /// Creates a jobs view
-  const JobsView({super.key});
+  JobsView({super.key});
+
+  // Get the navigation controller
+  late final NavigationController navigationController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildContent(BuildContext context) {
+    // Initialize the navigation controller
+    if (!Get.isRegistered<NavigationController>()) {
+      navigationController = Get.put(NavigationController(), permanent: true);
+    } else {
+      navigationController = Get.find<NavigationController>();
+    }
+
+    // Ensure the navigation index is set correctly
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      navigationController.updateIndexFromRoute('/jobs');
+    });
+
     return RoleBasedLayout(
       title: 'Jobs',
       body: Column(
@@ -222,10 +240,15 @@ class JobsView extends GetView<JobsController> {
       itemCount: jobs.length,
       itemBuilder: (context, index) {
         final job = jobs[index];
-        return JobCard(
-          job: job,
+        return UnifiedJobCard.fromModel(
+          jobModel: job,
           onTap: () => controller.viewJobDetails(job),
-          onSave: () => controller.toggleSaveJob(job),
+          onSave: ({required bool isLiked}) async {
+            controller.toggleSaveJob(job);
+            return !isLiked; // Toggle the saved state
+          },
+          isSaved: controller.isSaved(job.id),
+          matchPercentage: job.matchPercentage,
         );
       },
     );

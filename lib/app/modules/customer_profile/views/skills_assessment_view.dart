@@ -5,7 +5,7 @@ import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/customer_profile/controllers/customer_profile_controller.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
 
@@ -33,7 +33,7 @@ class SkillsAssessmentView extends GetView<CustomerProfileController> {
         ),
       ),
       drawer: const CustomDrawer(),
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.w),
         child: Column(
