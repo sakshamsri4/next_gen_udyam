@@ -10,7 +10,7 @@ import 'package:next_gen/app/modules/search/views/widgets/job_card.dart';
 import 'package:next_gen/app/modules/search/views/widgets/search_history_item.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/core/theme/role_themes.dart';
 import 'package:next_gen/widgets/neopop_button.dart';
 import 'package:responsive_builder/responsive_builder.dart';
@@ -89,7 +89,7 @@ class _SearchViewState extends State<SearchView> {
           ),
         ],
       ),
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       body: ResponsiveBuilder(
         builder: (context, sizingInformation) {
           // Determine if we're on a mobile device
@@ -474,21 +474,20 @@ class _SearchViewState extends State<SearchView> {
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(employeeBlue),
                             )
-                          : Obx(
-                              () => TextButton(
-                                onPressed: controller.hasMoreResults.value
-                                    ? controller.loadMoreResults
-                                    : null,
-                                child: Text(
-                                  controller.hasMoreResults.value
-                                      ? 'Load More'
-                                      : 'No More Results',
-                                  style: TextStyle(
-                                    color: controller.hasMoreResults.value
-                                        ? employeeBlue
-                                        : Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          : TextButton(
+                              // No need for nested Obx here as we're already in a reactive context
+                              onPressed: controller.hasMoreResults.value
+                                  ? controller.loadMoreResults
+                                  : null,
+                              child: Text(
+                                controller.hasMoreResults.value
+                                    ? 'Load More'
+                                    : 'No More Results',
+                                style: TextStyle(
+                                  color: controller.hasMoreResults.value
+                                      ? employeeBlue
+                                      : Colors.grey,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),

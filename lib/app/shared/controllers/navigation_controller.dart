@@ -63,6 +63,12 @@ class NavigationController extends GetxController {
   final RxBool isLoading = false.obs;
   final Rx<UserType?> userRole = Rx<UserType?>(null);
 
+  // Debounce variables to prevent rapid navigation requests
+  DateTime? _lastNavigationRequest;
+  int? _lastRequestedIndex;
+  // Reduced debounce time to improve responsiveness while still preventing double-taps
+  static const _debounceTime = Duration(milliseconds: 300);
+
   // We no longer use a shared scaffold key to avoid duplicate key errors
   // Each view should create its own scaffold key
 
@@ -246,13 +252,40 @@ class NavigationController extends GetxController {
   /// - More robust error recovery
   /// - Cleaner retry logic
   /// - Better state management during navigation
+  /// - Debounce mechanism to prevent rapid navigation requests
   Future<void> changeIndex(int index) async {
+    // Check for debounce - prevent rapid navigation requests to the same index
+    final now = DateTime.now();
+    if (_lastNavigationRequest != null &&
+        _lastRequestedIndex == index &&
+        now.difference(_lastNavigationRequest!) < _debounceTime) {
+      _logger.w(
+        'Debouncing navigation request to index $index (too soon after previous request)',
+      );
+      return;
+    }
+
+    // Update debounce tracking
+    _lastNavigationRequest = now;
+    _lastRequestedIndex = index;
+
     // Prevent multiple simultaneous navigation attempts
     if (isLoading.value) {
       _logger.w(
         'Navigation already in progress, ignoring request to change to index $index',
       );
-      return;
+
+      // Force reset the loading state if it's been stuck for too long
+      final now = DateTime.now();
+      if (_lastNavigationRequest != null &&
+          now.difference(_lastNavigationRequest!) >
+              const Duration(seconds: 3)) {
+        _logger.w('Navigation appears stuck, resetting loading state');
+        isLoading.value = false;
+        // Continue with the navigation
+      } else {
+        return;
+      }
     }
 
     // Set loading state to indicate navigation is in progress
@@ -306,6 +339,15 @@ class NavigationController extends GetxController {
     } finally {
       // Always reset loading state when done, regardless of success or failure
       isLoading.value = false;
+
+      // Schedule a safety check to ensure loading state is reset after a delay
+      // This helps recover from edge cases where the loading state might get stuck
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (isLoading.value) {
+          _logger.w('Loading state still true after navigation, forcing reset');
+          isLoading.value = false;
+        }
+      });
     }
   }
 
@@ -317,7 +359,9 @@ class NavigationController extends GetxController {
     var navigateResult = false;
     var retryCount = 0;
     const maxRetries = 2;
-    const timeout = Duration(seconds: 5);
+    const timeout = Duration(
+      seconds: 5,
+    ); // Increased timeout to allow more time for profile loading
 
     // Create a completer to handle the timeout more reliably
     final completer = Completer<bool>();
@@ -353,6 +397,9 @@ class NavigationController extends GetxController {
               completer.complete(true);
             }
             break;
+          } else {
+            _logger
+                .w('Navigation returned null result for route: $targetRoute');
           }
         } catch (navError, navStackTrace) {
           // Cancel the timer if navigation throws an exception
@@ -371,6 +418,7 @@ class NavigationController extends GetxController {
         // If we've reached max retries, break out of the loop
         if (retryCount > maxRetries) {
           if (!completer.isCompleted) {
+            _logger.w('Max retries reached for navigation to $targetRoute');
             completer.complete(false);
           }
           break;

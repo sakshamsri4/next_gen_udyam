@@ -125,9 +125,10 @@ class EmployerDrawerNav extends StatelessWidget {
                     primaryColor: primaryColor,
                     onTap: () {
                       // Close the drawer
-                      Get.back<void>();
-                      // Navigate to analytics
-                      Get.toNamed<dynamic>('/employer-analytics');
+                      Get
+                        ..back<void>()
+                        // Navigate to analytics
+                        ..toNamed<dynamic>('/employer-analytics');
                     },
                   ),
                   _buildAdditionalItem(
@@ -137,9 +138,10 @@ class EmployerDrawerNav extends StatelessWidget {
                     primaryColor: primaryColor,
                     onTap: () {
                       // Close the drawer
-                      Get.back<void>();
-                      // Navigate to settings
-                      Get.toNamed<dynamic>('/settings');
+                      Get
+                        ..back<void>()
+                        // Navigate to settings
+                        ..toNamed<dynamic>('/settings');
                     },
                   ),
 

@@ -194,7 +194,7 @@ class InterviewCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(26), // 0.1 * 255 ≈ 26,
         borderRadius: BorderRadius.circular(4.r),
       ),
       child: Text(
@@ -242,7 +242,7 @@ class InterviewCard extends StatelessWidget {
 
   /// Get border color
   Color _getBorderColor(InterviewStatus status) {
-    return _getStatusColor(status).withOpacity(0.3);
+    return _getStatusColor(status).withAlpha(76); // 0.3 * 255 ≈ 76
   }
 
   /// Get interview type icon

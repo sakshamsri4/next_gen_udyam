@@ -34,7 +34,7 @@ class JobPerformanceTable extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13), // 0.05 * 255 ≈ 13,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -59,7 +59,8 @@ class JobPerformanceTable extends StatelessWidget {
                   Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                      color: theme.textTheme.bodySmall?.color
+                          ?.withAlpha(179), // 0.7 * 255 ≈ 179,
                     ),
                   ),
                 ],
@@ -67,7 +68,8 @@ class JobPerformanceTable extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: RoleThemes.employerPrimary.withOpacity(0.1),
+                  color: RoleThemes.employerPrimary
+                      .withAlpha(26), // 0.1 * 255 ≈ 26,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: HeroIcon(
@@ -103,7 +105,7 @@ class JobPerformanceTable extends StatelessWidget {
           decoration: BoxDecoration(
             color: isDarkMode
                 ? Colors.grey[800]
-                : RoleThemes.employerPrimary.withOpacity(0.1),
+                : RoleThemes.employerPrimary.withAlpha(26), // 0.1 * 255 ≈ 26,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(8.r),
               topRight: Radius.circular(8.r),
@@ -194,7 +196,7 @@ class JobPerformanceTable extends StatelessWidget {
                     padding:
                         EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
                     decoration: BoxDecoration(
-                      color: conversionColor.withOpacity(0.1),
+                      color: conversionColor.withAlpha(26), // 0.1 * 255 ≈ 26,
                       borderRadius: BorderRadius.circular(4.r),
                     ),
                     child: Text(

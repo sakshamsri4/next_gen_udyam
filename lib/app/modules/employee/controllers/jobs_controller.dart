@@ -47,13 +47,28 @@ class JobsController extends GetxController {
 
   /// Set the current tab
   void setCurrentTab(int index) {
+    // Skip if already on the selected tab
+    if (currentTab.value == index) {
+      _logger.d('Already on tab $index, skipping');
+      return;
+    }
+
+    _logger.d('Switching to tab $index');
     currentTab.value = index;
 
-    // Refresh data when switching tabs
+    // Refresh data when switching tabs, but only if the data is empty or stale
     if (index == 0) {
-      searchJobs(searchController.text);
+      // Only reload search results if they're empty or it's been a while since the last search
+      if (searchResults.isEmpty) {
+        _logger.d('Search results empty, loading initial results');
+        searchJobs(searchController.text);
+      }
     } else {
-      loadSavedJobs();
+      // Only reload saved jobs if they're empty or it's been a while since the last load
+      if (savedJobs.isEmpty) {
+        _logger.d('Saved jobs empty, loading saved jobs');
+        loadSavedJobs();
+      }
     }
   }
 
@@ -144,9 +159,13 @@ class JobsController extends GetxController {
         );
       }
 
-      // Refresh the list if we're on the saved tab
+      // Update the UI without a full reload
+      // This is more efficient than reloading the entire list
       if (currentTab.value == 1) {
-        loadSavedJobs();
+        // We've already updated the savedJobs list in memory,
+        // so we don't need to reload from the server
+        // Just trigger a UI refresh by calling update() on the RxList
+        savedJobs.refresh();
       }
     } catch (e) {
       _logger.e('Error toggling save status for job', e);

@@ -36,15 +36,31 @@ class ApplicationsService {
       // Check if this is a missing index error
       if (e.toString().contains('failed-precondition') &&
           e.toString().contains('index')) {
-        _logger.e(
-          'Missing Firestore index for applications query. '
-          'Please create a composite index on "userId" and "appliedAt".',
-          e,
+        const errorMessage = 'Missing Firestore index for applications query. '
+            'Please create a composite index on "userId" and "appliedAt".';
+
+        // Extract the URL from the error message if available
+        String? indexUrl;
+        final errorString = e.toString();
+        final urlMatch =
+            RegExp(r'https://console\.firebase\.google\.com/[^\s]+')
+                .firstMatch(errorString);
+
+        if (urlMatch != null) {
+          indexUrl = urlMatch.group(0);
+          _logger.i('Index creation URL: $indexUrl');
+        }
+
+        _logger.e(errorMessage, e);
+
+        // Rethrow with more context to allow the controller to handle it appropriately
+        throw Exception(
+          '$errorMessage${indexUrl != null ? ' URL: $indexUrl' : ''}',
         );
       } else {
         _logger.e('Error getting user applications', e);
+        rethrow; // Rethrow to allow the controller to handle it
       }
-      return [];
     }
   }
 
@@ -188,8 +204,20 @@ class ApplicationsService {
 
       return counts;
     } catch (e) {
-      _logger.e('Error getting application counts', e);
-      return {};
+      // If this is an index error, we want to propagate it to the controller
+      if (e.toString().contains('Missing Firestore index')) {
+        _logger.e('Error getting application counts due to missing index', e);
+        rethrow;
+      } else {
+        _logger.e('Error getting application counts', e);
+
+        // Return empty counts map with all statuses initialized to 0
+        final counts = <ApplicationStatus, int>{};
+        for (final status in ApplicationStatus.values) {
+          counts[status] = 0;
+        }
+        return counts;
+      }
     }
   }
 }

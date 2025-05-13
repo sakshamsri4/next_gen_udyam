@@ -125,9 +125,10 @@ class EmployeeDrawerNav extends StatelessWidget {
                     primaryColor: primaryColor,
                     onTap: () {
                       // Close the drawer
-                      Get.back<void>();
-                      // Navigate to settings
-                      Get.toNamed<dynamic>('/settings');
+                      Get
+                        ..back<void>()
+                        // Navigate to settings
+                        ..toNamed<dynamic>('/settings');
                     },
                   ),
 

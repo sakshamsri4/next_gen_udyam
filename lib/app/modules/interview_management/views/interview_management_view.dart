@@ -9,7 +9,7 @@ import 'package:next_gen/app/modules/interview_management/models/interview_model
 import 'package:next_gen/app/modules/interview_management/views/widgets/interview_card.dart';
 import 'package:next_gen/app/modules/interview_management/views/widgets/interview_details.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/core/theme/role_themes.dart';
 
 /// Interview management view
@@ -41,7 +41,7 @@ class InterviewManagementView extends GetView<InterviewManagementController> {
         ],
       ),
       drawer: const CustomDrawer(),
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showScheduleInterviewForm(context),
         backgroundColor: RoleThemes.employerPrimary,

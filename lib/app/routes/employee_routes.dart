@@ -20,7 +20,7 @@ class EmployeeRoutes {
         // Discover tab (Home)
         GetPage<dynamic>(
           name: Routes.home,
-          page: () => const DiscoverView(),
+          page: DiscoverView.new,
           binding: EmployeeHomeBinding(),
           bindings: [NavigationBinding()],
           transition: Transition.fadeIn,
@@ -47,7 +47,7 @@ class EmployeeRoutes {
         // Profile tab
         GetPage<dynamic>(
           name: Routes.profile,
-          page: () => const ProfileView(),
+          page: ProfileView.new,
           binding: AuthBinding(),
           bindings: [NavigationBinding()],
           transition: Transition.fadeIn,

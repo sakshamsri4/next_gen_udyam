@@ -10,7 +10,7 @@ import 'package:next_gen/app/modules/applications/views/widgets/application_anal
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/mixins/keep_alive_mixin.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/ui/components/loaders/custom_lottie.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/applications_shimmer.dart';
@@ -21,11 +21,25 @@ class ApplicationsView extends GetView<ApplicationsController>
   /// Constructor
   ApplicationsView({super.key});
 
+  // Get the navigation controller
+  late final NavigationController navigationController;
+
   @override
   Widget buildContent(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final navigationController = Get.find<NavigationController>();
+
+    // Initialize the navigation controller
+    if (!Get.isRegistered<NavigationController>()) {
+      navigationController = Get.put(NavigationController(), permanent: true);
+    } else {
+      navigationController = Get.find<NavigationController>();
+    }
+
+    // Ensure the navigation index is set correctly
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      navigationController.updateIndexFromRoute('/applications');
+    });
 
     // Create a local scaffold key for this view
     final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -46,7 +60,7 @@ class ApplicationsView extends GetView<ApplicationsController>
         ),
       ),
       drawer: const CustomDrawer(),
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       body: RefreshIndicator(
         onRefresh: controller.refreshApplications,
         child: Obx(() {
@@ -75,28 +89,49 @@ class ApplicationsView extends GetView<ApplicationsController>
 
   /// Build error state
   Widget _buildErrorState(ThemeData theme, String error) {
+    // Check if this is a Firestore index error
+    final isIndexError = error.contains('Missing Firestore index');
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const HeroIcon(
-            HeroIcons.exclamationTriangle,
+          HeroIcon(
+            isIndexError
+                ? HeroIcons.serverStack
+                : HeroIcons.exclamationTriangle,
             size: 64,
-            color: Colors.orange,
+            color: isIndexError ? Colors.blue : Colors.orange,
           ),
           const SizedBox(height: 16),
           Text(
-            'Error',
+            isIndexError ? 'Database Setup Required' : 'Error',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            error,
-            style: theme.textTheme.bodyLarge,
-            textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              error,
+              style: theme.textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
           ),
+          if (isIndexError) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                'This is a one-time setup. Please check the console logs and click the Firebase link to create the required index.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontStyle: FontStyle.italic,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: controller.refreshApplications,
@@ -115,7 +150,8 @@ class ApplicationsView extends GetView<ApplicationsController>
         children: [
           CustomLottie(
             title: 'No Applications Yet',
-            asset: 'assets/animations/empty.json',
+            asset:
+                'assets/animations/search.json', // Using an existing animation
             assetHeight: 200.h,
           ),
           const SizedBox(height: 16),

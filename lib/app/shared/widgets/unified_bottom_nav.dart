@@ -40,6 +40,12 @@ class _UnifiedBottomNavState extends State<UnifiedBottomNav> {
   // Workers to listen for changes
   final List<Worker> _workers = [];
 
+  // Debounce for tap handling
+  DateTime? _lastTapTime;
+  int? _lastTappedIndex;
+  // Reduced debounce time to improve responsiveness while still preventing double-taps
+  static const _tapDebounceTime = Duration(milliseconds: 300);
+
   @override
   void initState() {
     super.initState();
@@ -309,16 +315,60 @@ class _UnifiedBottomNavState extends State<UnifiedBottomNav> {
     Color primaryColor,
     Color primaryLightColor,
   ) {
-    // Safely handle navigation tap with error handling
+    // Safely handle navigation tap with error handling and debounce
     void handleNavTap() {
       try {
         if (_navigationController != null) {
+          // Check for debounce to prevent rapid taps
+          final now = DateTime.now();
+          if (_lastTapTime != null &&
+              _lastTappedIndex == index &&
+              now.difference(_lastTapTime!) < _tapDebounceTime) {
+            _logger?.d(
+              'Debouncing tap on navigation item $index (too soon after previous tap)',
+            );
+            return;
+          }
+
+          // Update debounce tracking
+          _lastTapTime = now;
+          _lastTappedIndex = index;
+
+          // Skip if already selected
+          if (index == _selectedIndex) {
+            _logger?.d('Navigation item $index is already selected');
+            return;
+          }
+
           // Show visual feedback that the tap was registered
           HapticFeedback.lightImpact();
 
           // Change the index with a slight delay to allow the haptic feedback to complete
-          Future.delayed(const Duration(milliseconds: 50), () {
-            _navigationController!.changeIndex(index);
+          // Also check if the navigation controller is still in a loading state
+          Future.delayed(const Duration(milliseconds: 30), () {
+            if (_navigationController != null) {
+              // Check if navigation is already in progress
+              if (_navigationController!.isLoading.value) {
+                _logger?.w(
+                  'Navigation already in progress, will retry after delay',
+                );
+                // If navigation is in progress, try again after a short delay
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  if (_navigationController != null) {
+                    // Force reset loading state if it's still true after the delay
+                    if (_navigationController!.isLoading.value) {
+                      _logger?.w(
+                        'Navigation still loading after delay, forcing reset',
+                      );
+                      _navigationController!.isLoading.value = false;
+                    }
+                    _navigationController!.changeIndex(index);
+                  }
+                });
+              } else {
+                _navigationController!.changeIndex(index);
+              }
+            }
           });
         } else {
           _logger?.w('Navigation controller is null during tap');

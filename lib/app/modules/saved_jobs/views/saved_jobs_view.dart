@@ -7,7 +7,7 @@ import 'package:next_gen/app/modules/saved_jobs/controllers/saved_jobs_controlle
 import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
 import 'package:next_gen/ui/components/cards/custom_job_card.dart';
 import 'package:next_gen/ui/components/loaders/custom_lottie.dart';
@@ -41,7 +41,7 @@ class SavedJobsView extends GetView<SavedJobsController> {
           onPressed: () => navigationController.toggleDrawer(scaffoldKey),
         ),
       ),
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       body: RefreshIndicator(
         onRefresh: controller.refreshSavedJobs,
         child: Obx(() {
@@ -407,7 +407,7 @@ class SavedJobsView extends GetView<SavedJobsController> {
       title: 'No saved jobs yet',
       description:
           'Jobs you save will appear here. Tap the bookmark icon on any job to save it for later.',
-      asset: 'assets/empty.json',
+      asset: 'assets/animations/search.json',
       assetHeight: 200.h,
       titleStyle: GoogleFonts.poppins(
         fontSize: 18.sp,
@@ -430,7 +430,7 @@ class SavedJobsView extends GetView<SavedJobsController> {
     return CustomLottie(
       title: 'Something went wrong',
       description: errorMessage,
-      asset: 'assets/error.json',
+      asset: 'assets/animations/error.json',
       assetHeight: 200.h,
       titleStyle: GoogleFonts.poppins(
         fontSize: 18.sp,

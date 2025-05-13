@@ -98,7 +98,18 @@ class ApplicationsController extends GetxController {
       _statusCounts.assignAll(counts);
     } catch (e) {
       _logger.e('Error loading applications', e);
-      _error.value = 'Failed to load applications';
+
+      // Check if this is a Firestore index error
+      if (e.toString().contains('failed-precondition') &&
+          e.toString().contains('index')) {
+        _error.value =
+            'Missing Firestore index. Please create the required index by clicking the link in the console logs.';
+      } else if (e.toString().contains('network')) {
+        _error.value =
+            'Network error. Please check your internet connection and try again.';
+      } else {
+        _error.value = 'Failed to load applications. Please try again later.';
+      }
     } finally {
       _isLoading.value = false;
     }

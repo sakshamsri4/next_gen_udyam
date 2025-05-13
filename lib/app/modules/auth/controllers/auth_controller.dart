@@ -882,6 +882,7 @@ class AuthController extends GetxController {
   Future<void> refreshUser() async {
     try {
       log.i('Refreshing user data');
+      isLoading.value = true;
 
       // Reload the current user to get updated profile
       if (_auth.currentUser != null) {
@@ -917,6 +918,10 @@ class AuthController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      // Always reset loading state when done
+      isLoading.value = false;
+      log.d('User refresh completed, loading state reset');
     }
   }
 

@@ -84,23 +84,11 @@ class JobSearchView extends GetView<app_search.SearchController> {
             ],
           ),
 
-          // Active filters
-          Obx(() {
-            if (controller.activeFilters.isEmpty) {
-              return const SizedBox.shrink();
-            }
+          // Active filters - no need for nested Obx
+          if (controller.activeFilters.isNotEmpty) _buildActiveFilters(context),
 
-            return _buildActiveFilters(context);
-          }),
-
-          // Saved searches
-          Obx(() {
-            if (controller.savedSearches.isEmpty) {
-              return const SizedBox.shrink();
-            }
-
-            return _buildSavedSearches(context);
-          }),
+          // Saved searches - no need for nested Obx
+          if (controller.savedSearches.isNotEmpty) _buildSavedSearches(context),
         ],
       ),
     );
@@ -234,12 +222,11 @@ class JobSearchView extends GetView<app_search.SearchController> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Obx(
-                () => Text(
-                  '${controller.searchResults.length} Results',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              // No need for nested Obx here
+              Text(
+                '${controller.searchResults.length} Results',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               _buildSortDropdown(theme, isDarkMode),
@@ -249,30 +236,28 @@ class JobSearchView extends GetView<app_search.SearchController> {
 
         // Results list
         Expanded(
-          child: Obx(
-            () => ListView.builder(
-              controller: controller.scrollController,
-              padding: EdgeInsets.all(16.w),
-              itemCount:
-                  controller.searchResults.length + 1, // +1 for load more
-              itemBuilder: (context, index) {
-                // If we're at the end, show load more button or "No more results"
-                if (index == controller.searchResults.length) {
-                  return _buildLoadMoreButton(theme, isDarkMode);
-                }
+          // No need for nested Obx here as we're already in a reactive context
+          child: ListView.builder(
+            controller: controller.scrollController,
+            padding: EdgeInsets.all(16.w),
+            itemCount: controller.searchResults.length + 1, // +1 for load more
+            itemBuilder: (context, index) {
+              // If we're at the end, show load more button or "No more results"
+              if (index == controller.searchResults.length) {
+                return _buildLoadMoreButton(theme, isDarkMode);
+              }
 
-                // Otherwise, show a job card
-                final job = controller.searchResults[index];
-                return JobCard(
-                  job: job,
-                  onTap: () => _onJobTap(job),
-                  onSave: () => controller.toggleSaveJob(job),
-                  onShare: () => controller.shareJob(job),
-                  onQuickApply: () => controller.quickApplyJob(job),
-                  matchPercentage: _calculateMatchPercentage(job),
-                );
-              },
-            ),
+              // Otherwise, show a job card
+              final job = controller.searchResults[index];
+              return JobCard(
+                job: job,
+                onTap: () => _onJobTap(job),
+                onSave: () => controller.toggleSaveJob(job),
+                onShare: () => controller.shareJob(job),
+                onQuickApply: () => controller.quickApplyJob(job),
+                matchPercentage: _calculateMatchPercentage(job),
+              );
+            },
           ),
         ),
       ],
@@ -281,32 +266,31 @@ class JobSearchView extends GetView<app_search.SearchController> {
 
   /// Build sort dropdown
   Widget _buildSortDropdown(ThemeData theme, bool isDarkMode) {
-    return Obx(
-      () => DropdownButton<String>(
-        value: controller.sortOption.value,
-        icon: const HeroIcon(HeroIcons.chevronDown, size: 16),
-        underline: const SizedBox(),
-        style: theme.textTheme.bodyMedium,
-        onChanged: (String? newValue) {
-          if (newValue != null) {
-            controller.setSortOption(newValue);
-          }
-        },
-        items: const [
-          DropdownMenuItem(
-            value: 'relevance',
-            child: Text('Relevance'),
-          ),
-          DropdownMenuItem(
-            value: 'date',
-            child: Text('Date: Newest'),
-          ),
-          DropdownMenuItem(
-            value: 'salary',
-            child: Text('Salary: High to Low'),
-          ),
-        ],
-      ),
+    // No need for Obx here as we're already in a reactive context
+    return DropdownButton<String>(
+      value: controller.sortOption.value,
+      icon: const HeroIcon(HeroIcons.chevronDown, size: 16),
+      underline: const SizedBox(),
+      style: theme.textTheme.bodyMedium,
+      onChanged: (String? newValue) {
+        if (newValue != null) {
+          controller.setSortOption(newValue);
+        }
+      },
+      items: const [
+        DropdownMenuItem(
+          value: 'relevance',
+          child: Text('Relevance'),
+        ),
+        DropdownMenuItem(
+          value: 'date',
+          child: Text('Date: Newest'),
+        ),
+        DropdownMenuItem(
+          value: 'salary',
+          child: Text('Salary: High to Low'),
+        ),
+      ],
     );
   }
 
@@ -315,19 +299,18 @@ class JobSearchView extends GetView<app_search.SearchController> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 16.h),
       child: Center(
-        child: Obx(
-          () => TextButton(
-            onPressed: controller.hasMoreResults.value
-                ? controller.loadMoreResults
-                : null,
-            child: Text(
-              controller.hasMoreResults.value ? 'Load More' : 'No More Results',
-              style: TextStyle(
-                color: controller.hasMoreResults.value
-                    ? RoleThemes.employeePrimary
-                    : Colors.grey,
-                fontWeight: FontWeight.bold,
-              ),
+        // No need for Obx here as we're already in a reactive context
+        child: TextButton(
+          onPressed: controller.hasMoreResults.value
+              ? controller.loadMoreResults
+              : null,
+          child: Text(
+            controller.hasMoreResults.value ? 'Load More' : 'No More Results',
+            style: TextStyle(
+              color: controller.hasMoreResults.value
+                  ? RoleThemes.employeePrimary
+                  : Colors.grey,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),

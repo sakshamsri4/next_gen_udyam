@@ -45,7 +45,7 @@ class InterviewDetails extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(26), // 0.1 * 255 ≈ 26,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -393,7 +393,7 @@ class InterviewDetails extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(26), // 0.1 * 255 ≈ 26,
         borderRadius: BorderRadius.circular(4.r),
       ),
       child: Text(

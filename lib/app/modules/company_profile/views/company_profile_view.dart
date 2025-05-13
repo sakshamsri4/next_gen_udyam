@@ -6,7 +6,7 @@ import 'package:next_gen/app/modules/company_profile/controllers/company_profile
 import 'package:next_gen/app/modules/company_profile/views/widgets/about_us_tab.dart';
 import 'package:next_gen/app/modules/company_profile/views/widgets/company_profile_sliver_app_bar.dart';
 import 'package:next_gen/app/modules/company_profile/views/widgets/jobs_tab.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/profile_shimmer.dart';
 
 /// The company profile view
@@ -20,7 +20,7 @@ class CompanyProfileView extends GetView<CompanyProfileController> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const ProfileShimmer();

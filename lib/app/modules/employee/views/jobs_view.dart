@@ -4,6 +4,7 @@ import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/employee/controllers/jobs_controller.dart';
 import 'package:next_gen/app/modules/employee/views/widgets/simple_filter_modal.dart';
 import 'package:next_gen/app/modules/search/models/job_model.dart';
+import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
 import 'package:next_gen/app/shared/mixins/keep_alive_mixin.dart';
 import 'package:next_gen/app/shared/widgets/role_based_layout.dart';
 import 'package:next_gen/core/theme/role_themes.dart';
@@ -19,8 +20,23 @@ class JobsView extends GetView<JobsController>
   /// Creates a jobs view
   JobsView({super.key});
 
+  // Get the navigation controller
+  late final NavigationController navigationController;
+
   @override
   Widget buildContent(BuildContext context) {
+    // Initialize the navigation controller
+    if (!Get.isRegistered<NavigationController>()) {
+      navigationController = Get.put(NavigationController(), permanent: true);
+    } else {
+      navigationController = Get.find<NavigationController>();
+    }
+
+    // Ensure the navigation index is set correctly
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      navigationController.updateIndexFromRoute('/jobs');
+    });
+
     return RoleBasedLayout(
       title: 'Jobs',
       body: Column(

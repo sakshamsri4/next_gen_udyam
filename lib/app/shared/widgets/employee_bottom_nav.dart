@@ -183,7 +183,12 @@ class _EmployeeBottomNavState extends State<EmployeeBottomNav> {
     required Color primaryLightColor,
   }) {
     return InkWell(
-      onTap: () => _navigationController?.changeIndex(index),
+      onTap: () {
+        if (_navigationController != null &&
+            !_navigationController!.isLoading.value) {
+          _navigationController?.changeIndex(index);
+        }
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(

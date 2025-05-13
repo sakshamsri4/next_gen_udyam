@@ -72,7 +72,7 @@ class AppPages {
           // Return the appropriate view based on role
           switch (userRole) {
             case UserType.employee:
-              return const DiscoverView();
+              return DiscoverView();
             case UserType.employer:
               return const EmployerDashboardView();
             case UserType.admin:
@@ -172,7 +172,7 @@ class AppPages {
     ),
     GetPage<dynamic>(
       name: _Paths.profile,
-      page: () => const ProfileView(),
+      page: ProfileView.new,
       bindings: [AuthBinding(), NavigationBinding()],
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],

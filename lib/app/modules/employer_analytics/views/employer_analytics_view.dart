@@ -8,7 +8,7 @@ import 'package:next_gen/app/modules/employer_analytics/views/widgets/analytics_
 import 'package:next_gen/app/modules/employer_analytics/views/widgets/analytics_charts_part2.dart';
 import 'package:next_gen/app/modules/employer_analytics/views/widgets/job_performance_table.dart';
 import 'package:next_gen/app/shared/widgets/custom_drawer.dart';
-import 'package:next_gen/app/shared/widgets/role_based_bottom_nav.dart';
+import 'package:next_gen/app/shared/widgets/unified_bottom_nav.dart';
 import 'package:next_gen/core/theme/role_themes.dart';
 
 /// Employer analytics view
@@ -53,7 +53,7 @@ class EmployerAnalyticsView extends GetView<EmployerAnalyticsController> {
         ],
       ),
       drawer: const CustomDrawer(),
-      bottomNavigationBar: const RoleBasedBottomNav(),
+      bottomNavigationBar: const UnifiedBottomNav(),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

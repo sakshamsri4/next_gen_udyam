@@ -38,7 +38,7 @@ class AnalyticsLineChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13), // 0.05 * 255 ≈ 13
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -63,7 +63,8 @@ class AnalyticsLineChart extends StatelessWidget {
                   Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                      color: theme.textTheme.bodySmall?.color
+                          ?.withAlpha(179), // 0.7 * 255 ≈ 179,
                     ),
                   ),
                 ],
@@ -71,7 +72,7 @@ class AnalyticsLineChart extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withAlpha(26), // 0.1 * 255 ≈ 26
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: HeroIcon(
@@ -133,7 +134,8 @@ class _LineChartWidget extends StatelessWidget {
             return Text(
               label,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                color: theme.textTheme.bodySmall?.color
+                    ?.withAlpha(179), // 0.7 * 255 ≈ 179,
               ),
             );
           }).toList(),
@@ -165,7 +167,7 @@ class _LineChartPainter extends CustomPainter {
       ..strokeWidth = 3.0;
 
     final fillPaint = Paint()
-      ..color = color.withOpacity(0.2)
+      ..color = color.withAlpha(51) // 0.2 * 255 ≈ 51
       ..style = PaintingStyle.fill;
 
     final dotPaint = Paint()
@@ -204,20 +206,23 @@ class _LineChartPainter extends CustomPainter {
       }
 
       // Draw dots at each data point
-      canvas.drawCircle(Offset(x, y), 5, dotPaint);
-      canvas.drawCircle(Offset(x, y), 5, dotStrokePaint);
+      canvas
+        ..drawCircle(Offset(x, y), 5, dotPaint)
+        ..drawCircle(Offset(x, y), 5, dotStrokePaint);
 
       i++;
     }
 
     // Complete the fill path
-    fillPath.lineTo(size.width, size.height);
-    fillPath.lineTo(0, size.height);
-    fillPath.close();
+    fillPath
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
 
     // Draw the fill and the line
-    canvas.drawPath(fillPath, fillPaint);
-    canvas.drawPath(path, paint);
+    canvas
+      ..drawPath(fillPath, fillPaint)
+      ..drawPath(path, paint);
   }
 
   @override
@@ -259,7 +264,7 @@ class AnalyticsBarChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13), // 0.05 * 255 ≈ 13
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -284,7 +289,8 @@ class AnalyticsBarChart extends StatelessWidget {
                   Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                      color: theme.textTheme.bodySmall?.color
+                          ?.withAlpha(179), // 0.7 * 255 ≈ 179,
                     ),
                   ),
                 ],
@@ -292,7 +298,7 @@ class AnalyticsBarChart extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withAlpha(26), // 0.1 * 255 ≈ 26
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: HeroIcon(

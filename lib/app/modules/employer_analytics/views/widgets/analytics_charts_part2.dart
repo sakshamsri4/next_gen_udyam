@@ -39,7 +39,8 @@ class BarChartWidget extends StatelessWidget {
             return Text(
               label,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                color: theme.textTheme.bodySmall?.color
+                    ?.withAlpha(179), // 0.7 * 255 ≈ 179,
               ),
             );
           }).toList(),
@@ -125,7 +126,7 @@ class AnalyticsFunnelChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13), // 0.05 * 255 ≈ 13,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -150,7 +151,8 @@ class AnalyticsFunnelChart extends StatelessWidget {
                   Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                      color: theme.textTheme.bodySmall?.color
+                          ?.withAlpha(179), // 0.7 * 255 ≈ 179,
                     ),
                   ),
                 ],
@@ -158,7 +160,8 @@ class AnalyticsFunnelChart extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: RoleThemes.employerPrimary.withOpacity(0.1),
+                  color: RoleThemes.employerPrimary
+                      .withAlpha(26), // 0.1 * 255 ≈ 26,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: HeroIcon(
