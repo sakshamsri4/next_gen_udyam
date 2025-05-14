@@ -58,13 +58,14 @@ class AuthService {
 
     // Initialize GoogleSignIn with appropriate configuration
     if (kIsWeb) {
-      // For web, we'll disable Google Sign-In for now
-      // We'll need to add the client ID in index.html later
+      // For web, explicitly set the client ID from index.html
       _googleSignIn = GoogleSignIn(
         scopes: [
           'email',
           'profile',
         ],
+        clientId:
+            '91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com',
       );
     } else {
       // For mobile platforms
@@ -181,29 +182,73 @@ class AuthService {
       // await _analyticsService.logLogin(method: 'google');
 
       if (kIsWeb) {
-        _logger.d('Using web-specific Google sign-in flow');
-        // For web, use Firebase's built-in Google auth provider
-        // This avoids the need for a client ID in the web app
-        final googleProvider = GoogleAuthProvider()
-          ..addScope('email')
-          ..addScope('profile');
-
-        // Sign in with popup
-        final userCredential = await _auth.signInWithPopup(googleProvider);
-        _logger.i(
-          'User signed in with Google successfully:'
-          ' ${userCredential.user?.uid}',
+        _logger.d(
+          'Using web-specific Google sign-in flow with explicit client ID',
         );
+        try {
+          // First try using GoogleSignIn with explicit client ID
+          final googleUser = await _googleSignIn.signIn();
 
-        // Save user to storage
-        if (userCredential.user != null) {
-          await _saveUserToHive(
-            UserModel.fromFirebaseUser(userCredential.user!),
+          if (googleUser == null) {
+            _logger.w('Google sign-in canceled by user');
+            return null; // User canceled the sign-in flow
+          }
+
+          _logger.d('Google sign-in successful, obtaining auth details');
+          // Obtain the auth details from the request
+          final googleAuth = await googleUser.authentication;
+
+          // Create a new credential
+          final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
           );
-          _logger.d('User data saved to local storage');
-        }
 
-        return userCredential;
+          // Sign in to Firebase with the Google credential
+          final userCredential = await _auth.signInWithCredential(credential);
+          _logger.i(
+            'User signed in with Google successfully:'
+            ' ${userCredential.user?.uid}',
+          );
+
+          // Save user to storage
+          if (userCredential.user != null) {
+            await _saveUserToHive(
+              UserModel.fromFirebaseUser(userCredential.user!),
+            );
+            _logger.d('User data saved to local storage');
+          }
+
+          return userCredential;
+        } catch (e, stackTrace) {
+          _logger.w(
+            'Error using GoogleSignIn with explicit client ID, falling back to Firebase popup method',
+            e,
+            stackTrace,
+          );
+
+          // Fallback to Firebase's built-in Google auth provider
+          final googleProvider = GoogleAuthProvider()
+            ..addScope('email')
+            ..addScope('profile');
+
+          // Sign in with popup
+          final userCredential = await _auth.signInWithPopup(googleProvider);
+          _logger.i(
+            'User signed in with Google successfully using fallback method:'
+            ' ${userCredential.user?.uid}',
+          );
+
+          // Save user to storage
+          if (userCredential.user != null) {
+            await _saveUserToHive(
+              UserModel.fromFirebaseUser(userCredential.user!),
+            );
+            _logger.d('User data saved to local storage');
+          }
+
+          return userCredential;
+        }
       } else {
         _logger.d('Using mobile-specific Google sign-in flow');
         try {

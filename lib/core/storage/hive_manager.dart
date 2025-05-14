@@ -88,13 +88,30 @@ class HiveManager {
     _logger.i('Initializing Hive...');
 
     try {
-      // Initialize Hive
-      if (kIsWeb) {
-        _logger.d('Initializing Hive for web');
-        await Hive.initFlutter('next_gen_hive');
-      } else {
-        _logger.d('Initializing Hive for mobile');
-        await Hive.initFlutter();
+      // Initialize Hive with improved web handling
+      try {
+        if (kIsWeb) {
+          _logger.d('Initializing Hive for web');
+          // For web, we'll use a simpler initialization to avoid path issues
+          await Hive.initFlutter();
+          _logger.d('Hive initialized for web successfully');
+        } else {
+          _logger.d('Initializing Hive for mobile');
+          await Hive.initFlutter();
+          _logger.d('Hive initialized for mobile successfully');
+        }
+      } catch (e) {
+        _logger.e('Error during Hive.initFlutter()', e);
+        // If initialization fails, try a fallback approach for web
+        if (kIsWeb) {
+          _logger.d('Trying fallback initialization for web');
+          // On web, we can initialize Hive without Flutter-specific features
+          Hive.init('next_gen_hive');
+          _logger.d('Fallback Hive initialization for web completed');
+        } else {
+          // For non-web platforms, rethrow the error
+          rethrow;
+        }
       }
 
       // Register adapters

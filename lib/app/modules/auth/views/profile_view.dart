@@ -19,46 +19,68 @@ class ProfileView extends GetView<AuthController>
   /// Creates a profile view
   ProfileView({super.key});
 
-  // Get the navigation controller
-  late final NavigationController navigationController;
+  // Navigation controller - accessed via getter to avoid multiple initializations
+  NavigationController? _navigationControllerInstance;
 
-  // Logger for debugging
-  late final LoggerService _logger;
-
-  // Initialize logger
-  void _initLogger() {
-    try {
-      _logger = Get.find<LoggerService>();
-    } catch (e) {
-      debugPrint('Error finding LoggerService: $e');
-      _logger = LoggerService();
-      Get.put(_logger, permanent: true);
+  // Get navigation controller instance safely
+  NavigationController get _navigationController {
+    // Return existing instance if already initialized
+    if (_navigationControllerInstance != null) {
+      return _navigationControllerInstance!;
     }
-  }
 
-  @override
-  Widget buildContent(BuildContext context) {
-    // Initialize logger
-    _initLogger();
-    _logger.i('ProfileView: Building profile view');
-
-    // Initialize the navigation controller
     try {
-      if (!Get.isRegistered<NavigationController>()) {
+      if (Get.isRegistered<NavigationController>()) {
+        _logger.d('ProfileView: Found existing NavigationController');
+        _navigationControllerInstance = Get.find<NavigationController>();
+      } else {
         _logger.d(
           'ProfileView: NavigationController not registered, registering now',
         );
-        navigationController = Get.put(NavigationController(), permanent: true);
-      } else {
-        _logger.d('ProfileView: Found existing NavigationController');
-        navigationController = Get.find<NavigationController>();
+        _navigationControllerInstance =
+            Get.put(NavigationController(), permanent: true);
       }
     } catch (e) {
       _logger.e('ProfileView: Error initializing NavigationController', e);
       // Create a fallback controller
-      navigationController = NavigationController();
-      Get.put(navigationController, permanent: true);
+      _navigationControllerInstance = NavigationController();
+      Get.put(_navigationControllerInstance!, permanent: true);
     }
+
+    return _navigationControllerInstance!;
+  }
+
+  // Logger for debugging - initialized lazily using a static field to avoid immutability issues
+  static LoggerService? _loggerInstance;
+
+  // Get logger instance safely
+  LoggerService get _logger {
+    if (_loggerInstance != null) return _loggerInstance!;
+
+    try {
+      if (Get.isRegistered<LoggerService>()) {
+        _loggerInstance = Get.find<LoggerService>();
+      } else {
+        _loggerInstance = LoggerService();
+        Get.put(_loggerInstance!, permanent: true);
+      }
+    } catch (e) {
+      debugPrint('Error finding LoggerService: $e');
+      _loggerInstance = LoggerService();
+      Get.put(_loggerInstance!, permanent: true);
+    }
+
+    return _loggerInstance!;
+  }
+
+  @override
+  Widget buildContent(BuildContext context) {
+    // Log that we're building the profile view
+    _logger.i('ProfileView: Building profile view');
+
+    // Access the navigation controller via the getter
+    // This ensures it's only initialized once
+    final navigationController = _navigationController;
 
     // Ensure the navigation index is set correctly
     WidgetsBinding.instance.addPostFrameCallback((_) {

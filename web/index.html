@@ -21,7 +21,7 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="NextGen App by Udyam">
 
-  <!-- Firebase Web API Key -->
+  <!-- Firebase Web API Key and Google Sign-In Client ID -->
   <meta name="google-signin-client_id"
     content="91032840429-5f08hs0aod88lsgknf4i5v6h3lu0cf65.apps.googleusercontent.com">
 
@@ -30,9 +30,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Next Gen">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Google Sign-In Client ID -->
-  <meta name="google-signin-client_id" content="YOUR_WEB_CLIENT_ID.apps.googleusercontent.com">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
@@ -98,6 +95,15 @@
     .flutter-loader {
       display: none;
     }
+
+    .error-message {
+      color: #FF5252;
+      margin-top: 20px;
+      max-width: 80%;
+      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -106,6 +112,7 @@
   <div id="loading-indicator" class="loading-container">
     <div class="loading-indicator"></div>
     <div class="loading-text">NEXT GEN</div>
+    <div id="error-container" class="error-message"></div>
   </div>
 
   <!-- Firebase Configuration -->
@@ -140,30 +147,59 @@
 
   <script src="flutter.js" defer></script>
   <script>
+    // Add console logging for debugging
+    console.log('Starting app initialization...');
+
     // The value below is injected by flutter build, do not touch.
-    // Use the template token as recommended in the deprecation notice
     var serviceWorkerVersion = '{{flutter_service_worker_version}}';
 
-    window.addEventListener('load', function (ev) {
-      // Hide loading indicator when Flutter app is ready
-      const loadingIndicator = document.querySelector('#loading-indicator');
+    // Global error handler
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.error('Global error caught:', message, error);
+      document.getElementById('error-container').innerHTML = 'Error: ' + message;
+      return true;
+    };
 
-      // Download main.dart.js
-      // Use load instead of loadEntrypoint as recommended in the deprecation notice
-      _flutter.loader.load({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function (engineInitializer) {
-          engineInitializer.initializeEngine().then(function (appRunner) {
-            // Hide loading indicator before running the app
-            if (loadingIndicator) {
+    window.addEventListener('load', function (ev) {
+      console.log('Window load event fired');
+
+      // Get loading indicator element
+      const loadingIndicator = document.querySelector('#loading-indicator');
+      const errorContainer = document.getElementById('error-container');
+      console.log('Loading indicator element:', loadingIndicator);
+
+      // Simple function to show errors
+      function showError(message) {
+        console.error(message);
+        errorContainer.innerHTML = message;
+      }
+
+      try {
+        // Initialize Flutter
+        console.log('Initializing Flutter...');
+
+        // Use a simpler initialization approach
+        _flutter.loader.loadEntrypoint({
+          serviceWorker: {
+            serviceWorkerVersion: serviceWorkerVersion,
+          },
+          onEntrypointLoaded: function (engineInitializer) {
+            console.log('Entrypoint loaded, initializing engine...');
+            engineInitializer.initializeEngine().then(function (appRunner) {
+              console.log('Engine initialized, running app...');
+              // Hide loading indicator before running the app
               loadingIndicator.style.display = 'none';
-            }
-            appRunner.runApp();
-          });
-        }
-      });
+              appRunner.runApp();
+            }).catch(function (error) {
+              showError('Failed to initialize Flutter engine: ' + error.message);
+            });
+          }
+        }).catch(function (error) {
+          showError('Failed to load Flutter entrypoint: ' + error.message);
+        });
+      } catch (error) {
+        showError('Error during Flutter initialization: ' + error.message);
+      }
     });
 
   </script>

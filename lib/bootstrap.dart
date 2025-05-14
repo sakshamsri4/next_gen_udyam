@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:next_gen/app/modules/auth/services/auth_service.dart';
@@ -260,7 +261,22 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   FlutterError.onError = (details) {
     // Use LoggerService for Flutter errors
     logger.e('FlutterError caught', details.exception, details.stack);
+
+    // For web platform, also log to console for easier debugging
+    if (kIsWeb) {
+      // ignore: avoid_print
+      print('Flutter error: ${details.exception}');
+      // ignore: avoid_print
+      print('Stack trace: ${details.stack}');
+    }
   };
+
+  // Set up platform-specific error handlers
+  if (kIsWeb) {
+    // Web-specific error handling
+    logger.i('Setting up web-specific error handlers');
+    // This is handled in index.html with window.onerror
+  }
 
   // Set up BLoC observer
   Bloc.observer = const AppBlocObserver();
