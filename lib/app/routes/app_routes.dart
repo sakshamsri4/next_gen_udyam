@@ -30,6 +30,10 @@ abstract class Routes {
   static const verificationSuccess = _Paths.verificationSuccess;
   static const employerAnalytics = _Paths.employerAnalytics;
   static const interviewManagement = _Paths.interviewManagement;
+  static const moderation = _Paths.moderation;
+  static const userManagement = _Paths.userManagement;
+  static const systemConfig = _Paths.systemConfig;
+  static const activityLog = _Paths.activityLog;
 }
 
 abstract class _Paths {
@@ -61,4 +65,8 @@ abstract class _Paths {
   static const verificationSuccess = '/verification_success';
   static const employerAnalytics = '/employer-analytics';
   static const interviewManagement = '/interview-management';
+  static const moderation = '/moderation';
+  static const userManagement = '/user-management';
+  static const systemConfig = '/system-config';
+  static const activityLog = '/activity-log';
 }

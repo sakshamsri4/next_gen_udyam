@@ -86,7 +86,7 @@ class AdminSideNav extends StatelessWidget {
                   _buildNavItem(
                     context,
                     icon: HeroIcons.users,
-                    label: 'Users',
+                    label: 'User Management',
                     index: 1,
                     isSelected: selectedIndex == 1,
                     navigationController: navigationController,
@@ -95,8 +95,8 @@ class AdminSideNav extends StatelessWidget {
                   ),
                   _buildNavItem(
                     context,
-                    icon: HeroIcons.documentText,
-                    label: 'Content',
+                    icon: HeroIcons.shieldCheck,
+                    label: 'Content Moderation',
                     index: 2,
                     isSelected: selectedIndex == 2,
                     navigationController: navigationController,
@@ -106,7 +106,7 @@ class AdminSideNav extends StatelessWidget {
                   _buildNavItem(
                     context,
                     icon: HeroIcons.cog6Tooth,
-                    label: 'Settings',
+                    label: 'System Config',
                     index: 3,
                     isSelected: selectedIndex == 3,
                     navigationController: navigationController,
@@ -115,8 +115,8 @@ class AdminSideNav extends StatelessWidget {
                   ),
                   _buildNavItem(
                     context,
-                    icon: HeroIcons.chartBar,
-                    label: 'Analytics',
+                    icon: HeroIcons.user,
+                    label: 'Profile',
                     index: 4,
                     isSelected: selectedIndex == 4,
                     navigationController: navigationController,

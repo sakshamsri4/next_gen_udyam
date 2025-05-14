@@ -94,9 +94,9 @@ class NavigationController extends GetxController {
   // These routes must match the order of tabs in AdminSideNav
   final List<String> _adminRoutes = [
     Routes.dashboard, // Dashboard (index 0)
-    Routes.jobPosting, // Job posting management (index 1)
-    Routes.search, // User management (index 2)
-    Routes.settings, // System settings (index 3)
+    Routes.userManagement, // User management (index 1)
+    Routes.moderation, // Content moderation (index 2)
+    Routes.systemConfig, // System settings (index 3)
     Routes.profile, // Profile (index 4)
   ];
 

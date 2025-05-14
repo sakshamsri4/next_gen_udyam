@@ -49,8 +49,8 @@ class _DashboardViewState extends State<DashboardView> {
           // Register AuthController if not already registered
           authController = Get.put(AuthController(), permanent: true);
         }
-        // Refresh user data
-        authController.refreshUser();
+        // Don't call refreshUser() directly in initState
+        // It will be called in a post-frame callback below
       } catch (e) {
         debugPrint('Error initializing AuthController: $e');
         // Create a new instance as fallback
@@ -80,13 +80,21 @@ class _DashboardViewState extends State<DashboardView> {
         controller = Get.put(DashboardController());
       }
 
-      // Force reload user role in navigation controller
+      // Force reload user role in navigation controller and refresh user data
       // Use addPostFrameCallback instead of Future.delayed for better reliability
       WidgetsBinding.instance.addPostFrameCallback((_) {
         try {
-          navigationController.reloadUserRole();
+          // First refresh user data
+          if (mounted) {
+            authController.refreshUser();
+          }
+
+          // Then reload user role
+          if (mounted) {
+            navigationController.reloadUserRole();
+          }
         } catch (e) {
-          debugPrint('Error reloading user role: $e');
+          debugPrint('Error in post-frame callback: $e');
         }
       });
     } catch (e, stack) {

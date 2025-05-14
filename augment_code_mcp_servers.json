@@ -943,6 +943,14 @@
         "mcp-remote",
         "https://gitmcp.io/idosal/git-mcp"
       ]
+    },
+    {
+      "name": "playwright-docs",
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/microsoft/playwright"
+      ]
     }
   ]
 }

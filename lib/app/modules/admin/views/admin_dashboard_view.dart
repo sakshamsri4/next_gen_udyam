@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:next_gen/app/modules/admin/controllers/admin_dashboard_controller.dart';
+import 'package:next_gen/app/routes/app_pages.dart';
 import 'package:next_gen/app/shared/widgets/role_based_layout.dart';
 import 'package:next_gen/ui/components/loaders/shimmer/shimmer_widget.dart';
 
@@ -54,7 +55,7 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                   primaryColor,
                   onSeeAllPressed: () {
                     // Navigate to moderation screen
-                    Get.toNamed<dynamic>('/moderation');
+                    Get.toNamed<dynamic>(Routes.moderation);
                   },
                 ),
 
@@ -72,7 +73,7 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                   primaryColor,
                   onSeeAllPressed: () {
                     // Navigate to activity log screen
-                    Get.toNamed<dynamic>('/activity-log');
+                    Get.toNamed<dynamic>(Routes.activityLog);
                   },
                 ),
 
@@ -663,11 +664,8 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                   // View button
                   IconButton(
                     onPressed: () {
-                      // Navigate to user details
-                      Get.toNamed<dynamic>(
-                        '/users/details',
-                        arguments: activity.userId,
-                      );
+                      // Navigate to user management screen
+                      Get.toNamed<dynamic>(Routes.userManagement);
                     },
                     icon: HeroIcon(
                       HeroIcons.chevronRight,
@@ -724,28 +722,31 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                 icon: HeroIcons.users,
                 label: 'Users',
                 color: primaryColor,
-                onTap: () => Get.toNamed<dynamic>('/users'),
+                onTap: () => Get.toNamed<dynamic>(Routes.userManagement),
               ),
               _buildQuickActionItem(
                 context,
                 icon: HeroIcons.shieldCheck,
                 label: 'Moderation',
                 color: secondaryColor,
-                onTap: () => Get.toNamed<dynamic>('/moderation'),
+                onTap: () => Get.toNamed<dynamic>(Routes.moderation),
               ),
               _buildQuickActionItem(
                 context,
                 icon: HeroIcons.cog6Tooth,
                 label: 'Settings',
                 color: Colors.grey[700]!,
-                onTap: () => Get.toNamed<dynamic>('/settings'),
+                onTap: () => Get.toNamed<dynamic>(Routes.systemConfig),
               ),
               _buildQuickActionItem(
                 context,
                 icon: HeroIcons.chartBar,
                 label: 'Analytics',
                 color: accentColor,
-                onTap: () => Get.toNamed<dynamic>('/analytics'),
+                onTap: () {
+                  // TODO(developer): Implement analytics screen
+                  // This route doesn't exist yet
+                },
               ),
             ],
           ),
