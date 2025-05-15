@@ -51,6 +51,8 @@ import 'package:next_gen/app/routes/employee_routes.dart';
 import 'package:next_gen/app/routes/employer_routes.dart';
 import 'package:next_gen/app/shared/bindings/navigation_binding.dart';
 import 'package:next_gen/app/shared/controllers/navigation_controller.dart';
+import 'package:next_gen/ui/components/buttons/button_demo_page.dart';
+import 'package:next_gen/ui/pages/theme_demo_page.dart';
 
 part 'app_routes.dart';
 
@@ -287,6 +289,22 @@ class AppPages {
       binding: AuthBinding(),
       transition: Transition.fadeIn,
       middlewares: [OnboardingMiddleware(), AuthMiddleware()],
+    ),
+
+    // Theme demo page
+    GetPage<dynamic>(
+      name: _Paths.themeDemo,
+      page: () => const ThemeDemoPage(),
+      bindings: [NavigationBinding()],
+      transition: Transition.fadeIn,
+    ),
+
+    // Button demo page
+    GetPage<dynamic>(
+      name: _Paths.buttonDemo,
+      page: () => const ButtonDemoPage(),
+      bindings: [NavigationBinding()],
+      transition: Transition.fadeIn,
     ),
   ];
 }

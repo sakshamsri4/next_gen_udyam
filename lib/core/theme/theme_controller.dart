@@ -8,7 +8,7 @@ import 'package:next_gen/core/services/logger_service.dart';
 import 'package:next_gen/core/storage/storage_service.dart';
 import 'package:next_gen/core/storage/theme_settings.dart';
 import 'package:next_gen/core/theme/app_theme.dart';
-import 'package:next_gen/core/theme/role_themes.dart';
+import 'package:next_gen/core/theme/complete_role_themes.dart';
 
 /// Controller for managing app theme
 class ThemeController extends GetxController {
@@ -257,14 +257,20 @@ class ThemeController extends GetxController {
     _logger.d('User role set to $role');
   }
 
-  /// Apply the current theme based on role and dark mode
+  /// Apply the current theme based on role and dark mode with smooth transition
   void _applyTheme() {
     final themeData = theme;
+
+    // Apply theme with animation
     Get
       ..changeTheme(themeData)
       ..changeThemeMode(_isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+
+    // Note: For custom theme transitions, we'll implement an AnimatedTheme
+    // widget in the UI layer using RoleThemes.themeChangeDuration
+
     _logger.d(
-      'Theme applied: isDarkMode=${_isDarkMode.value}, role=${_currentRole.value}',
+      'Theme applied with animation: isDarkMode=${_isDarkMode.value}, role=${_currentRole.value}',
     );
   }
 

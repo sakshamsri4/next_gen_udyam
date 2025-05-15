@@ -34,6 +34,8 @@ abstract class Routes {
   static const userManagement = _Paths.userManagement;
   static const systemConfig = _Paths.systemConfig;
   static const activityLog = _Paths.activityLog;
+  static const themeDemo = _Paths.themeDemo;
+  static const buttonDemo = _Paths.buttonDemo;
 }
 
 abstract class _Paths {
@@ -69,4 +71,6 @@ abstract class _Paths {
   static const userManagement = '/user-management';
   static const systemConfig = '/system-config';
   static const activityLog = '/activity-log';
+  static const themeDemo = '/theme-demo';
+  static const buttonDemo = '/button-demo';
 }
