@@ -1,7 +1,7 @@
 plugins {
     id "com.android.application"
     // START: FlutterFire Configuration
-    id 'com.google.gms.google-services' apply false  // Apply manually after flavor selection
+    id 'com.google.gms.google-services'
     // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
@@ -116,6 +116,3 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.20"
 }
-
-// Apply Google Services plugin after flavor selection
-apply plugin: 'com.google.gms.google-services'
